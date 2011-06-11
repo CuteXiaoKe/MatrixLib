@@ -50,10 +50,9 @@ public class SquareMatrix extends Matrix {
 	 */
 	public boolean isUpperTriangular() {
 		
-		// check upper triangular
 		for (int i = 1; i < this.rows(); i++) {
 			for (int j = 0; j < i; j++) {
-				if (getAt(i,j).equals(new ComplexNumber(0, 0))) {
+				if (!getAt(i,j).equals(new ComplexNumber(0, 0))) {
 					return false;
 				}
 			}
@@ -67,11 +66,10 @@ public class SquareMatrix extends Matrix {
 	 * @return whether the matrix is lower triangular or not
 	 */
 	public boolean isLowerTriangular() {
-		
-		// check upper triangular
-		for (int i = 1; i < this.rows(); i++) {
+
+		for (int i = 0; i < this.rows(); i++) {
 			for (int j = i+1; j < this.cols(); j++) {
-				if (getAt(i,j).equals(new ComplexNumber(0, 0))) {
+				if (!getAt(i,j).equals(new ComplexNumber(0, 0))) {
 					return false;
 				}
 			}

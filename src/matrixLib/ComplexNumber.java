@@ -158,7 +158,17 @@ public class ComplexNumber {
 	 */
 	public String toString() {
 
-		return re + " + " + im + "i";
+		// return only a or bi if the number is real or imaginary
+		if (re == 0) {
+			return Double.toString(im) + "i";
+		}
+		else if (im == 0) {
+			return Double.toString(re);
+		}
+		// otherwise have to return a + bi
+		else {
+			return re + " + " + im + "i";
+		}
 	}
 	
 	/**
