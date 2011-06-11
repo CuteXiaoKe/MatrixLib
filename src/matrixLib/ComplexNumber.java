@@ -9,8 +9,16 @@ public class ComplexNumber {
 
 	private double re;
 	private double im;
-	public final double pi = 3.1415926536;
+	public final double pi = 3.1415926536; // used in arg()
 
+	/**
+	 * Creates the complex number z= (0, 0)
+	 */
+	public ComplexNumber() {
+		this.re = 0;
+		this.im = 0;
+	}
+	
 	/**
 	 * Creates a complex number z = (re, im)
 	 * @param re The real part of z
@@ -72,6 +80,16 @@ public class ComplexNumber {
 	}
 
 	/**
+	 * Scales a complex number by a factor
+	 * @param f the scaling factor
+	 * @return the complex number scaled by f
+	 */
+	public ComplexNumber multiply(float f) {
+		
+		return new ComplexNumber(re*f, im*f);
+	}
+	
+	/**
 	 * Returns the complex conjugate a-bi of this complex number
 	 * @return The complex conjugate of this complex number
 	 */
@@ -86,7 +104,17 @@ public class ComplexNumber {
 	 */
 	public double abs() {
 		
-		return Math.sqrt(re*re + im*im);
+		// if the number is real or imaginary, |z| is simple:
+		if (re == 0.0) {
+			return Math.abs(im);
+		}
+		else if (im == 0.0) {
+			return Math.abs(re);
+		}
+		// otherwise it's the more complicated modulus formula:
+		else {
+			return Math.sqrt(re*re + im*im);
+		}
 	}
 
 	/**
@@ -125,11 +153,11 @@ public class ComplexNumber {
 	}
 	
 	/**
-	 * Returns the a+bi form of this complex number
+	 * Returns the a + bi form of this complex number
 	 * @return The string representation of this number
 	 */
 	public String toString() {
-		
+
 		return re + " + " + im + "i";
 	}
 	

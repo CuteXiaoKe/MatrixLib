@@ -2,13 +2,20 @@ package matrixLib;
 
 /**
  * Represents a matrix over either R or C
- * @author bryan
+ * @author Bryan Cuccioli
  *
  */
 public class Matrix {
 
-	private float[][] matrix;
+	private ComplexNumber[][] matrix;
 	private int rows, cols;
+	
+	/**
+	 * Blank constructor
+	 */
+	public Matrix() {
+		
+	}
 	
 	/**
 	 * Constructs the nxn identity matrix
@@ -16,13 +23,13 @@ public class Matrix {
 	 */
 	public Matrix(int n) {
 		
-		matrix = new float[n][n];
+		matrix = new RealNumber[n][n];
 		rows = n;
 		cols = n;
 		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				matrix[i][j] = (i == j) ? 1 : 0;
+				matrix[i][j] = new RealNumber((i == j) ? 1 : 0);
 			}
 		}
 	}
@@ -33,7 +40,25 @@ public class Matrix {
 	 */
 	public Matrix(float[][] mat) {
 		
-		matrix = new float[mat.length][mat[0].length];
+		matrix = new RealNumber[mat.length][mat[0].length];
+		
+		for (int i = 0; i < mat.length; i++) {
+			for (int j = 0; j < mat[0].length; j++) {
+				matrix[i][j] = new RealNumber(mat[i][j]);
+			}
+		}
+		
+		rows = mat.length;
+		cols = mat[0].length; // the number of columns in the matrix
+	}
+	
+	/**
+	 * Constructs the matrix that wraps the array mat[][]
+	 * @param mat the data to go in the matrix
+	 */
+	public Matrix(ComplexNumber[][] mat) {
+		
+		matrix = new ComplexNumber[mat.length][mat[0].length];
 		
 		for (int i = 0; i < mat.length; i++) {
 			for (int j = 0; j < mat[0].length; j++) {
@@ -46,20 +71,43 @@ public class Matrix {
 	}
 	
 	/**
+	 * Create a new unpopulated rxc matrix
+	 * @param r the number of rows in the matrix
+	 * @param c the number of columns in the matrix
+	 */
+	public Matrix(int r, int c) {
+		
+		matrix = new ComplexNumber[r][c];
+		this.rows = r;
+		this.cols = c;
+	}
+
+	/**
 	 * Gets the element at location (r,c) in the matrix
 	 * @param r the row to retrieve the element from
 	 * @param c the column to retrieve the element from
 	 * @return the element in the matrix at (r,c)
 	 */
-	public float getAt(int r, int c) {
+	public ComplexNumber getAt(int r, int c) {
 		return matrix[r][c];
+	}
+	
+	/**
+	 * Sets the element at (r, c) to something
+	 * @param r the row of the element to set
+	 * @param c the column of the element to set
+	 * @param val the value to set (r, c) to
+	 */
+	public void set(int r, int c, ComplexNumber val) {
+		
+		matrix[r][c] = val;
 	}
 	
 	/**
 	 * Returns the underlying data array
 	 * @return the data array underlying the matrix
 	 */
-	public float[][] getMatrix() {
+	public ComplexNumber[][] getMatrix() {
 		return matrix;
 	}
 
@@ -74,7 +122,7 @@ public class Matrix {
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				sum += matrix[i][j]*matrix[i][j];
+				sum += Math.pow(matrix[i][j].abs(), 2);
 			}
 		}
 		
@@ -85,9 +133,9 @@ public class Matrix {
 	 * Returns the matrix transpose of this matrix
 	 * @return the transpsoe of this matrix
 	 */
-	public Matrix getTranspose() {
+	public Matrix transpose() {
 		
-		float[][] trans = new float[cols][rows];
+		ComplexNumber[][] trans = new ComplexNumber[cols][rows];
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
@@ -102,7 +150,7 @@ public class Matrix {
 	 * Returns the number of rows in the matrix
 	 * @return the number of rows
 	 */
-	public int getRows() {
+	public int rows() {
 		return rows;
 	}
 	
@@ -110,7 +158,7 @@ public class Matrix {
 	 * Returns the number of columns in the matrix
 	 * @return the number of columns
 	 */
-	public int getCols() {
+	public int cols() {
 		return cols;
 	}
 
@@ -123,24 +171,24 @@ public class Matrix {
 	public Matrix multiply(Matrix m) throws DimensionMismatchException {
 		
 		// can only multiply matrices of dimension nxm by mxp
-		if (cols != m.getRows()) {
+		if (cols != m.rows()) {
 			throw new DimensionMismatchException();
 		}
 		
-		float[][] prod = new float[rows][m.getCols()];
+		Matrix prod = new Matrix(rows, m.cols());
+		//ComplexNumber[][] prod = new ComplexNumber[rows][m.cols()];
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-
-				float sum = 0;
 				for (int k = 0; k < cols; k++) {
-					sum += matrix[i][k] * m.getAt(k, j);
+					prod.set(i, j, prod.getAt(i, j).add(matrix[i][k].multiply(m.getAt(k, j))));
+					//prod[i][j] = prod[i][j].add(matrix[i][k].multiply(m.getAt(k, j)));
 				}
-				prod[i][j] = sum;
 			}
 		}
 		
-		return new Matrix(prod);
+		//return new Matrix(prod);
+		return prod;
 	}
 	
 	/**
@@ -151,19 +199,19 @@ public class Matrix {
 	 */
 	public Matrix add(Matrix m) throws DimensionMismatchException {
 		
-		if (m.getRows() != rows || m.getCols() != cols) {
+		if (m.rows() != rows || m.cols() != cols) {
 			throw new DimensionMismatchException();
 		}
 		
-		float[][] sum = new float[rows][cols];
+		Matrix sum = new Matrix(rows, cols);
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				sum[i][j] = matrix[i][j] + m.getAt(i, j);
+				sum.set(i, j, matrix[i][j].add(m.getAt(i, j)));
 			}
 		}
 		
-		return new Matrix(sum);
+		return sum;
 	}
 
 	/**
@@ -173,14 +221,14 @@ public class Matrix {
 	 */
 	public Matrix scale(float factor) {
 		
-		float[][] scaled = new float[rows][cols];
+		Matrix scaled = new Matrix(rows, cols);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < rows; j++) {
-				scaled[i][j] = factor * matrix[i][j];
+				scaled.set(i, j, matrix[i][j].multiply(factor));
 			}
 		}
 		
-		return new Matrix(scaled);
+		return scaled;
 	}
 
 	public String toString() {
@@ -192,7 +240,7 @@ public class Matrix {
 			mstr += "[";
 
 			for (int j = 0; j < cols; j++) {
-				mstr += Float.toString(getAt(i, j));
+				mstr += getAt(i, j).toString();
 				if (j != cols - 1) mstr += ", ";
 				else {
 					mstr += "]";
@@ -209,7 +257,7 @@ public class Matrix {
 	 * Gets the underlying data array for this matrix
 	 * @return the underlying data array for this matrix
 	 */
-	protected float[][] getData() {
+	protected ComplexNumber[][] getData() {
 		
 		return this.matrix;
 	}
@@ -217,7 +265,7 @@ public class Matrix {
 	public boolean equals(Matrix m) {
 		
 		// have to have matching dimension to be equal
-		if (rows != m.getRows() || cols != m.getCols()) {
+		if (rows != m.rows() || cols != m.cols()) {
 			return false;
 		}
 		

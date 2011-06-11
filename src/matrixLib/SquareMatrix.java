@@ -21,7 +21,7 @@ public class SquareMatrix extends Matrix {
 	 * @param mat the underlying data of the matrix
 	 * @throws NotSquareException
 	 */
-	public SquareMatrix(float[][] mat) throws NotSquareException {
+	public SquareMatrix(ComplexNumber[][] mat) throws NotSquareException {
 		
 		super(mat);
 		
@@ -31,15 +31,29 @@ public class SquareMatrix extends Matrix {
 	}
 
 	/**
+	 * Construct the matrix with specified underlying data
+	 * @param mat the underlying data of the matrix
+	 * @throws NotSquareException
+	 */
+	public SquareMatrix(float[][] mat) throws NotSquareException {
+		
+		super(mat);
+		
+		if (mat.length != mat[0].length) {
+			throw new NotSquareException();
+		}
+	}
+	
+	/**
 	 * Tells whether the matrix is upper triangular
 	 * @return whether the matrix is upper triangular or not
 	 */
 	public boolean isUpperTriangular() {
 		
 		// check upper triangular
-		for (int i = 1; i < this.getRows(); i++) {
+		for (int i = 1; i < this.rows(); i++) {
 			for (int j = 0; j < i; j++) {
-				if (getAt(i,j) != 0.0) {
+				if (getAt(i,j).equals(new ComplexNumber(0, 0))) {
 					return false;
 				}
 			}
@@ -55,9 +69,9 @@ public class SquareMatrix extends Matrix {
 	public boolean isLowerTriangular() {
 		
 		// check upper triangular
-		for (int i = 1; i < this.getRows(); i++) {
-			for (int j = i+1; j < this.getCols(); j++) {
-				if (this.getAt(i, j) != 0) {
+		for (int i = 1; i < this.rows(); i++) {
+			for (int j = i+1; j < this.cols(); j++) {
+				if (getAt(i,j).equals(new ComplexNumber(0, 0))) {
 					return false;
 				}
 			}
@@ -84,7 +98,7 @@ public class SquareMatrix extends Matrix {
 	 */
 	public Matrix getInverse() throws SingularMatrixException {
 				
-		if (determinant() == 0) {
+		if (determinant().equals(new ComplexNumber(0, 0))) {
 			// if the matrix has det 0 it is not invertible
 			throw new SingularMatrixException();
 		}
@@ -99,23 +113,23 @@ public class SquareMatrix extends Matrix {
 	 * @return the matrix missing row r and column c
 	 * @throws Exception
 	 */
-	protected float[][] getReducted(int r, int c) throws Exception {
+	protected ComplexNumber[][] getReducted(int r, int c) throws Exception {
 		// returns a matrix without row r or column c
 
-		if (this.getRows() == 1 || this.getCols() == 1) {
+		if (this.rows() == 1 || this.cols() == 1) {
 			throw new Exception("This matrix is too small to reduce any further.");
 		}
 		
 		int targetRow = 0, targetCol = 0;
-		float[][] reduced = new float[this.getRows()-1][this.getCols()-1];
+		ComplexNumber[][] reduced = new ComplexNumber[this.rows()-1][this.cols()-1];
 		
-		for (int sourceRow = 0; sourceRow < this.getRows(); sourceRow++) {
+		for (int sourceRow = 0; sourceRow < this.rows(); sourceRow++) {
 			// if we're at the row to skip, jump back to the top
 			if (sourceRow == r) {
 				continue;
 			}
 			
-			for (int sourceCol = 0; sourceCol < this.getCols(); sourceCol++) {
+			for (int sourceCol = 0; sourceCol < this.cols(); sourceCol++) {
 				if (sourceCol == c) {
 					continue;
 				}
@@ -134,13 +148,13 @@ public class SquareMatrix extends Matrix {
 	 * Returns the determinant of this matrix in O(n!)
 	 * @return the determinant of the matrix
 	 */
-	public float determinant() {
+	public ComplexNumber determinant() {
 
 		// if triangular just take the product along the diagonal
 		if (isUpperTriangular() || isLowerTriangular()) {
-			float prod = 1;
-			for (int i = 0; i < getRows(); i++) {
-				prod *= getAt(i,i);
+			ComplexNumber prod = new ComplexNumber(1, 0);
+			for (int i = 0; i < rows(); i++) {
+				prod = prod.multiply(getAt(i, i));
 			}
 			return prod;
 		}
@@ -157,7 +171,7 @@ public class SquareMatrix extends Matrix {
 	public boolean isSymmetric() {
 		
 		// a symmetric matrix equals its transpose
-		return (this.equals(this.getTranspose()));
+		return (this.equals(this.transpose()));
 	}
 	
 	/**
@@ -167,7 +181,7 @@ public class SquareMatrix extends Matrix {
 	public boolean isAntiSymmetric() {
 				
 		// an antisymmetric matrix equals the negative of its transpose
-		return (this.equals(this.getTranspose().scale(-1)));
+		return (this.equals(this.transpose().scale(-1)));
 	}
 
 	/**
@@ -176,10 +190,10 @@ public class SquareMatrix extends Matrix {
 	 */
 	public boolean isIdentity() {
 		
-		for (int i = 0; i < getRows(); i++) {
-			for (int j = 0; j < getCols(); j++) {
-				if ((i != j && getAt(i,j) != 0)
-						|| (i == j && getAt(i,j) != 1)) {
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				if ((i != j && !getAt(i, j).equals(new ComplexNumber(0, 0)))
+					|| (i == j && !getAt(i, j).equals(new ComplexNumber(1, 0)))) {
 					return false;
 				}
 			}
@@ -195,7 +209,7 @@ public class SquareMatrix extends Matrix {
 	 */
 	public boolean isOrthogonal() throws DimensionMismatchException {
 		
-		return ((SquareMatrix)this.multiply(this.getTranspose())).isIdentity();
+		return ((SquareMatrix)this.multiply(this.transpose())).isIdentity();
 	}
 	
 	/**
@@ -215,21 +229,21 @@ public class SquareMatrix extends Matrix {
 	}
 	
 	// determinant helper method
-	private float determinant(float[][] mat) {
+	private ComplexNumber determinant(ComplexNumber[][] mat) {
 		
 		// precondition: this is a square matrix
 		
 		// base case is 2x2 matrix:
 		if (mat.length == 2) {
-			return mat[0][0]*mat[1][1] - mat[0][1]*mat[1][0];
+			return mat[0][0].multiply(mat[1][1]).subtract(mat[0][1].multiply(mat[1][0]));
 		}
 		
 		int negator = 1;
-		float det = 0;
+		ComplexNumber det = new ComplexNumber(0, 0);
 		
-		for (int i = 0; i < getCols(); i++) {
+		for (int i = 0; i < cols(); i++) {
 			try {
-				det += negator * getAt(0, i) * determinant(getReducted(0, i));
+				det = det.add(getAt(0, i).multiply(negator).multiply(determinant(getReducted(0, i))));
 			} catch (Exception e) {
 				// the matrix ran out of rows or columns to remove - shouldn't happen
 				e.printStackTrace();
@@ -244,12 +258,12 @@ public class SquareMatrix extends Matrix {
 	 * Returns the trace of the matrix, the sum of the diagonal elements
 	 * @return the trace of the matrix
 	 */
-	public float trace() {
+	public ComplexNumber trace() {
 				
-		float tr = 0;
+		ComplexNumber tr = new ComplexNumber(0, 0);
 		
-		for (int i = 0; i < getRows(); i++) {
-			tr += getAt(i, i);
+		for (int i = 0; i < rows(); i++) {
+			tr = tr.add(getAt(i, i));
 		}
 		
 		return tr;
