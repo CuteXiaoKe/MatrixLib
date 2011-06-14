@@ -1,5 +1,7 @@
 package matrixLib;
 
+import java.util.ArrayList;
+
 /**
  * Implementation of vectors (column matrices)
  * @author Bryan Cuccioli
@@ -24,12 +26,30 @@ public class Vector extends Matrix {
 		
 		super(parse(entries));
 	}
-
+	
+	
+	public Vector(float[] entries) {
+	
+		super(parse(entries));
+	}
+	
 	// wraps a 1d array into a 2d column array
 	// used as a helper to the Vector(ComplexNumber[]) constructor
 	private static ComplexNumber[][] parse(ComplexNumber[] array) {
 		
 		ComplexNumber[][] ret = new ComplexNumber[array.length][1];
+		for (int i = 0; i < array.length; i++) {
+			ret[i][0] = array[i];
+		}
+		
+		return ret;
+	}
+	
+	// wraps a 1d array into a 2d column array
+	// used as a helper to the Vector(float[]) constructor
+	private static float[][] parse(float[] array) {
+		
+		float[][] ret = new float[array.length][1];
 		for (int i = 0; i < array.length; i++) {
 			ret[i][0] = array[i];
 		}
@@ -57,7 +77,7 @@ public class Vector extends Matrix {
 	}
 	
 	/**
-	 * Compute the inner product (dot product) of two vectors
+	 * Compute the standard inner product (dot product) of two vectors
 	 * @param v the vector to dot against this
 	 * @return the inner product <this, v> of this vector with v 
 	 */
@@ -67,12 +87,8 @@ public class Vector extends Matrix {
 			throw new DimensionMismatchException();
 		}
 		
-		ComplexNumber dotprod = new ComplexNumber(0, 0);
-		for (int i = 0; i < this.dim(); i++) {
-			dotprod = dotprod.add(getAt(i).multiply(v.getAt(i)));
-		}
-		
-		return dotprod;
+		// the standard inner product is always real
+		return this.conjugateTranspose().multiply(v).getAt(0, 0);
 	}
 	
 	/**
@@ -95,5 +111,14 @@ public class Vector extends Matrix {
 		coords[2] = getAt(1).multiply(v.getAt(2)).subtract(getAt(2).multiply(v.getAt(1)));
 		
 		return new Vector(coords);
+	}
+	
+	public Vector proj(Vector onto) throws DimensionMismatchException {
+		
+		if (this.dim() != onto.dim()) {
+			throw new DimensionMismatchException();
+		}
+		
+		return (Vector) this.scale(onto.dot(this).divide(onto.dot(onto)));
 	}
 }

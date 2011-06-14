@@ -9,6 +9,16 @@ public class Demo {
 		SquareMatrix m = new SquareMatrix(f);
 		SquareMatrix t = new SquareMatrix(g);
 		
+		//System.out.println(t.multiply(t));
+		
+		float[] u_arr = {2,1};
+		float[] v_arr = {-3,4};
+		
+		Vector u = new Vector(u_arr);
+		Vector v = new Vector(v_arr);
+		
+		System.out.println(u.proj(v));
+		
 		//System.out.println("det(f) = " + m.determinant());
 		//System.out.println("det(g) = " + t.determinant());
 		//System.out.println("det(I_5) = " + (new SquareMatrix(4)).determinant());
@@ -20,7 +30,7 @@ public class Demo {
 		System.out.println("h is lower triangular: " + blah.isLowerTriangular());
 		System.out.println(blah.toString());*/
 		
-		System.out.println(m.transpose());
+		//System.out.println(m.transpose());
 	}
 
 }

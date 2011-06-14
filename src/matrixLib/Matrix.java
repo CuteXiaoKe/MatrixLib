@@ -80,6 +80,13 @@ public class Matrix {
 		matrix = new ComplexNumber[r][c];
 		this.rows = r;
 		this.cols = c;
+		
+		// build the zero matrix
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < c; j++) {
+				matrix[i][j] = new ComplexNumber(0, 0);
+			}
+		}
 	}
 
 	/**
@@ -154,8 +161,8 @@ public class Matrix {
 		
 		ComplexNumber[][] ct = new ComplexNumber[cols][rows];
 		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
+		for (int i = 0; i < cols; i++) {
+			for (int j = 0; j < rows; j++) {
 				ct[i][j] = matrix[j][i].conjugate();
 			}
 		}
@@ -193,13 +200,11 @@ public class Matrix {
 		}
 		
 		Matrix prod = new Matrix(rows, m.cols());
-		//ComplexNumber[][] prod = new ComplexNumber[rows][m.cols()];
 		
 		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
+			for (int j = 0; j < m.cols(); j++) {
 				for (int k = 0; k < cols; k++) {
 					prod.set(i, j, prod.getAt(i, j).add(matrix[i][k].multiply(m.getAt(k, j))));
-					//prod[i][j] = prod[i][j].add(matrix[i][k].multiply(m.getAt(k, j)));
 				}
 			}
 		}
@@ -232,7 +237,24 @@ public class Matrix {
 	}
 
 	/**
-	 * Multiplies each element of the matrix by a field scalar
+	 * Multiplies each element of the matrix by a complex number
+	 * @param factor the scalar to multiply the matrix by
+	 * @return the matrix factor*this
+	 */
+	public Matrix scale(ComplexNumber factor) {
+		
+		Matrix scaled = new Matrix(rows, cols);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < rows; j++) {
+				scaled.set(i, j, matrix[i][j].multiply(factor));
+			}
+		}
+		
+		return scaled;
+	}
+
+	/**
+	 * Multiplies each element of the matrix by a float
 	 * @param factor the scalar to multiply the matrix by
 	 * @return the matrix factor*this
 	 */
@@ -247,7 +269,7 @@ public class Matrix {
 		
 		return scaled;
 	}
-
+	
 	public String toString() {
 		
 		String mstr = "[";

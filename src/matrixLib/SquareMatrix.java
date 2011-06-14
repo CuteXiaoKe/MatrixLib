@@ -227,6 +227,16 @@ public class SquareMatrix extends Matrix {
 	}
 	
 	/**
+	 * Tells whether the matrix is unitary (its inverse is its conjugate transpose)
+	 * @return whether the matrix is unitary or not
+	 * @throws DimensionMismatchException
+	 */
+	public boolean isUnitary() throws DimensionMismatchException {
+		
+		return ((SquareMatrix)this.multiply(this.conjugateTranspose())).isIdentity();
+	}
+	
+	/**
 	 * Computes and returns the LU decomposition of the matrix
 	 * @return the result of the LU decomposition {L,D,U}, or null if no LU decomposition is admitted
 	 */

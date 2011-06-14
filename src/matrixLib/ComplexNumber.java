@@ -78,13 +78,28 @@ public class ComplexNumber {
 				re*z.Re() - im*z.Im(),
 				re*z.Im() + im*z.Re());
 	}
+	
+	/**
+	 * Divides this complex number by z (through multiplying by the inverse)
+	 * @param z the complex number to divide this by
+	 * @return the quotient of this and the argument
+	 * @throws ArithmeticException
+	 */
+	public ComplexNumber divide(ComplexNumber z) throws ArithmeticException {
+		
+		if (z.isZero()) {
+			throw new ArithmeticException();
+		}
+		
+		return this.multiply(z.conjugate()).multiply(1.0/(z.Re()-z.Im()));
+	}
 
 	/**
 	 * Scales a complex number by a factor
 	 * @param f the scaling factor
 	 * @return the complex number scaled by f
 	 */
-	public ComplexNumber multiply(float f) {
+	public ComplexNumber multiply(double f) {
 		
 		return new ComplexNumber(re*f, im*f);
 	}
@@ -179,5 +194,14 @@ public class ComplexNumber {
 	public boolean equals(ComplexNumber z) {
 		
 		return this.re == z.Re() && this.im == z.Im();
+	}
+	
+	/**
+	 * Tells whether this is the 0 vector in C
+	 * @return whether this is the complex number equal to 0
+	 */
+	public boolean isZero() {
+		
+		return this.re == 0 && this.im == 0;
 	}
 }
