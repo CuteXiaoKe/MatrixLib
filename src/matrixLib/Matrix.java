@@ -147,6 +147,23 @@ public class Matrix {
 	}
 	
 	/**
+	 * Returns the conjugate transpose of this matrix
+	 * @return the matrix that is the conjugate transpose of this matrix
+	 */
+	public Matrix conjugateTranspose() {
+		
+		ComplexNumber[][] ct = new ComplexNumber[cols][rows];
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				ct[i][j] = matrix[j][i].conjugate();
+			}
+		}
+		
+		return new Matrix(ct);
+	}
+	
+	/**
 	 * Returns the number of rows in the matrix
 	 * @return the number of rows
 	 */

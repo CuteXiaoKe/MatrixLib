@@ -170,6 +170,13 @@ public class SquareMatrix extends Matrix {
 		
 		// a symmetric matrix equals its transpose
 		return (this.equals(this.transpose()));
+		
+		/*for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < rows(); j++) {
+				
+				if
+			}
+		}*/
 	}
 	
 	/**
@@ -200,6 +207,15 @@ public class SquareMatrix extends Matrix {
 		return true;
 	}
 	
+	/**
+	 * Tells whether the matrix is Hermetian/self-adjoint (equal to its own conjugate transpose)
+	 * @return whether the matrix is Hermetian
+	 */
+	public boolean isHermetian() {
+		
+		return this.conjugateTranspose().equals(this);
+	}
+
 	/**
 	 * Tells whether the matrix is orthogonal (A^T A = I) or not
 	 * @return whether the matrix is orthogonal
