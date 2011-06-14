@@ -91,7 +91,7 @@ public class ComplexNumber {
 			throw new ArithmeticException();
 		}
 		
-		return this.multiply(z.conjugate()).multiply(1.0/(z.Re()-z.Im()));
+		return this.multiply(z.conjugate()).multiply(1.0/(z.Re()*z.Re()-z.Im()*z.Im()));
 	}
 
 	/**

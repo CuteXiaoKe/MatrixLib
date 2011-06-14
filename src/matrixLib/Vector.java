@@ -1,7 +1,5 @@
 package matrixLib;
 
-import java.util.ArrayList;
-
 /**
  * Implementation of vectors (column matrices)
  * @author Bryan Cuccioli
@@ -27,7 +25,10 @@ public class Vector extends Matrix {
 		super(parse(entries));
 	}
 	
-	
+	/**
+	 * Constructs a wrapping vector for entries
+	 * @param entries the underlying data for the new vector
+	 */
 	public Vector(float[] entries) {
 	
 		super(parse(entries));
@@ -65,6 +66,16 @@ public class Vector extends Matrix {
 	public ComplexNumber getAt(int i) {
 		
 		return super.getAt(i, 0);
+	}
+	
+	/**
+	 * Sets the element at a given coordinate to something
+	 * @param coord the coordinate to set the value at
+	 * @param val the value to set at the given coordinate
+	 */
+	public void set(int coord, ComplexNumber val) {
+		
+		super.set(coord, 0, val);
 	}
 	
 	/**
@@ -113,12 +124,46 @@ public class Vector extends Matrix {
 		return new Vector(coords);
 	}
 	
+	/**
+	 * Return the vector that is the projection of this onto a certain vector
+	 * @param onto the vector onto which we project this
+	 * @return the projection proj_onto(this)
+	 * @throws DimensionMismatchException
+	 */
 	public Vector proj(Vector onto) throws DimensionMismatchException {
 		
 		if (this.dim() != onto.dim()) {
 			throw new DimensionMismatchException();
 		}
 		
-		return (Vector) this.scale(onto.dot(this).divide(onto.dot(onto)));
+		return onto.scale(onto.dot(this).divide(onto.dot(onto))).toVector();
+	}
+	
+	/**
+	 * Returns the unit vector pointing in the same direction as this vector
+	 * @return the unit vector pointing in the same direction as this vector
+	 */
+	public Vector normalize() {
+		
+		return this.scale(new ComplexNumber(1/super.length(), 0)).toVector();
+	}
+	
+	/**
+	 * Returns a string representation of this vector
+	 * @return a string representation <a, b, ...>
+	 */
+	public String toString() {
+		
+		String str = "<";
+		for (int i = 0; i < this.dim(); i++) {
+			str += this.getAt(i);
+			if (i != this.dim() - 1) {
+				str += ", ";
+			}
+			
+		}
+		str += ">";
+		
+		return str;
 	}
 }

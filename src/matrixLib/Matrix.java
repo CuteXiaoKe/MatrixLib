@@ -123,7 +123,7 @@ public class Matrix {
 	 * which is the square root of the sum of each element squared
 	 * @return the length of the matrix
 	 */
-	public double getLength() {
+	public double length() {
 		
 		float sum = 0;
 		
@@ -245,7 +245,7 @@ public class Matrix {
 		
 		Matrix scaled = new Matrix(rows, cols);
 		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < rows; j++) {
+			for (int j = 0; j < cols; j++) {
 				scaled.set(i, j, matrix[i][j].multiply(factor));
 			}
 		}
@@ -262,7 +262,7 @@ public class Matrix {
 		
 		Matrix scaled = new Matrix(rows, cols);
 		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < rows; j++) {
+			for (int j = 0; j < cols; j++) {
 				scaled.set(i, j, matrix[i][j].multiply(factor));
 			}
 		}
@@ -301,6 +301,28 @@ public class Matrix {
 		return this.matrix;
 	}
 	
+	/**
+	 * Converts this matrix to a vector through the standard isomorphism
+	 * @return a vector with the elements from this matrix
+	 */
+	public Vector toVector() {
+		
+		Vector v = new Vector(rows * cols);
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				v.set(i*cols + j, getAt(i, j));
+			}
+		}
+		
+		return v;
+	}
+	
+	/**
+	 * Tells if two matrices are equal (if all of their corresponding elements are equal)
+	 * @param m the matrix to compare this one too
+	 * @return whether the two matrices are equal
+	 */
 	public boolean equals(Matrix m) {
 		
 		// have to have matching dimension to be equal
@@ -311,7 +333,7 @@ public class Matrix {
 		// each element has to match for them to be equal
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				if (m.getAt(i, j) != matrix[i][j]) {
+				if (!m.getAt(i, j).equals(matrix[i][j])) {
 					return false;
 				}
 			}
