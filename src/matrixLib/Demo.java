@@ -33,16 +33,16 @@ public class Demo {
 		float[][] c = {{1,2},{3,4}};
 		SquareMatrix m = new SquareMatrix(c);
 		
-		Matrix[] qr1 = m.QRDecompose();
-		System.out.println(qr1[0]);
-		System.out.println(qr1[1]);
+		//Matrix[] qr1 = m.QRDecompose();
+		//System.out.println(qr1[0]);
+		//System.out.println(qr1[1]);
 		
 		ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
 		SquareMatrix zm = new SquareMatrix(z);
 		
-		//Matrix[] qr = zm.QRDecompose();
-		//System.out.println(qr[0]);
-		//System.out.println(qr[1]);
+		Matrix[] qr = zm.QRDecompose();
+		System.out.println(qr[0]);
+		System.out.println(qr[1]);
 	}
 	
 	public static void test_det() throws NotSquareException {
@@ -57,12 +57,8 @@ public class Demo {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		
-		ComplexNumber[] a = {new ComplexNumber(2,1), new ComplexNumber(3, -1)};
-		Vector v = new Vector(a);
-		System.out.println(v.normalize());
-		
-		//test_qr();
+				
+		test_qr();
 		//test_proj();
 		//test_dot();
 		//test_eigen();
