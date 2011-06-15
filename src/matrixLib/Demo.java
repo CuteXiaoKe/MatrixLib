@@ -15,10 +15,12 @@ public class Demo {
 		ComplexNumber[] b = {new ComplexNumber(1,1), new ComplexNumber(4, -1)};
 		Vector v1 = new Vector(a);
 		Vector v2 = new Vector(b);
+
+		System.out.println("dot: " + v1.dot(v2));
+		System.out.println("dot: " + v2.dot(v2));
 		
 		// projection of v1 onto v2
 		System.out.println(v1.proj(v2));
-		System.out.println(v2.proj(v1));
 	}
 	
 	public static void test_dot() throws DimensionMismatchException {
@@ -58,8 +60,8 @@ public class Demo {
 	
 	public static void main(String[] args) throws Exception {
 				
-		test_qr();
-		//test_proj();
+		//test_qr();
+		test_proj();
 		//test_dot();
 		//test_eigen();
 	}
