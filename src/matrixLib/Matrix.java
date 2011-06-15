@@ -167,7 +167,7 @@ public class Matrix {
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				sum += Math.pow(matrix[i][j].abs(), 2);
+				sum += Math.pow(matrix[i][j].Re(), 2) + Math.pow(matrix[i][j].Im(), 2); 
 			}
 		}
 		
@@ -322,10 +322,13 @@ public class Matrix {
 		for (int i = 0; i < cols(); i++) {
 			
 			u[i] = getVector(i);
+			System.out.println("u["+i+"]: " + u[i]);
 			for (int j = 0; j < i; j++) {
 				u[i] = u[i].subtract(getVector(i).proj(e[j]));
 			}
+			System.out.println(u[i]);
 			e[i] = u[i].normalize();
+			System.out.println("e["+i+"]: " + e[i]);
 		}
 		
 		qr[0] = new Matrix(e);
@@ -334,29 +337,15 @@ public class Matrix {
 		return qr;
 	}
 	
-	
-	public String toString() {
+	/**
+	 * Performs row reduction (Gauss-Jordan elimination) on this matrix
+	 * @return the reduced row echelon form of this matrix
+	 */
+	public Matrix rowReduce() {
 		
-		String mstr = "[";
-
-		for (int i = 0; i < rows; i++) {
-			if (i != 0) mstr += " "; // align left margin horizontally
-			mstr += "[";
-
-			for (int j = 0; j < cols; j++) {
-				mstr += getAt(i, j).toString();
-				if (j != cols - 1) mstr += ", ";
-				else {
-					mstr += "]";
-					if (i == rows - 1) mstr += "]";
-					else mstr += "\n";
-				}
-			}
-		}
-		
-		return mstr;
+		return this; // placeholder
 	}
-
+	
 	/**
 	 * Gets the underlying data array for this matrix
 	 * @return the underlying data array for this matrix
@@ -381,6 +370,28 @@ public class Matrix {
 		}
 		
 		return v;
+	}
+	
+	public String toString() {
+		
+		String mstr = "[";
+
+		for (int i = 0; i < rows; i++) {
+			if (i != 0) mstr += " "; // align left margin horizontally
+			mstr += "[";
+
+			for (int j = 0; j < cols; j++) {
+				mstr += getAt(i, j).toString();
+				if (j != cols - 1) mstr += ", ";
+				else {
+					mstr += "]";
+					if (i == rows - 1) mstr += "]";
+					else mstr += "\n";
+				}
+			}
+		}
+		
+		return mstr;
 	}
 	
 	/**

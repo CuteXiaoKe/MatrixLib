@@ -166,6 +166,23 @@ public class ComplexNumber {
 			}
 		}
 	}
+
+	/**
+	 * Returns the principle square root of this complex number
+	 * @return the principle square root of this complex number
+	 */
+	public ComplexNumber sqrt() {
+		
+		double a = this.Re(), b = this.Im();
+		double p = 1.0/Math.sqrt(2) * Math.sqrt(Math.sqrt(a*a+b*b)+a);
+		double q = 1.0/Math.sqrt(2) * Math.sqrt(Math.sqrt(a*a+b*b)-a);
+		
+		if (b < 0) {
+			q = -q;
+		}
+		
+		return new ComplexNumber(p, q);
+	}
 	
 	/**
 	 * Returns the a + bi form of this complex number

@@ -120,8 +120,13 @@ public class Vector extends Matrix {
 			throw new DimensionMismatchException();
 		}
 		
-		// the standard inner product is always real
-		return this.conjugateTranspose().multiply(v).getAt(0, 0);
+		//return this.conjugateTranspose().multiply(v).getAt(0, 0);
+		
+		ComplexNumber dotprod = new ComplexNumber(0, 0);
+		for (int i = 0; i < dim(); i++) {
+			dotprod = dotprod.add(this.getAt(i).multiply(v.getAt(i)));
+		}
+		return dotprod;
 	}
 	
 	/**
@@ -159,6 +164,8 @@ public class Vector extends Matrix {
 		}
 		
 		return onto.scale(onto.dot(this).divide(onto.dot(onto))).toVector();
+		//return onto.scale(onto.dot(this).multiply(1/Math.pow(onto.length(),2))).toVector();
+
 	}
 	
 	/**
@@ -168,8 +175,24 @@ public class Vector extends Matrix {
 	public Vector normalize() {
 		
 		double len_inv = 1/super.length();
-		ComplexNumber normf = new ComplexNumber(len_inv, len_inv);
-		return this.scale(normf).toVector();
+		//System.out.println("len_inv: " + len_inv);
+		//ComplexNumber normf = new ComplexNumber(len_inv, len_inv);
+		//System.out.println("---");
+		//System.out.println(getAt(0));
+		//System.out.println(getAt(0).multiply(normf));
+		//System.out.println("---");
+		
+		
+		
+		//System.out.println(this.scale(normf));
+		//return this.scale(normf).toVector();
+		
+		ComplexNumber[] normed = new ComplexNumber[this.dim()];
+		for (int i = 0; i < this.dim(); i++) {
+			normed[i] = new ComplexNumber(getAt(i).Re()*len_inv, getAt(i).Im()*len_inv);
+		}
+		
+		return new Vector(normed);
 	}
 	
 	/**
