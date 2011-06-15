@@ -53,7 +53,7 @@ public class Demo {
 		
 		System.out.println("det(f) = " + m.determinant());
 		System.out.println("det(g) = " + t.determinant());
-		System.out.println("det(I_5) = " + (new SquareMatrix(4)).determinant());
+		System.out.println("det(I_4) = " + (new SquareMatrix(4)).determinant());
 	}
 	
 	public static void main(String[] args) throws Exception {

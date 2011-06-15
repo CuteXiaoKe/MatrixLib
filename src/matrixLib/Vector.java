@@ -174,25 +174,21 @@ public class Vector extends Matrix {
 	 */
 	public Vector normalize() {
 		
-		double len_inv = 1/super.length();
-		//System.out.println("len_inv: " + len_inv);
-		//ComplexNumber normf = new ComplexNumber(len_inv, len_inv);
-		//System.out.println("---");
-		//System.out.println(getAt(0));
-		//System.out.println(getAt(0).multiply(normf));
-		//System.out.println("---");
+		ComplexNumber factor = new ComplexNumber(0, 0);
 		
-		
-		
-		//System.out.println(this.scale(normf));
-		//return this.scale(normf).toVector();
-		
-		ComplexNumber[] normed = new ComplexNumber[this.dim()];
-		for (int i = 0; i < this.dim(); i++) {
-			normed[i] = new ComplexNumber(getAt(i).Re()*len_inv, getAt(i).Im()*len_inv);
+		for (int i = 0; i < dim(); i++) {
+			factor = factor.add(getAt(i).multiply(getAt(i)));
 		}
 		
-		return new Vector(normed);
+		factor = factor.sqrt();
+		System.out.println("asdf: " + factor);
+		
+		ComplexNumber[] entries = new ComplexNumber[dim()];
+		for (int i = 0; i < dim(); i++) {
+			entries[i] = getAt(i).divide(factor);
+		}
+		
+		return new Vector(entries);
 	}
 	
 	/**
