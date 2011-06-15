@@ -167,7 +167,9 @@ public class Vector extends Matrix {
 	 */
 	public Vector normalize() {
 		
-		return this.scale(new ComplexNumber(1/super.length(), 0)).toVector();
+		double len_inv = 1/super.length();
+		ComplexNumber normf = new ComplexNumber(len_inv, len_inv);
+		return this.scale(normf).toVector();
 	}
 	
 	/**
