@@ -88,6 +88,28 @@ public class Vector extends Matrix {
 	}
 	
 	/**
+	 * Adds two vectors
+	 * @param v the vector to add to this one
+	 * @return the vector sum of this vector and v
+	 * @throws DimensionMismatchException
+	 */
+	public Vector add(Vector v) throws DimensionMismatchException {
+		
+		return super.add((Matrix)v).toVector();
+	}
+
+	/**
+	 * Subtracts a vector from this one
+	 * @param v the vector to subtract
+	 * @return the vector difference of this vector and v
+	 * @throws DimensionMismatchException
+	 */
+	public Vector subtract(Vector v) throws DimensionMismatchException {
+		
+		return super.add((Matrix)v.scale(-1)).toVector();
+	}
+	
+	/**
 	 * Compute the standard inner product (dot product) of two vectors
 	 * @param v the vector to dot against this
 	 * @return the inner product <this, v> of this vector with v 

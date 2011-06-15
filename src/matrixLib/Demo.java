@@ -9,15 +9,18 @@ public class Demo {
 		SquareMatrix m = new SquareMatrix(f);
 		SquareMatrix t = new SquareMatrix(g);
 		
+		ComplexNumber[] evals = t.eigenvalues();
+		System.out.println(evals[0] + " " + evals[1]);
+		
 		//System.out.println(t.multiply(t));
 		
-		float[] u_arr = {2,1};
-		float[] v_arr = {-3,4};
+		//float[] u_arr = {2,1};
+		//float[] v_arr = {-3,4};
 		
-		Vector u = new Vector(u_arr);
-		Vector v = new Vector(v_arr);
+		//Vector u = new Vector(u_arr);
+		//Vector v = new Vector(v_arr);
 		
-		System.out.println(u.proj(v));
+		//System.out.println(u.proj(v));
 		
 		//System.out.println("det(f) = " + m.determinant());
 		//System.out.println("det(g) = " + t.determinant());

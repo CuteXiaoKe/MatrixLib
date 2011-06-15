@@ -293,4 +293,42 @@ public class SquareMatrix extends Matrix {
 		return tr;
 	}
 
+	private boolean isAlmostUpperTriangular(Matrix m) {
+		
+		double epsilon = 1E-6;
+		
+		for (int i = 1; i < m.rows(); i++) {
+			for (int j = 0; j < i; j++) {
+				if (m.getAt(i, j).abs() > epsilon) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Returns a list of the eigenvalues of the matrix
+	 * @return an array containing the eigenvalues of the matrix
+	 * @throws DimensionMismatchException 
+	 */
+	public ComplexNumber[] eigenvalues() throws DimensionMismatchException {
+		
+		// max amount of eigenvalues is the dimension of the matrix
+		ComplexNumber[] evals = new ComplexNumber[rows()];
+		
+		Matrix temp = this;
+		while (!isAlmostUpperTriangular(temp)) {
+			Matrix[] qr = temp.QRDecompose();
+			temp = qr[1].multiply(qr[0]);
+		}
+		
+		// temp is now upper triangular, so the evals are on the diagonal
+		for (int i = 0; i < rows(); i++) {
+			evals[i] = temp.getAt(i, i);
+		}
+		
+		return evals;
+	}
 }

@@ -90,6 +90,44 @@ public class Matrix {
 	}
 
 	/**
+	 * Constructs a matrix from a collection of vectors
+	 * @param vectors the vectors to create the matrix from
+	 * @throws DimensionMismatchException
+	 */
+	public Matrix(Vector[] vectors) throws DimensionMismatchException {
+		
+		this.rows = vectors[0].dim();
+		this.cols = vectors.length;
+		matrix = new ComplexNumber[rows][cols];
+		
+		for (int j = 0; j < cols; j++) {
+			if (j != 0 && vectors[j].dim() != vectors[j-1].dim()) {
+				// the vectors did not all have the same number of coordinates
+				throw new DimensionMismatchException();
+			}
+			for (int i = 0; i < rows; i++) {
+				matrix[i][j] = vectors[j].getAt(i);
+			}
+		}
+	}
+	
+	/**
+	 * Retrieves the nth vector from the matrix
+	 * @param n the column/vector to get from the matrix
+	 * @return the nth vector from the matrix
+	 */
+	public Vector getVector(int n) {
+		
+		ComplexNumber[] entries = new ComplexNumber[rows()];
+		
+		for (int i = 0; i < rows(); i++) {
+			entries[i] = matrix[i][n];
+		}
+		
+		return new Vector(entries);
+	}
+	
+	/**
 	 * Gets the element at location (r,c) in the matrix
 	 * @param r the row to retrieve the element from
 	 * @param c the column to retrieve the element from
@@ -119,9 +157,9 @@ public class Matrix {
 	}
 
 	/**
-	 * Computes the length of the matrix,
+	 * Computes the length (Frobenius norm) of the matrix,
 	 * which is the square root of the sum of each element squared
-	 * @return the length of the matrix
+	 * @return the length (Frobenius norm) of the matrix
 	 */
 	public double length() {
 		
@@ -269,6 +307,33 @@ public class Matrix {
 		
 		return scaled;
 	}
+
+	/**
+	 * Performs a QR decomposition on this matrix
+	 * @return an ordered pair {Q, R}
+	 * @throws DimensionMismatchException 
+	 */
+	public Matrix[] QRDecompose() throws DimensionMismatchException {
+		
+		Matrix[] qr = new Matrix[2];
+		Vector[] u = new Vector[cols()];
+		Vector[] e = new Vector[cols()];
+		
+		for (int i = 0; i < cols(); i++) {
+			
+			u[i] = getVector(i);
+			for (int j = 0; j < i; j++) {
+				u[i] = u[i].subtract(getVector(i).proj(e[j]));
+			}
+			e[i] = u[i].normalize();
+		}
+		
+		qr[0] = new Matrix(e);
+		qr[1] = qr[0].transpose().multiply(this);
+		
+		return qr;
+	}
+	
 	
 	public String toString() {
 		
