@@ -39,12 +39,23 @@ public class Demo {
 		//System.out.println(qr1[0]);
 		//System.out.println(qr1[1]);
 		
-		ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
+		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
+		ComplexNumber[][] z = {{new ComplexNumber(0,1), new ComplexNumber(2, 0)},{new ComplexNumber(1,0),new ComplexNumber(1,1)}};
 		SquareMatrix zm = new SquareMatrix(z);
 		
 		Matrix[] qr = zm.QRDecompose();
 		System.out.println(qr[0]);
 		System.out.println(qr[1]);
+	}
+	
+	public static void test_cholesky() throws NotSquareException, DimensionMismatchException {
+		
+		float[][] f = {{2,-1,0},{-1,2,-1},{0,-1,2}};
+		SquareMatrix m = new SquareMatrix(f);
+		
+		SquareMatrix L = m.choleskyDecompose();
+		System.out.println(L);
+		System.out.println(L.multiply(L.conjugateTranspose()));
 	}
 	
 	public static void test_det() throws NotSquareException {
@@ -58,10 +69,18 @@ public class Demo {
 		System.out.println("det(I_4) = " + (new SquareMatrix(4)).determinant());
 	}
 	
+	public static void test_norm() {
+		ComplexNumber[] a = {new ComplexNumber(1,0),new ComplexNumber(0,1)};
+		Vector v = new Vector(a);
+		System.out.println(v.normalize());
+	}
+	
 	public static void main(String[] args) throws Exception {
-				
+		
+		test_cholesky();
+		
 		//test_qr();
-		test_proj();
+		//test_proj();
 		//test_dot();
 		//test_eigen();
 	}

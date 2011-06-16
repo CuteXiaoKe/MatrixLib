@@ -320,6 +320,7 @@ public class SquareMatrix extends Matrix {
 		
 		Matrix temp = this;
 		while (!isAlmostUpperTriangular(temp)) {
+			System.out.println("QR decomposing...");
 			Matrix[] qr = temp.QRDecompose();
 			temp = qr[1].multiply(qr[0]);
 		}
@@ -330,5 +331,48 @@ public class SquareMatrix extends Matrix {
 		}
 		
 		return evals;
+	}
+	
+	/**
+	 * Performs a Cholesky decomposition, which writes a 
+	 * positive definite Hermetian matrix in terms of a 
+	 * lower triangular matrix and its conjugate transpose
+	 * @return the lower triangular matrix L in A=LL* or null if no Cholesky decomposition is admitted
+	 * @throws NotSquareException 
+	 */
+	public SquareMatrix choleskyDecompose() throws NotSquareException {
+		
+		if (!isHermetian()) {
+			return null;
+		}
+		
+		ComplexNumber[][] L = new ComplexNumber[rows()][rows()];
+		
+		for (int i = 0; i < cols(); i++) {
+			for (int j = 0; j < rows(); j++) {
+				if (j < i) {
+					L[j][i] = new ComplexNumber(0, 0);
+				}
+				else {
+					ComplexNumber entry = getAt(j, i);
+					for (int k = 0; k < i-1; k++) {
+						//System.out.printf("(%d, %d)\n", j, k);
+						//System.out.printf("(%d, %d)\n", i, k);
+						entry = entry.subtract(L[j][k].multiply(L[i][k].conjugate()));
+					}
+					if (i == j) {
+						entry = entry.sqrt();
+					}
+					else {
+						//System.out.printf("(%d, %d)\n", i, i);
+						entry = entry.divide(L[i][i]);
+					}
+					//System.out.printf("adding (%d, %d)\n", j, i);
+					L[j][i] = new ComplexNumber(entry.Re(), entry.Im());
+				}
+			}
+		}
+		
+		return new SquareMatrix(L);
 	}
 }

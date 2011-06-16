@@ -174,18 +174,25 @@ public class Vector extends Matrix {
 	 */
 	public Vector normalize() {
 		
-		ComplexNumber factor = new ComplexNumber(0, 0);
+		double factor = 0;
+		for (int i = 0; i < dim(); i++) {
+			double re = getAt(i).Re(), im = getAt(i).Im();
+			factor += Math.sqrt(re*re + im*im);
+		}
+		factor = 1.0/factor;
+		
+		/*ComplexNumber factor = new ComplexNumber(0, 0);
 		
 		for (int i = 0; i < dim(); i++) {
 			factor = factor.add(getAt(i).multiply(getAt(i)));
 		}
 		
-		factor = factor.sqrt();
-		System.out.println("asdf: " + factor);
+		factor = factor.sqrt();*/
 		
 		ComplexNumber[] entries = new ComplexNumber[dim()];
 		for (int i = 0; i < dim(); i++) {
-			entries[i] = getAt(i).divide(factor);
+			//entries[i] = getAt(i).divide(factor);
+			entries[i] = getAt(i).multiply(factor);
 		}
 		
 		return new Vector(entries);

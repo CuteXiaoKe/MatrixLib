@@ -320,15 +320,13 @@ public class Matrix {
 		Vector[] e = new Vector[cols()];
 		
 		for (int i = 0; i < cols(); i++) {
-			
 			u[i] = getVector(i);
 			System.out.println("u["+i+"]: " + u[i]);
 			for (int j = 0; j < i; j++) {
 				u[i] = u[i].subtract(getVector(i).proj(e[j]));
 			}
-			System.out.println(u[i]);
+			System.out.println("u["+i+"]: " + u[i]);
 			e[i] = u[i].normalize();
-			System.out.println("e["+i+"]: " + e[i]);
 		}
 		
 		qr[0] = new Matrix(e);
