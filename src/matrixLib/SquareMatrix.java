@@ -116,6 +116,19 @@ public class SquareMatrix extends Matrix {
 		}
 		
 		Matrix aug_rref = (new Matrix(augmented)).rref();
+		
+		// if the left wasn't reduced to the identity, inverse doesn't exist
+		ComplexNumber[][] id = new ComplexNumber[rows()][cols()];
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				id[i][j] = aug_rref.getAt(i, j);
+			}
+		}
+		
+		if (!(new SquareMatrix(id)).isIdentity()) {
+			return null;
+		}		
+		
 		ComplexNumber[][] inv = new ComplexNumber[rows()][cols()];
 		
 		for (int i = 0; i < rows(); i++) {

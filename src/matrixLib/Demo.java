@@ -89,7 +89,7 @@ public class Demo {
 	}
 	
 	public static void test_inverse() throws NotSquareException, DimensionMismatchException {
-		float[][] f = {{5,19},{1,4}};
+		float[][] f = {{-2,2,3},{-1,1,3},{2,0,-1}};
 		SquareMatrix m = new SquareMatrix(f);
 		System.out.println(m.inverse());
 	}
@@ -99,7 +99,6 @@ public class Demo {
 		test_inverse();
 		
 		//test_cholesky();
-		
 		//test_qr();
 		//test_proj();
 		//test_dot();

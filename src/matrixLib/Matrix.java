@@ -40,11 +40,11 @@ public class Matrix {
 	 */
 	public Matrix(float[][] mat) {
 		
-		matrix = new RealNumber[mat.length][mat[0].length];
+		matrix = new ComplexNumber[mat.length][mat[0].length];
 		
 		for (int i = 0; i < mat.length; i++) {
 			for (int j = 0; j < mat[0].length; j++) {
-				matrix[i][j] = new RealNumber(mat[i][j]);
+				matrix[i][j] = new ComplexNumber(mat[i][j], 0);
 			}
 		}
 		
@@ -298,14 +298,7 @@ public class Matrix {
 	 */
 	public Matrix scale(float factor) {
 		
-		Matrix scaled = new Matrix(rows, cols);
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				scaled.set(i, j, matrix[i][j].multiply(factor));
-			}
-		}
-		
-		return scaled;
+		return scale(new ComplexNumber(factor, 0));
 	}
 
 	/**
@@ -370,63 +363,6 @@ public class Matrix {
 		return v;
 	}
 	
-	// helper methods for Gaussian elimination
-	public Matrix rowOp_swap(int row1, int row2) {
-		
-		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
-		
-		for (int i = 0; i < rows(); i++) {
-			for (int j = 0; j < cols(); j++) {
-				if (i == row1) {
-					newdata[i][j] = matrix[row2][j];
-				}
-				else if (i == row2) {
-					newdata[i][j] = matrix[row1][j];
-				}
-				else {
-					newdata[i][j] = matrix[i][j];
-				}
-			}
-		}
-		
-		return new Matrix(newdata);
-	}
-	
-	public Matrix rowOp_scale(int row, ComplexNumber factor) {
-		
-		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
-		
-		for (int i = 0; i < rows(); i++) {
-			for (int j = 0; j < cols(); j++) {
-				if (i == row) {
-					newdata[i][j] = matrix[i][j].divide(factor);
-				}
-				else {
-					newdata[i][j] = matrix[i][j];
-				}
-			}
-		}
-		
-		return new Matrix(newdata);
-	}
-	
-	public Matrix rowOp_subMultiple(int toRow, int srcRow, ComplexNumber factor) {
-		
-		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
-		
-		for (int i = 0; i < rows(); i++) {
-			for (int j = 0; j < cols(); j++) {
-				newdata[i][j] = matrix[i][j];
-			}
-		}
-		
-		for (int j = 0; j < cols(); j++) {
-			newdata[toRow][j] = matrix[toRow][j].subtract(matrix[srcRow][j].multiply(factor));
-		}
-		
-		return new Matrix(newdata);
-	}
-
 	/**
 	 * Computes the row-reduced echelon form of
 	 * of this Matrix by Gaussian elimination
@@ -455,13 +391,27 @@ public class Matrix {
 					}
 				}
 			}
-			rref = rref.rowOp_swap(i, r);
 			
-			rref = rref.rowOp_scale(r, rref.getAt(r, lead));
+			// swap rows i and r
+			for (int a = 0; a < cols(); a++) {
+				ComplexNumber temp = rref.getAt(i, a);
+				rref.set(i, a, rref.getAt(r, a));
+				rref.set(r, a, temp);
+			}
+	
+			// divide row r by rref[r][lead]
+			ComplexNumber div = rref.getAt(r, lead);
+			for (int a = 0; a < cols(); a++) {
+				rref.set(r, a, rref.getAt(r, a).divide(div));
+			}
 			
 			for (int j = 0; j < rows(); j++) {
 				if (j != r) {
-					rref = rref.rowOp_subMultiple(j, r, rref.getAt(j, lead));
+					// subtract row r * -rref[j][lead] from row j
+					ComplexNumber c = rref.getAt(j, lead); 
+					for (int a = 0; a < cols(); a++) {
+						rref.set(j, a, rref.getAt(j, a).subtract(rref.getAt(r, a).multiply(c)));
+					}
 				}
 			}
 			lead++;
