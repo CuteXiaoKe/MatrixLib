@@ -61,12 +61,15 @@ public class Demo {
 	public static void test_det() throws NotSquareException {
 		float[][] f = {{1,2,3},{4,5,6},{7,8,7}};
 		float[][] g = {{1,2},{3,4}};
+		float[][] h = {{3,0,6,-3},{0,2,3,0},{-4,-7,2,0},{2,0,1,10}};
 		SquareMatrix m = new SquareMatrix(f);
-		SquareMatrix t = new SquareMatrix(g);	
+		SquareMatrix t = new SquareMatrix(g);
+		SquareMatrix u = new SquareMatrix(h);
 		
 		System.out.println("det(f) = " + m.determinant());
 		System.out.println("det(g) = " + t.determinant());
-		System.out.println("det(I_4) = " + (new SquareMatrix(4)).determinant());
+		System.out.println("det(I_9) = " + (new SquareMatrix(9)).determinant());
+		System.out.println("det(h) = " + u.determinant());
 	}
 	
 	public static void test_lu() throws NotSquareException, DimensionMismatchException, SingularMatrixException {
@@ -86,9 +89,11 @@ public class Demo {
 	}
 	
 	public static void test_rref() throws DimensionMismatchException {
-		float[][] f = {{1,2},{3,4}};
+		float[][] f = {{1,2,3},{4,5,6},{7,8,7}};
 		Matrix m = new Matrix(f);
 		System.out.println(m.rref());
+		//System.out.println("rank: " + m.rank());
+		//System.out.println("nullity: " + m.nullity());
 	}
 	
 	public static void test_inverse() throws NotSquareException, DimensionMismatchException {
@@ -99,8 +104,9 @@ public class Demo {
 	
 	public static void main(String[] args) throws Exception {
 		
-		test_lu();
-		
+		test_det();
+		//test_rref();
+		//test_lu();
 		//test_inverse();
 		//test_cholesky();
 		//test_qr();

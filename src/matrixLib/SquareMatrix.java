@@ -139,62 +139,22 @@ public class SquareMatrix extends Matrix {
 		
 		return new SquareMatrix(inv);
 	}
-
+	
 	/**
-	 * Returns the matrix missing row r and column c
-	 * @param r the row to remove from the matrix
-	 * @param c the column to remove from the matrix
-	 * @return the matrix missing row r and column c
-	 * @throws Exception
-	 */
-	protected ComplexNumber[][] getReducted(int r, int c) throws Exception {
-		// returns a matrix without row r or column c
-
-		if (this.rows() == 1 || this.cols() == 1) {
-			throw new Exception("This matrix is too small to reduce any further.");
-		}
-		
-		int targetRow = 0, targetCol = 0;
-		ComplexNumber[][] reduced = new ComplexNumber[this.rows()-1][this.cols()-1];
-		
-		for (int sourceRow = 0; sourceRow < this.rows(); sourceRow++) {
-			// if we're at the row to skip, jump back to the top
-			if (sourceRow == r) {
-				continue;
-			}
-			
-			for (int sourceCol = 0; sourceCol < this.cols(); sourceCol++) {
-				if (sourceCol == c) {
-					continue;
-				}
-				reduced[targetRow][targetCol] = getAt(sourceRow, sourceCol);
-				targetCol++;
-			}
-			// only update targetRow if we haven't jumped over the row to cut
-			targetRow++;
-			targetCol = 0; // already 0 if we skipped the row
-		}
-		
-		return reduced;
-	}
-
-	/**
-	 * Returns the determinant of this matrix in O(n!)
+	 * Returns the determinant of this matrix in O(n^3) time complexity
 	 * @return the determinant of the matrix
 	 */
 	public ComplexNumber determinant() {
 
-		// if triangular just take the product along the diagonal
-		if (isUpperTriangular() || isLowerTriangular()) {
-			ComplexNumber prod = new ComplexNumber(1, 0);
-			for (int i = 0; i < rows(); i++) {
-				prod = prod.multiply(getAt(i, i));
-			}
-			return prod;
+		// try shortcuts for common sizes first
+		if (rows() == 1) {
+			return getAt(0,0);
+		}
+		else if (rows() == 2) {
+			return getAt(0,0).multiply(getAt(1,1)).subtract(getAt(1,0).multiply(getAt(0,1)));
 		}
 		else {
-			// otherwise we have to go through the usual algorithm
-			return determinant(this.getData());
+			return rref(1).getAt(0, 0);
 		}
 	}
 
@@ -223,24 +183,6 @@ public class SquareMatrix extends Matrix {
 				
 		// an antisymmetric matrix equals the negative of its transpose
 		return (this.equals(this.transpose().scale(-1)));
-	}
-
-	/**
-	 * Tells whether the matrix is the identity matrix
-	 * @return whether the matrix is the identity matrix
-	 */
-	public boolean isIdentity() {
-		
-		for (int i = 0; i < rows(); i++) {
-			for (int j = 0; j < cols(); j++) {
-				if ((i != j && !getAt(i, j).equals(new ComplexNumber(0, 0)))
-					|| (i == j && !getAt(i, j).equals(new ComplexNumber(1, 0)))) {
-					return false;
-				}
-			}
-		}
-		
-		return true;
 	}
 	
 	/**
@@ -337,32 +279,6 @@ public class SquareMatrix extends Matrix {
 		}
 		
 		return lu;
-	}
-	
-	// determinant helper method
-	private ComplexNumber determinant(ComplexNumber[][] mat) {
-		
-		// precondition: this is a square matrix
-		
-		// base case is 2x2 matrix:
-		if (mat.length == 2) {
-			return mat[0][0].multiply(mat[1][1]).subtract(mat[0][1].multiply(mat[1][0]));
-		}
-		
-		int negator = 1;
-		ComplexNumber det = new ComplexNumber(0, 0);
-		
-		for (int i = 0; i < cols(); i++) {
-			try {
-				det = det.add(getAt(0, i).multiply(negator).multiply(determinant(getReducted(0, i))));
-			} catch (Exception e) {
-				// the matrix ran out of rows or columns to remove - shouldn't happen
-				e.printStackTrace();
-			}
-			negator *= -1;
-		}
-		
-		return det;
 	}
 	
 	/**

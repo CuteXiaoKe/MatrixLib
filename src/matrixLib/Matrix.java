@@ -363,17 +363,13 @@ public class Matrix {
 		return v;
 	}
 	
-	/**
-	 * Computes the row-reduced echelon form of
-	 * of this Matrix by Gaussian elimination
-	 * @return the row-reduced echelon form of this matrix
-	 * @throws DimensionMismatchException 
-	 */
-	public Matrix rref() throws DimensionMismatchException {
-		
-		// algorithm adapted from Wikipedia
+	// helper method for public rref()
+	// used for computing either rref or the determinant
+	// type=0: rref, type=1: det
+	protected Matrix rref(int type) {
 		
 		Matrix rref = new Matrix(matrix);
+		ComplexNumber det = new ComplexNumber(1,0);
 		
 		int lead = 0;
 		for (int r = 0; r < rows(); r++) {
@@ -393,17 +389,23 @@ public class Matrix {
 			}
 			
 			// swap rows i and r
-			for (int a = 0; a < cols(); a++) {
-				ComplexNumber temp = rref.getAt(i, a);
-				rref.set(i, a, rref.getAt(r, a));
-				rref.set(r, a, temp);
+			if (i != r) {
+				for (int a = 0; a < cols(); a++) {
+					ComplexNumber temp = rref.getAt(i, a);
+					rref.set(i, a, rref.getAt(r, a));
+					rref.set(r, a, temp);
+				}
+				// swapping rows negates the determinant
+				det = det.multiply(-1);
 			}
-	
+			
 			// divide row r by rref[r][lead]
 			ComplexNumber div = rref.getAt(r, lead);
 			for (int a = 0; a < cols(); a++) {
 				rref.set(r, a, rref.getAt(r, a).divide(div));
 			}
+			// scaling the matrix scales the determinant
+			det = det.multiply(div);
 			
 			for (int j = 0; j < rows(); j++) {
 				if (j != r) {
@@ -416,8 +418,66 @@ public class Matrix {
 			}
 			lead++;
 		}
-				
+		
+		if (type == 0) {
+			return rref;
+		}
+		else {
+			if (rref.isIdentity()) {
+				rref.set(0, 0, det);
+			}
+			else {
+				rref.set(0, 0, new ComplexNumber(0, 0));
+			}
+		}
+		
 		return rref;
+	}
+	
+	/**
+	 * Computes the row-reduced echelon form of
+	 * of this Matrix by Gaussian elimination
+	 * @return the row-reduced echelon form of this matrix
+	 * @throws DimensionMismatchException 
+	 */
+	public Matrix rref() throws DimensionMismatchException {
+		
+		return rref(0);
+	}
+	
+	/**
+	 * Returns the rank of this matrix (the dimension of its image)
+	 * @return the rank of this matrix
+	 * @throws DimensionMismatchException 
+	 */
+	public int rank() throws DimensionMismatchException {
+		
+		int rk = 0;
+		
+		for (ComplexNumber[] row : this.rref().getData()) {
+			boolean all_zero = true;
+			for (ComplexNumber z : row) {
+				if (!z.isZero()) {
+					all_zero = false;
+					break;
+				}
+			}
+			if (!all_zero) {
+				rk++;
+			}
+		}
+		
+		return rk;
+	}
+	
+	/**
+	 * Returns the nullity of this matrix (the dimension of its kernel)
+	 * @return the nullity of this matrix
+	 * @throws DimensionMismatchException 
+	 */
+	public int nullity() throws DimensionMismatchException {
+		
+		return cols() - rank();
 	}
 	
 	public String toString() {
@@ -440,6 +500,28 @@ public class Matrix {
 		}
 		
 		return mstr;
+	}
+	
+	/**
+	 * Tells whether the matrix is the identity matrix
+	 * @return whether the matrix is the identity matrix
+	 */
+	public boolean isIdentity() {
+		
+		if (rows() != cols()) {
+			return false;
+		}
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				if ((i != j && !getAt(i, j).equals(new ComplexNumber(0, 0)))
+					|| (i == j && !getAt(i, j).equals(new ComplexNumber(1, 0)))) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	/**
