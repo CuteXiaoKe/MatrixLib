@@ -70,10 +70,13 @@ public class Demo {
 	}
 	
 	public static void test_lu() throws NotSquareException, DimensionMismatchException, SingularMatrixException {
-		float[][] a = {{4,3},{6,3}};
+		float[][] a = {{1,2},{3,4}};
 		SquareMatrix m = new SquareMatrix(a);
 		
-		System.out.println(m.luDecompose());
+		Matrix[] lu = m.luDecompose();
+		
+		System.out.println(lu[0]);
+		System.out.println(lu[1]);
 	}
 	
 	public static void test_norm() {
@@ -83,21 +86,22 @@ public class Demo {
 	}
 	
 	public static void test_rref() throws DimensionMismatchException {
-		float[][] f = {{1,2},{2,4}};
+		float[][] f = {{1,2},{3,4}};
 		Matrix m = new Matrix(f);
 		System.out.println(m.rref());
 	}
 	
 	public static void test_inverse() throws NotSquareException, DimensionMismatchException {
-		float[][] f = {{-2,2,3},{-1,1,3},{2,0,-1}};
+		float[][] f = {{1,0},{-3,1}};
 		SquareMatrix m = new SquareMatrix(f);
 		System.out.println(m.inverse());
 	}
 	
 	public static void main(String[] args) throws Exception {
 		
-		test_inverse();
+		test_lu();
 		
+		//test_inverse();
 		//test_cholesky();
 		//test_qr();
 		//test_proj();

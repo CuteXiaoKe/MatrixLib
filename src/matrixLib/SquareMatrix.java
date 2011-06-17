@@ -300,15 +300,15 @@ public class SquareMatrix extends Matrix {
 			}
 		}
 		
-		Matrix[] lowers = new Matrix[rows()-1];
+		SquareMatrix[] lowers = new SquareMatrix[rows()-1];
 		Matrix temp = this;
 		
 		for (int n = 0; n < rows()-1; n++) {
-			ComplexNumber[] ls = new ComplexNumber[rows()-n];
+			ComplexNumber[] ls = new ComplexNumber[rows()];
 			ComplexNumber[][] build = new ComplexNumber[rows()][cols()];
 			
-			for (int i = n+1; i <= rows(); i++) {
-				ls[i-n-1] = temp.getAt(i, n).divide(temp.getAt(n, n)).multiply(-1);
+			for (int i = n+1; i < rows(); i++) {
+				ls[i] = temp.getAt(i, n).divide(temp.getAt(n, n)).multiply(-1);
 			}
 			
 			for (int a = 0; a < rows(); a++) {
@@ -325,17 +325,17 @@ public class SquareMatrix extends Matrix {
 				}
 			}
 			
-			lowers[n] = new Matrix(build);
+			lowers[n] = new SquareMatrix(build);
 			temp = lowers[n].multiply(temp);
 		}
 		
 		lu[1] = temp;
 		
-		lu[0] = lowers[0];
+		lu[0] = lowers[0].inverse();
 		for (int i = 1; i < rows()-1; i++) {
-			lu[0] = lu[0].multiply(((SquareMatrix)lowers[i]).inverse());
+			lu[0] = lu[0].multiply(lowers[i].inverse());
 		}
-				
+		
 		return lu;
 	}
 	
