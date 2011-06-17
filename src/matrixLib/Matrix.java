@@ -370,6 +370,64 @@ public class Matrix {
 		return v;
 	}
 	
+	// helper methods for Gaussian elimination
+	protected Matrix rowOp_swap(int row1, int row2) {
+		
+		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				if (i == row1) {
+					newdata[i][j] = matrix[row2][j];
+				}
+				else if (i == row2) {
+					newdata[i][j] = matrix[row1][j];
+				}
+				else {
+					newdata[i][j] = matrix[i][j];
+				}
+			}
+		}
+		
+		return new Matrix(newdata);
+	}
+	
+	protected Matrix rowOp_scale(int row, ComplexNumber factor) {
+		
+		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				if (i == row) {
+					newdata[i][j] = matrix[i][j].multiply(factor);
+				}
+				else {
+					newdata[i][j] = matrix[i][j];
+				}
+			}
+		}
+		
+		return new Matrix(newdata);
+	}
+	
+	protected Matrix rowOp_addMultiple(int toRow, int srcRow, ComplexNumber factor) {
+		
+		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				if (i == toRow) {
+					newdata[i][j] = matrix[i][j].add(matrix[srcRow][j]).multiply(factor);
+				}
+				else {
+					newdata[i][j] = matrix[i][j];
+				}
+			}
+		}
+		
+		return new Matrix(newdata);
+	}
+	
 	public String toString() {
 		
 		String mstr = "[";

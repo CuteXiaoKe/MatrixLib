@@ -239,17 +239,66 @@ public class SquareMatrix extends Matrix {
 	/**
 	 * Computes and returns the LU decomposition of the matrix
 	 * @return the result of the LU decomposition {L,D,U}, or null if no LU decomposition is admitted
+	 * @throws DimensionMismatchException 
 	 */
-	public Matrix[] luDecompose() {
+	public Matrix[] luDecompose() throws DimensionMismatchException {
 		
-		// returns {null, null, null} if the matrix does not admit an LU-decomposition
+		// returns {null, null} if the matrix does not admit an LU-decomposition
 		
-		Matrix[] ldu = new Matrix[3];
+		Matrix[] lu = new Matrix[2];
 		
+		// check all leading principal minors are nonzero
+		// this encompasses checking that the matrix is invertible too
+		for (int i = 1; i <= rows(); i++) {
+			ComplexNumber[][] build = new ComplexNumber[i][i];
+			for (int j = 0; j < i; j++) {
+				for (int k = 0; k < i; k++) {
+					build[j][k] = getAt(j, k);
+				}
+			}
+			if ((new SquareMatrix(build)).determinant().isZero()) {
+				lu[0] = lu[1] = null;
+				return lu;
+			}
+		}
 		
+		Matrix[] lowers = new Matrix[rows()-1];
+		Matrix temp = this;
 		
+		for (int n = 0; n < rows()-1; n++) {
+			ComplexNumber[] ls = new ComplexNumber[rows()-n];
+			ComplexNumber[][] build = new ComplexNumber[rows()][cols()];
+			
+			for (int i = n+1; i <= rows(); i++) {
+				ls[i-n-1] = temp.getAt(i, n).divide(temp.getAt(n, n)).multiply(-1);
+			}
+			
+			for (int a = 0; a < rows(); a++) {
+				for (int b = 0; b < cols(); b++) {
+					if (a == b) {
+						build[a][b] = new ComplexNumber(1,0);
+					}
+					else if (b == n && a > n) {
+						build[a][b] = ls[a];
+					}
+					else {
+						build[a][b] = new ComplexNumber(0,0);
+					}
+				}
+			}
+			
+			lowers[n] = new Matrix(build);
+			temp = lowers[n].multiply(temp);
+		}
 		
-		return ldu;
+		lu[1] = temp;
+		
+		lu[0] = lowers[0];
+		for (int i = 1; i < rows()-1; i++) {
+			lu[0] = lu[0].multiply(lowers[i].inverse());
+		}
+				
+		return lu;
 	}
 	
 	// determinant helper method

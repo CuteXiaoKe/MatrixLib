@@ -69,6 +69,13 @@ public class Demo {
 		System.out.println("det(I_4) = " + (new SquareMatrix(4)).determinant());
 	}
 	
+	public static void test_lu() throws NotSquareException {
+		float[][] a = {{4,3},{6,3}};
+		SquareMatrix m = new SquareMatrix(a);
+		
+		System.out.println(m.luDecompose());
+	}
+	
 	public static void test_norm() {
 		ComplexNumber[] a = {new ComplexNumber(1,0),new ComplexNumber(0,1)};
 		Vector v = new Vector(a);
@@ -77,7 +84,7 @@ public class Demo {
 	
 	public static void main(String[] args) throws Exception {
 		
-		test_cholesky();
+		//test_cholesky();
 		
 		//test_qr();
 		//test_proj();
