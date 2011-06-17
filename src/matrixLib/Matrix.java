@@ -329,21 +329,31 @@ public class Matrix {
 	}
 	
 	/**
-	 * Performs row reduction (Gauss-Jordan elimination) on this matrix
-	 * @return the reduced row echelon form of this matrix
-	 */
-	public Matrix rowReduce() {
-		
-		return this; // placeholder
-	}
-	
-	/**
 	 * Gets the underlying data array for this matrix
 	 * @return the underlying data array for this matrix
 	 */
 	protected ComplexNumber[][] getData() {
 		
 		return this.matrix;
+	}
+	
+	/**
+	 * Gets the singular values of the matrix
+	 * @return an array of singular values of the matrix
+	 * @throws DimensionMismatchException 
+	 * @throws NotSquareException 
+	 */
+	public ComplexNumber[] singularValues() throws NotSquareException, DimensionMismatchException {
+		
+		ComplexNumber[] sv = new ComplexNumber[cols()];
+		SquareMatrix sm = new SquareMatrix(this.conjugateTranspose().multiply(this).getData());
+		ComplexNumber[] evals = sm.eigenvalues();
+		
+		for (int i = 0; i < evals.length; i++) {
+			sv[i] = evals[i].sqrt();
+		}
+		
+		return sv;
 	}
 	
 	/**
