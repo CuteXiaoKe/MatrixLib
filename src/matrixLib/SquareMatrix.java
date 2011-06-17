@@ -94,8 +94,8 @@ public class SquareMatrix extends Matrix {
 	 * @return the corresponding inverse matrix
 	 * @throws SingularMatrixException
 	 */
-	public Matrix getInverse() throws SingularMatrixException {
-				
+	public Matrix inverse() throws SingularMatrixException {
+		
 		if (determinant().equals(new ComplexNumber(0, 0))) {
 			// if the matrix has det 0 it is not invertible
 			throw new SingularMatrixException();
@@ -240,8 +240,10 @@ public class SquareMatrix extends Matrix {
 	 * Computes and returns the LU decomposition of the matrix
 	 * @return the result of the LU decomposition {L,D,U}, or null if no LU decomposition is admitted
 	 * @throws DimensionMismatchException 
+	 * @throws SingularMatrixException 
+	 * @throws NotSquareException 
 	 */
-	public Matrix[] luDecompose() throws DimensionMismatchException {
+	public Matrix[] luDecompose() throws DimensionMismatchException, SingularMatrixException, NotSquareException {
 		
 		// returns {null, null} if the matrix does not admit an LU-decomposition
 		
@@ -295,7 +297,7 @@ public class SquareMatrix extends Matrix {
 		
 		lu[0] = lowers[0];
 		for (int i = 1; i < rows()-1; i++) {
-			lu[0] = lu[0].multiply(lowers[i].inverse());
+			lu[0] = lu[0].multiply(((SquareMatrix)lowers[i]).inverse());
 		}
 				
 		return lu;

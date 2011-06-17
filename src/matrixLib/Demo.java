@@ -69,7 +69,7 @@ public class Demo {
 		System.out.println("det(I_4) = " + (new SquareMatrix(4)).determinant());
 	}
 	
-	public static void test_lu() throws NotSquareException {
+	public static void test_lu() throws NotSquareException, DimensionMismatchException, SingularMatrixException {
 		float[][] a = {{4,3},{6,3}};
 		SquareMatrix m = new SquareMatrix(a);
 		
@@ -82,7 +82,22 @@ public class Demo {
 		System.out.println(v.normalize());
 	}
 	
+	public static void test_rref() throws DimensionMismatchException {
+		float[][] f = {{1,2},{2,4}};
+		Matrix m = new Matrix(f);
+		System.out.println(m.rref());
+	}
+	
 	public static void main(String[] args) throws Exception {
+		
+		float[][] f = {{1,2},{3,4}};
+		Matrix m = new Matrix(f);
+		
+		//System.out.println(m.rowOp_swap(0,1));
+		//System.out.println(m.rowOp_scale(0, new ComplexNumber(3,0)));
+		//System.out.println(m.rowOp_subMultiple(0,1,new ComplexNumber(2,0)));
+		
+		test_rref();
 		
 		//test_cholesky();
 		

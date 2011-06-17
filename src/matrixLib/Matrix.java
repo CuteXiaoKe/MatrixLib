@@ -371,7 +371,7 @@ public class Matrix {
 	}
 	
 	// helper methods for Gaussian elimination
-	protected Matrix rowOp_swap(int row1, int row2) {
+	public Matrix rowOp_swap(int row1, int row2) {
 		
 		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
 		
@@ -392,14 +392,14 @@ public class Matrix {
 		return new Matrix(newdata);
 	}
 	
-	protected Matrix rowOp_scale(int row, ComplexNumber factor) {
+	public Matrix rowOp_scale(int row, ComplexNumber factor) {
 		
 		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
 		
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < cols(); j++) {
 				if (i == row) {
-					newdata[i][j] = matrix[i][j].multiply(factor);
+					newdata[i][j] = matrix[i][j].divide(factor);
 				}
 				else {
 					newdata[i][j] = matrix[i][j];
@@ -410,19 +410,18 @@ public class Matrix {
 		return new Matrix(newdata);
 	}
 	
-	protected Matrix rowOp_addMultiple(int toRow, int srcRow, ComplexNumber factor) {
+	public Matrix rowOp_subMultiple(int toRow, int srcRow, ComplexNumber factor) {
 		
 		ComplexNumber[][] newdata = new ComplexNumber[rows()][cols()];
 		
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < cols(); j++) {
-				if (i == toRow) {
-					newdata[i][j] = matrix[i][j].add(matrix[srcRow][j]).multiply(factor);
-				}
-				else {
-					newdata[i][j] = matrix[i][j];
-				}
+				newdata[i][j] = matrix[i][j];
 			}
+		}
+		
+		for (int j = 0; j < cols(); j++) {
+			newdata[toRow][j] = matrix[toRow][j].subtract(matrix[srcRow][j].multiply(factor));
 		}
 		
 		return new Matrix(newdata);
@@ -432,33 +431,42 @@ public class Matrix {
 	 * Computes the row-reduced echelon form of
 	 * of this Matrix by Gaussian elimination
 	 * @return the row-reduced echelon form of this matrix
+	 * @throws DimensionMismatchException 
 	 */
-	public Matrix rref() {
+	public Matrix rref() throws DimensionMismatchException {
 		
 		// algorithm adapted from Wikipedia
 		
 		Matrix rref = new Matrix(matrix);
-		int i = 0, j = 0;
 		
-		while (i < rows() && j < cols()) {
-			
-			int maxi = i;
-			for (int k = i+1; k < rows(); k++) {
-				if (rref.getAt(k,j).abs() > rref.getAt(maxi,j).abs()) {
-					maxi = k;
-				}
+		int lead = 0;
+		for (int r = 0; r < rows(); r++) {
+			if (lead >= cols()) {
+				break;
 			}
-			if (!rref.getAt(maxi, j).isZero()) {
-				rref = rref.rowOp_swap(i, maxi);
-				rref = rref.rowOp_scale(i, rref.getAt(i, j).reciprocal());
-				for (int u = i+1; u < rows(); u++) {
-					rref = rref.rowOp_addMultiple(u, i, (new ComplexNumber(0, 0)).subtract(rref.getAt(u, j)));
-				}
+			int i = r;
+			while (rref.getAt(i, lead).isZero()) {
 				i++;
+				if (i == rows()) {
+					i = r;
+					lead++;
+					if (lead == cols()) {
+						return rref;
+					}
+				}
 			}
-			j++;
+			rref = rref.rowOp_swap(i, r);
+			
+			rref = rref.rowOp_scale(r, rref.getAt(r, lead));
+			
+			for (int j = 0; j < rows(); j++) {
+				if (j != r) {
+					rref = rref.rowOp_subMultiple(j, r, rref.getAt(j, lead));
+				}
+			}
+			lead++;
 		}
-		
+				
 		return rref;
 	}
 	

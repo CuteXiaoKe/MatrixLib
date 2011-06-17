@@ -206,6 +206,9 @@ public class ComplexNumber {
 
 		// return only a or bi if the number is real or imaginary
 		if (re == 0) {
+			if (im == 0) {
+				return "0";
+			}
 			return Double.toString(im) + "i";
 		}
 		else if (im == 0) {
