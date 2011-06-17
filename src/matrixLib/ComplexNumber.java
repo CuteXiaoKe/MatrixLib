@@ -95,6 +95,20 @@ public class ComplexNumber {
 	}
 
 	/**
+	 * Returns the reciprocal 1/z of this complex number
+	 * @return the reciprocal of this complex number
+	 * @throws ArithmeticException
+	 */
+	public ComplexNumber reciprocal() throws ArithmeticException {
+		
+		if (this.isZero()) {
+			throw new ArithmeticException();
+		}
+		
+		return this.conjugate().multiply(1.0/this.abs());
+	}
+	
+	/**
 	 * Scales a complex number by a factor
 	 * @param f the scaling factor
 	 * @return the complex number scaled by f

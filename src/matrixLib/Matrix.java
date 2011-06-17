@@ -427,6 +427,40 @@ public class Matrix {
 		
 		return new Matrix(newdata);
 	}
+
+	/**
+	 * Computes the row-reduced echelon form of
+	 * of this Matrix by Gaussian elimination
+	 * @return the row-reduced echelon form of this matrix
+	 */
+	public Matrix rref() {
+		
+		// algorithm adapted from Wikipedia
+		
+		Matrix rref = new Matrix(matrix);
+		int i = 0, j = 0;
+		
+		while (i < rows() && j < cols()) {
+			
+			int maxi = i;
+			for (int k = i+1; k < rows(); k++) {
+				if (rref.getAt(k,j).abs() > rref.getAt(maxi,j).abs()) {
+					maxi = k;
+				}
+			}
+			if (!rref.getAt(maxi, j).isZero()) {
+				rref = rref.rowOp_swap(i, maxi);
+				rref = rref.rowOp_scale(i, rref.getAt(i, j).reciprocal());
+				for (int u = i+1; u < rows(); u++) {
+					rref = rref.rowOp_addMultiple(u, i, (new ComplexNumber(0, 0)).subtract(rref.getAt(u, j)));
+				}
+				i++;
+			}
+			j++;
+		}
+		
+		return rref;
+	}
 	
 	public String toString() {
 		
