@@ -105,7 +105,7 @@ public class ComplexNumber {
 			throw new ArithmeticException();
 		}
 		
-		return this.conjugate().multiply(1.0/this.abs());
+		return this.conjugate().multiply(1.0/(this.abs()*this.abs()));
 	}
 	
 	/**

@@ -104,7 +104,14 @@ public class Demo {
 	
 	public static void main(String[] args) throws Exception {
 		
-		test_det();
+		ComplexNumber c = new ComplexNumber(5,0);
+		ComplexNumber z = new ComplexNumber(2,3);
+		
+		System.out.println(c.reciprocal());
+		System.out.println(z.reciprocal());
+		
+		
+		//test_det();
 		//test_rref();
 		//test_lu();
 		//test_inverse();
