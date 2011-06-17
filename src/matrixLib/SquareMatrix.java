@@ -91,17 +91,40 @@ public class SquareMatrix extends Matrix {
 	
 	/**
 	 * Returns the inverse of this matrix
-	 * @return the corresponding inverse matrix
-	 * @throws SingularMatrixException
+	 * @return the corresponding inverse matrix, or null if the matrix is not invertible
+	 * @throws DimensionMismatchException 
+	 * @throws NotSquareException 
 	 */
-	public Matrix inverse() throws SingularMatrixException {
+	public SquareMatrix inverse() throws DimensionMismatchException, NotSquareException {
 		
-		if (determinant().equals(new ComplexNumber(0, 0))) {
-			// if the matrix has det 0 it is not invertible
-			throw new SingularMatrixException();
+		ComplexNumber[][] augmented = new ComplexNumber[rows()][cols()*2];
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols()*2; j++) {
+				if (j < cols()) {
+					augmented[i][j] = getAt(i, j);
+				}
+				else {
+					if (i == j - cols()) {
+						augmented[i][j] = new ComplexNumber(1,0);
+					}
+					else {
+						augmented[i][j] = new ComplexNumber(0,0);
+					}
+				}
+			}
 		}
 		
-		return this; // placeholder
+		Matrix aug_rref = (new Matrix(augmented)).rref();
+		ComplexNumber[][] inv = new ComplexNumber[rows()][cols()];
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				inv[i][j] = aug_rref.getAt(i, j+cols());
+			}
+		}
+		
+		return new SquareMatrix(inv);
 	}
 
 	/**

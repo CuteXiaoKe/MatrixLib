@@ -88,16 +88,15 @@ public class Demo {
 		System.out.println(m.rref());
 	}
 	
+	public static void test_inverse() throws NotSquareException, DimensionMismatchException {
+		float[][] f = {{5,19},{1,4}};
+		SquareMatrix m = new SquareMatrix(f);
+		System.out.println(m.inverse());
+	}
+	
 	public static void main(String[] args) throws Exception {
 		
-		float[][] f = {{1,2},{3,4}};
-		Matrix m = new Matrix(f);
-		
-		//System.out.println(m.rowOp_swap(0,1));
-		//System.out.println(m.rowOp_scale(0, new ComplexNumber(3,0)));
-		//System.out.println(m.rowOp_subMultiple(0,1,new ComplexNumber(2,0)));
-		
-		test_rref();
+		test_inverse();
 		
 		//test_cholesky();
 		
