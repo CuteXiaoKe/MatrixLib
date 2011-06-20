@@ -5,6 +5,7 @@ public class Demo {
 	public static void test_eigen() throws NotSquareException, DimensionMismatchException {
 		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
 		ComplexNumber[][] z = {{new ComplexNumber(0,1), new ComplexNumber(2, 0)},{new ComplexNumber(1,0),new ComplexNumber(1,1)}};
+		//float[][]z = {{1,2},{3,4}};
 		SquareMatrix zm = new SquareMatrix(z);
 		ComplexNumber[] evals = zm.eigenvalues();
 		System.out.println(evals[0] + " " + evals[1]);
@@ -102,14 +103,7 @@ public class Demo {
 		System.out.println(m.inverse());
 	}
 	
-	public static void main(String[] args) throws Exception {
-		
-		ComplexNumber c = new ComplexNumber(5,0);
-		ComplexNumber z = new ComplexNumber(2,3);
-		
-		System.out.println(c.reciprocal());
-		System.out.println(z.reciprocal());
-		
+	public static void main(String[] args) throws Exception {		
 		
 		//test_det();
 		//test_rref();
@@ -119,7 +113,7 @@ public class Demo {
 		//test_qr();
 		//test_proj();
 		//test_dot();
-		//test_eigen();
+		test_eigen();
 	}
 
 }

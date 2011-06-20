@@ -320,6 +320,7 @@ public class Matrix {
 			}
 			System.out.println("u["+i+"]: " + u[i]);
 			e[i] = u[i].normalize();
+			System.out.println("e["+i+"]: " + e[i]);
 		}
 		
 		qr[0] = new Matrix(e);

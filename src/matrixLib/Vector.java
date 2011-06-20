@@ -110,7 +110,7 @@ public class Vector extends Matrix {
 	}
 	
 	/**
-	 * Compute the standard inner product (dot product) of two vectors
+	 * Compute the Hermetian inner product (dot product) of two vectors
 	 * @param v the vector to dot against this
 	 * @return the inner product <this, v> of this vector with v 
 	 */
@@ -120,11 +120,9 @@ public class Vector extends Matrix {
 			throw new DimensionMismatchException();
 		}
 		
-		//return this.conjugateTranspose().multiply(v).getAt(0, 0);
-		
 		ComplexNumber dotprod = new ComplexNumber(0, 0);
 		for (int i = 0; i < dim(); i++) {
-			dotprod = dotprod.add(this.getAt(i).multiply(v.getAt(i)));
+			dotprod = dotprod.add(this.getAt(i).multiply(v.getAt(i).conjugate()));
 		}
 		return dotprod;
 	}
@@ -161,6 +159,10 @@ public class Vector extends Matrix {
 		
 		if (this.dim() != onto.dim()) {
 			throw new DimensionMismatchException();
+		}
+		
+		if (onto.dot(onto).isZero()) {
+			System.out.println("onto: " + onto);
 		}
 		
 		return onto.scale(onto.dot(this).divide(onto.dot(onto))).toVector();
