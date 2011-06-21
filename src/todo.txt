@@ -1,0 +1,11 @@
+todo:
+
+svd
+schur
+fast matrix multiplication
+eigenvectors
+fix eigenvalues
+fix multiplication?
+junit tests
+change throws to try/catch blocks
+optimize

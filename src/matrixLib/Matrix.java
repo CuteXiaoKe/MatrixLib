@@ -1,5 +1,7 @@
 package matrixLib;
 
+import java.util.LinkedList;
+
 /**
  * Represents a matrix over either R or C
  * @author Bryan Cuccioli
@@ -336,6 +338,28 @@ public class Matrix {
 	protected ComplexNumber[][] getData() {
 		
 		return this.matrix;
+	}
+	
+	/**
+	 * Gets the canonical basis for the image of the matrix
+	 * @return the vectors forming a basis for the image of the matrix
+	 * @throws DimensionMismatchException 
+	 */
+	public LinkedList<Vector> imageBasis() throws DimensionMismatchException {
+		
+		Matrix rref = this.rref();
+		LinkedList<Vector> basis = new LinkedList<Vector>();
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				if (!rref.getAt(i,j).isZero()) {
+					basis.add(getVector(j));
+					break;
+				}
+			}
+		}
+		
+		return basis;
 	}
 	
 	/**

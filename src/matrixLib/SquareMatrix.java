@@ -326,6 +326,7 @@ public class SquareMatrix extends Matrix {
 			System.out.println("QR decomposing...");
 			Matrix[] qr = temp.QRDecompose();
 			temp = qr[1].multiply(qr[0]);
+			System.out.println(temp);
 		}
 		
 		// temp is now upper triangular, so the evals are on the diagonal
