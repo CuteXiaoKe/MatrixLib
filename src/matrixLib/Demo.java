@@ -5,11 +5,15 @@ public class Demo {
 	public static void test_eigen() throws NotSquareException, DimensionMismatchException {
 		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
 		//ComplexNumber[][] z = {{new ComplexNumber(0,1), new ComplexNumber(2, 0)},{new ComplexNumber(1,0),new ComplexNumber(1,1)}};
-		float[][] z = {{3,-2},{4,-1}};
-		//float[][]z = {{1,2},{3,4}};
+		//float[][] z = {{3,-2},{4,-1}};
+		float[][]z = {{1,2},{3,4}};
 		SquareMatrix zm = new SquareMatrix(z);
 		ComplexNumber[] evals = zm.eigenvalues();
 		System.out.println(evals[0] + " " + evals[1]);
+		Vector[] evs = zm.eigenvectors();
+		for (Vector ev : evs) {
+			System.out.println(ev);
+		}
 	}
 	
 	public static void test_proj() throws DimensionMismatchException {
@@ -105,21 +109,32 @@ public class Demo {
 	}
 	
 	public static void test_multiply() throws DimensionMismatchException {
-		ComplexNumber[][] z = {{new ComplexNumber(1,1),new ComplexNumber(2,0)},{new ComplexNumber(1,0),new ComplexNumber(0,1)}};
-		Matrix m = new Matrix(z);
-		System.out.println(m.multiply(m));
+		//ComplexNumber[][] z = {{new ComplexNumber(1,1),new ComplexNumber(2,0)},{new ComplexNumber(1,0),new ComplexNumber(0,1)}};
+		//Matrix m = new Matrix(z);
+		float[][] f = {{1,2,3},{4,5,6}};
+		float[] g = {7, 8, 9};
+		Matrix m = new Matrix(f);
+		Vector v = new Vector(g);
+		System.out.println(m.multiply(v));
 	}
 	
 	public static void test_bases() throws DimensionMismatchException {
 		float[][] f = {{0,0,0},{1,2,3},{2,4,7}};
 		Matrix m = new Matrix(f);
-		
 		System.out.println("Basis for image: " + m.imageBasis());
+	}
+	
+	public static void test_svd() throws NotSquareException, DimensionMismatchException {
+		float[][] f = {{4,0},{3,-5}};
+		Matrix m = new Matrix(f);
+		System.out.println(m.singularValueDecomposition());
 	}
 	
 	public static void main(String[] args) throws Exception {		
 		
-		test_bases();
+		//test_svd();
+		
+		//test_bases();
 		
 		//test_multiply();
 		
@@ -131,7 +146,6 @@ public class Demo {
 		//test_qr();
 		//test_proj();
 		//test_dot();
-		//test_eigen();
+		test_eigen();
 	}
-
 }

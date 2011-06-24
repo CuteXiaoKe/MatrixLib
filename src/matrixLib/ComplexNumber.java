@@ -5,7 +5,7 @@ package matrixLib;
  * Enables using matrices over the field C instead of just R
  * @author Bryan Cuccioli
  */
-public class ComplexNumber {
+public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
@@ -237,5 +237,21 @@ public class ComplexNumber {
 	public boolean isZero() {
 		
 		return this.re == 0 && this.im == 0;
+	}
+
+	/**
+	 * Compares this to z by comparing the modulus of this with |z|
+	 */
+	public int compareTo(ComplexNumber z) {
+		
+		if (this.abs() > z.abs()) {
+			return -1;
+		}
+		else if (this.abs() < z.abs()) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
 	}
 }

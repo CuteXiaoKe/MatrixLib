@@ -1,5 +1,6 @@
 package matrixLib;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -254,6 +255,29 @@ public class Matrix {
 	}
 	
 	/**
+	 * Multiplies this matrix by the given vector
+	 * @param v the vector by which to multiply the matrix
+	 * @return the product of this matrix and the given vector
+	 * @throws DimensionMismatchException
+	 */
+	public Vector multiply(Vector v) throws DimensionMismatchException {
+		
+		if (this.cols() != v.dim()) {
+			throw new DimensionMismatchException();
+		}
+		
+		Vector prod = new Vector(this.rows());
+		
+		for (int i = 0; i < rows(); i++) {
+			for (int j = 0; j < cols(); j++) {
+				prod.set(i, prod.getAt(i).add(matrix[i][j].multiply(v.getAt(j))));
+			}
+		}
+		
+		return prod;
+	}
+	
+	/**
 	 * Adds this matrix to m
 	 * @param m the matrix to add to this one
 	 * @return the sum this+m
@@ -316,13 +340,13 @@ public class Matrix {
 		
 		for (int i = 0; i < cols(); i++) {
 			u[i] = getVector(i);
-			System.out.println("u["+i+"]: " + u[i]);
+			//System.out.println("u["+i+"]: " + u[i]);
 			for (int j = 0; j < i; j++) {
 				u[i] = u[i].subtract(getVector(i).proj(e[j]));
 			}
-			System.out.println("u["+i+"]: " + u[i]);
+			//System.out.println("u["+i+"]: " + u[i]);
 			e[i] = u[i].normalize();
-			System.out.println("e["+i+"]: " + e[i]);
+			//System.out.println("e["+i+"]: " + e[i]);
 		}
 		
 		qr[0] = new Matrix(e);
@@ -361,10 +385,37 @@ public class Matrix {
 		
 		return basis;
 	}
+
+	/**
+	 * Computes the singular value decomposition (SVD) of this matrix,
+	 * writing it as a product of a unitary matrix, a diagonal matrix, and another unitary matrix.
+	 * @return the matrices composing the factorization M={unitary, diagonal, unitary*}
+	 * @throws DimensionMismatchException 
+	 * @throws NotSquareException 
+	 */
+	public Matrix[] singularValueDecomposition() throws NotSquareException, DimensionMismatchException {
+		
+		Matrix[] svd = new Matrix[3];
+		ComplexNumber[] singvals = singularValues();
+		
+		ComplexNumber[][] build = new ComplexNumber[singvals.length][singvals.length];
+		int sv_pos = 0;
+		for (int i = 0; i < build.length; i++) {
+			for (int j = 0; j < build[0].length; j++) {
+				build[i][j] = (i == j) ? singvals[sv_pos++] : new ComplexNumber(0, 0);
+			}
+		}
+		SquareMatrix diag = new SquareMatrix(build);
+		System.out.println(diag);
+		System.out.println(diag.inverse());
+		
+		
+		return null; // fix this
+	}
 	
 	/**
 	 * Gets the singular values of the matrix
-	 * @return an array of singular values of the matrix
+	 * @return an array of singular values of the matrix, sorted in descending order by absolute value
 	 * @throws DimensionMismatchException 
 	 * @throws NotSquareException 
 	 */
@@ -378,6 +429,7 @@ public class Matrix {
 			sv[i] = evals[i].sqrt();
 		}
 		
+		Arrays.sort(sv); // uses a tuned quicksort
 		return sv;
 	}
 	

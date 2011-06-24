@@ -215,6 +215,24 @@ public class SquareMatrix extends Matrix {
 	}
 	
 	/**
+	 * Tells whether the matrix is upper Hessenberg
+	 * (whether it has zeros below the first subdiagonal)
+	 * @return whether the matrix is upper Hessenberg
+	 */
+	public boolean isUpperHessenberg() {
+		
+		for (int i = 2; i < rows(); i++) {
+			for (int j = 0; j < i-1; j++) {
+				if (!getAt(i,j).isZero()) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
 	 * Computes and returns the LU decomposition of the matrix
 	 * @return the result of the LU decomposition {L,D,U}, or null if no LU decomposition is admitted
 	 * @throws DimensionMismatchException 
@@ -323,10 +341,10 @@ public class SquareMatrix extends Matrix {
 		
 		Matrix temp = this;
 		while (!isAlmostUpperTriangular(temp)) {
-			System.out.println("QR decomposing...");
+			//System.out.println("QR decomposing...");
 			Matrix[] qr = temp.QRDecompose();
 			temp = qr[1].multiply(qr[0]);
-			System.out.println(temp);
+			//System.out.println(temp);
 		}
 		
 		// temp is now upper triangular, so the evals are on the diagonal
@@ -335,6 +353,58 @@ public class SquareMatrix extends Matrix {
 		}
 		
 		return evals;
+	}
+
+	/**
+	 * Computes the normalized eigenvectors
+	 * @return an array of normalized eigenvectors for the matrix
+	 * @throws DimensionMismatchException
+	 * @throws NotSquareException
+	 */
+	public Vector[] eigenvectors() throws DimensionMismatchException, NotSquareException {
+		
+		return eigenvectors(eigenvalues());
+	}
+	
+	/**
+	 * Computes the normalized eigenvectors of the matrix corresponding to certain eigenvalues
+	 * @param evals The list of eigenvalues to compute the associated eigenvectors of
+	 * @return an array of normalized eigenvectors for the matrix
+	 * @throws DimensionMismatchException 
+	 * @throws NotSquareException 
+	 */
+	public Vector[] eigenvectors(ComplexNumber[] evals) throws DimensionMismatchException, NotSquareException {
+		
+		Vector[] evecs = new Vector[rows()];
+		int vec_pos = 0;
+		
+		ComplexNumber[] test_vec = new ComplexNumber[rows()];
+		for (int i = 0; i < rows(); i++) {
+			test_vec[i] = new ComplexNumber(1, 0);
+		}
+		
+		for (ComplexNumber ev : evals) {
+			
+			SquareMatrix diag = new SquareMatrix(getData());
+			for (int i = 0; i < rows(); i++) {
+				for (int j = 0; j < cols(); j++) {
+					if (i == j) {
+						diag.set(i, j, diag.getAt(i, j).subtract(ev));
+					}
+				}
+			}
+			diag = diag.inverse();
+			
+			Vector prev = new Vector(test_vec);
+			Vector next = diag.multiply(prev).normalize();
+			do {
+				prev = next;
+				next = diag.multiply(prev).normalize();
+			} while (!next.isAlmost(prev));
+			evecs[vec_pos++] = next.normalize();
+		}
+		
+		return evecs;
 	}
 	
 	/**
