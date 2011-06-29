@@ -29,7 +29,7 @@ public class Vector extends Matrix {
 	 * Constructs a wrapping vector for entries
 	 * @param entries the underlying data for the new vector
 	 */
-	public Vector(float[] entries) {
+	public Vector(double[] entries) {
 	
 		super(parse(entries));
 	}
@@ -47,10 +47,10 @@ public class Vector extends Matrix {
 	}
 	
 	// wraps a 1d array into a 2d column array
-	// used as a helper to the Vector(float[]) constructor
-	private static float[][] parse(float[] array) {
+	// used as a helper to the Vector(double[]) constructor
+	private static double[][] parse(double[] array) {
 		
-		float[][] ret = new float[array.length][1];
+		double[][] ret = new double[array.length][1];
 		for (int i = 0; i < array.length; i++) {
 			ret[i][0] = array[i];
 		}
@@ -207,6 +207,52 @@ public class Vector extends Matrix {
 		}
 		
 		return true;
+	}
+
+	/**
+	 * Generates a unitary matrix whose first column is this vector
+	 * @return a unitary matrix whose first column is this vector
+	 * @throws DimensionMismatchException 
+	 */
+	public SquareMatrix generateUnitaryMatrix() throws DimensionMismatchException {
+		
+		Vector[] overspan = new Vector[this.dim()+1];
+		overspan[0] = this.normalize();
+		ComplexNumber[] oscontent = new ComplexNumber[this.dim()];
+		oscontent[0] = new ComplexNumber(1,0); // debug - should be (1,1)
+		
+		for (int i = 1; i < this.dim(); i++) {
+			oscontent[i] = new ComplexNumber(0,0);
+		}
+		
+		for (int i = 1; i <= this.dim(); i++) {
+			overspan[i] = new Vector(oscontent);
+			if (i != this.dim()) {
+				oscontent[i] = oscontent[i-1];
+			}
+			oscontent[i-1] = new ComplexNumber(0,0);
+		}
+		
+		// choose a maximal subset of independent vectors
+		System.out.println(new Matrix(overspan));
+		Matrix allvectors = new Matrix(overspan);
+		Matrix rref = allvectors.rref();
+		System.out.println(rref);
+		Vector[] basis = new Vector[this.dim()];
+		int vec_pos = 0;
+		for (int i = 0; i < this.dim(); i++) {
+			for (int j = 0; j <= this.dim(); j++) {
+				if (!getAt(i,j).isZero()) {
+					basis[vec_pos++] = allvectors.getVector(j);
+					System.out.println("added vector " + j + ": " + allvectors.getVector(j));
+					break;
+				}
+			}
+		}
+		System.out.println(new Matrix(basis));
+		
+		// apply Gram-Schmidt to orthogonalize the vectors
+		return (SquareMatrix) (new SquareMatrix(basis)).orthonormalize();
 	}
 	
 	/**

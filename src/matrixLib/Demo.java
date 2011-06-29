@@ -3,15 +3,14 @@ package matrixLib;
 public class Demo {
 
 	public static void test_eigen() throws NotSquareException, DimensionMismatchException {
-		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
-		//ComplexNumber[][] z = {{new ComplexNumber(0,1), new ComplexNumber(2, 0)},{new ComplexNumber(1,0),new ComplexNumber(1,1)}};
-		//float[][] z = {{3,-2},{4,-1}};
-		float[][]z = {{1,2},{3,4}};
-		SquareMatrix zm = new SquareMatrix(z);
-		ComplexNumber[] evals = zm.eigenvalues();
-		System.out.println(evals[0] + " " + evals[1]);
-		Vector[] evs = zm.eigenvectors();
-		for (Vector ev : evs) {
+		double[][] f = {{1,2},{2,1}};
+		SquareMatrix m = new SquareMatrix(f);
+		ComplexNumber[] evals = m.eigenvalues();
+		for (ComplexNumber val : evals) {
+			System.out.println(val);
+		}
+		Vector[] eigenvecs = m.eigenvectors(evals);
+		for (Vector ev: eigenvecs) {
 			System.out.println(ev);
 		}
 	}
@@ -38,7 +37,7 @@ public class Demo {
 	}
 	
 	public static void test_qr() throws NotSquareException, DimensionMismatchException {
-		float[][] c = {{1,2},{3,4}};
+		double[][] c = {{1,2},{3,4}};
 		SquareMatrix m = new SquareMatrix(c);
 		
 		//Matrix[] qr1 = m.QRDecompose();
@@ -56,7 +55,7 @@ public class Demo {
 	
 	public static void test_cholesky() throws NotSquareException, DimensionMismatchException {
 		
-		float[][] f = {{2,-1,0},{-1,2,-1},{0,-1,2}};
+		double[][] f = {{2,-1,0},{-1,2,-1},{0,-1,2}};
 		SquareMatrix m = new SquareMatrix(f);
 		
 		SquareMatrix L = m.choleskyDecompose();
@@ -65,9 +64,9 @@ public class Demo {
 	}
 	
 	public static void test_det() throws NotSquareException {
-		float[][] f = {{1,2,3},{4,5,6},{7,8,7}};
-		float[][] g = {{1,2},{3,4}};
-		float[][] h = {{3,0,6,-3},{0,2,3,0},{-4,-7,2,0},{2,0,1,10}};
+		double[][] f = {{1,2,3},{4,5,6},{7,8,7}};
+		double[][] g = {{1,2},{3,4}};
+		double[][] h = {{3,0,6,-3},{0,2,3,0},{-4,-7,2,0},{2,0,1,10}};
 		SquareMatrix m = new SquareMatrix(f);
 		SquareMatrix t = new SquareMatrix(g);
 		SquareMatrix u = new SquareMatrix(h);
@@ -79,7 +78,7 @@ public class Demo {
 	}
 	
 	public static void test_lu() throws NotSquareException, DimensionMismatchException, SingularMatrixException {
-		float[][] a = {{1,2},{3,4}};
+		double[][] a = {{1,2},{3,4}};
 		SquareMatrix m = new SquareMatrix(a);
 		
 		Matrix[] lu = m.luDecompose();
@@ -95,7 +94,8 @@ public class Demo {
 	}
 	
 	public static void test_rref() throws DimensionMismatchException {
-		float[][] f = {{1,2,3},{4,5,6},{7,8,7}};
+		double[][] f = {{1,2,3},{4,5,6},{7,8,9}};
+		//double[][] f = {{1,2},{2,4}};
 		Matrix m = new Matrix(f);
 		System.out.println(m.rref());
 		//System.out.println("rank: " + m.rank());
@@ -103,34 +103,69 @@ public class Demo {
 	}
 	
 	public static void test_inverse() throws NotSquareException, DimensionMismatchException {
-		float[][] f = {{1,0},{-3,1}};
-		SquareMatrix m = new SquareMatrix(f);
-		System.out.println(m.inverse());
+		double[][] f = {{5,19},{1,4}};
+		System.out.println((new SquareMatrix(f)).inverse());
+		//double[][] f = {{2,(double) 2.09999},{(double) 2.09999,2}};
+		//double[][] data = {{1,2},{2,1}};
+		//SquareMatrix m = new SquareMatrix(f);
+		//System.out.println(m.inverse());
+		
+		/*ComplexNumber ev = new ComplexNumber(-1,0);
+		ev = ev.multiply(1.1);
+		
+		SquareMatrix diag = new SquareMatrix(data);
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				if (i == j) {
+					diag.set(i, j, diag.getAt(i, j).subtract(ev));
+				}
+			}
+		}
+		System.out.println(diag);
+		diag = diag.inverse();
+		System.out.println(diag);*/
 	}
 	
 	public static void test_multiply() throws DimensionMismatchException {
 		//ComplexNumber[][] z = {{new ComplexNumber(1,1),new ComplexNumber(2,0)},{new ComplexNumber(1,0),new ComplexNumber(0,1)}};
 		//Matrix m = new Matrix(z);
-		float[][] f = {{1,2,3},{4,5,6}};
-		float[] g = {7, 8, 9};
+		double[][] f = {{1,2,3},{4,5,6}};
+		double[] g = {7, 8, 9};
 		Matrix m = new Matrix(f);
 		Vector v = new Vector(g);
 		System.out.println(m.multiply(v));
 	}
 	
 	public static void test_bases() throws DimensionMismatchException {
-		float[][] f = {{0,0,0},{1,2,3},{2,4,7}};
+		double[][] f = {{0,0,0},{1,2,3},{2,4,7}};
 		Matrix m = new Matrix(f);
 		System.out.println("Basis for image: " + m.imageBasis());
 	}
 	
 	public static void test_svd() throws NotSquareException, DimensionMismatchException {
-		float[][] f = {{4,0},{3,-5}};
+		double[][] f = {{4,0},{3,-5}};
 		Matrix m = new Matrix(f);
 		System.out.println(m.singularValueDecomposition());
 	}
 	
-	public static void main(String[] args) throws Exception {		
+	public static void test_schur() throws NotSquareException, DimensionMismatchException {
+		double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
+		SquareMatrix m = new SquareMatrix(f);
+		SquareMatrix[] schur = m.schurDecompose();
+		System.out.println(schur[0]);
+		System.out.println(schur[1]);
+	}
+	
+	public static void test_gs() throws NotSquareException, DimensionMismatchException {
+		double[][] f = {{.7000, .70711},{.70001, .70711}};
+		SquareMatrix m = new SquareMatrix(f);
+		System.out.println(m.orthonormalize());
+	}
+	
+	public static void main(String[] args) throws Exception {
+		
+		//test_gs();
+		//test_schur();
 		
 		//test_svd();
 		
@@ -138,14 +173,15 @@ public class Demo {
 		
 		//test_multiply();
 		
-		//test_det();
+		test_det();
 		//test_rref();
 		//test_lu();
+		//test_eigen();
 		//test_inverse();
 		//test_cholesky();
 		//test_qr();
 		//test_proj();
 		//test_dot();
-		test_eigen();
+		
 	}
 }

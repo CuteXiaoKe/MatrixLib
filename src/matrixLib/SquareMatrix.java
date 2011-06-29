@@ -35,7 +35,7 @@ public class SquareMatrix extends Matrix {
 	 * @param mat the underlying data of the matrix
 	 * @throws NotSquareException
 	 */
-	public SquareMatrix(float[][] mat) throws NotSquareException {
+	public SquareMatrix(double[][] mat) throws NotSquareException {
 		
 		super(mat);
 		
@@ -44,6 +44,20 @@ public class SquareMatrix extends Matrix {
 		}
 	}
 	
+	/**
+	 * Construct the square matrix made up of the specified vectors
+	 * @param cols the vectors that make up the matrix
+	 * @throws DimensionMismatchException
+	 */
+	public SquareMatrix(Vector[] cols) throws DimensionMismatchException {
+		
+		super(cols);
+		
+		if (cols.length != cols[0].dim()) {
+			throw new DimensionMismatchException();
+		}
+	}
+
 	/**
 	 * Tells whether the matrix is upper triangular
 	 * @return whether the matrix is upper triangular or not
@@ -117,17 +131,20 @@ public class SquareMatrix extends Matrix {
 		
 		Matrix aug_rref = (new Matrix(augmented)).rref();
 		
-		// if the left wasn't reduced to the identity, inverse doesn't exist
-		ComplexNumber[][] id = new ComplexNumber[rows()][cols()];
+		// if the left wasn't reduced to Id, inverse doesn't exist
 		for (int i = 0; i < rows(); i++) {
+			boolean all_zero = true;
 			for (int j = 0; j < cols(); j++) {
-				id[i][j] = aug_rref.getAt(i, j);
+				if (!aug_rref.getAt(i, j).isZero()) {
+					all_zero = false;
+					break;
+				}
+			}
+			if (all_zero) {
+				// there was an all 0 row; not identity
+				return null;
 			}
 		}
-		
-		if (!(new SquareMatrix(id)).isIdentity()) {
-			return null;
-		}		
 		
 		ComplexNumber[][] inv = new ComplexNumber[rows()][cols()];
 		
@@ -230,6 +247,60 @@ public class SquareMatrix extends Matrix {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Computes the Schur decomposition of the matrix
+	 * @return an array containing the unitary and triangular matrices
+	 * @throws NotSquareException 
+	 * @throws DimensionMismatchException 
+	 */
+	public SquareMatrix[] schurDecompose() throws NotSquareException, DimensionMismatchException {
+		
+		SquareMatrix[] ut = new SquareMatrix[2];
+		SquareMatrix u = null, prev = new SquareMatrix(getData());
+		
+		for (int k = 0; k < rows()-1; k++) {
+			ComplexNumber[][] build_a = new ComplexNumber[rows()-k][rows()-k];
+			
+			for (int i = k; i < rows(); i++) {
+				for (int j = k; j < rows(); j++) {
+					build_a[i-k][j-k] = prev.getAt(i, j);
+				}
+			}
+			SquareMatrix temp = new SquareMatrix(build_a);
+			ComplexNumber[] eigenval = {(temp.eigenvalues())[0]};
+			System.out.println("eigenvalue: " + eigenval[0]);
+			
+			SquareMatrix unitary = temp.eigenvectors(eigenval)[0].generateUnitaryMatrix();
+			
+			if (k == 0) {
+				u = unitary;
+			}
+			else {
+				ComplexNumber[][] build_u = new ComplexNumber[k*2][k*2];
+				for (int i = 0; i < k*2; i++) {
+					for (int j = 0; j < k*2; j++) {
+						if (i >= k && j >= k) {
+							build_u[i][j] = unitary.getAt(i-k, j-k);
+						}
+						else if (i == j) {
+							build_u[i][j] = new ComplexNumber(1,0);
+						}
+						else {
+							build_u[i][j] = new ComplexNumber(0,0);
+						}
+					}
+				}
+				u = new SquareMatrix(build_u);
+			}
+			
+			prev = (SquareMatrix) u.conjugateTranspose().multiply(prev).multiply(u);
+		}
+		
+		ut[0] = u;
+		ut[1] = prev;
+		return ut;
 	}
 	
 	/**
@@ -387,16 +458,13 @@ public class SquareMatrix extends Matrix {
 			
 			SquareMatrix diag = new SquareMatrix(getData());
 			for (int i = 0; i < rows(); i++) {
-				for (int j = 0; j < cols(); j++) {
-					if (i == j) {
-						diag.set(i, j, diag.getAt(i, j).subtract(ev));
-					}
-				}
+				diag.set(i, i, diag.getAt(i, i).subtract(ev));
 			}
 			diag = diag.inverse();
 			
 			Vector prev = new Vector(test_vec);
 			Vector next = diag.multiply(prev).normalize();
+			
 			do {
 				prev = next;
 				next = diag.multiply(prev).normalize();

@@ -41,7 +41,7 @@ public class Matrix {
 	 * Constructs the matrix that wraps the array mat[][]
 	 * @param mat the data to go in the matrix
 	 */
-	public Matrix(float[][] mat) {
+	public Matrix(double[][] mat) {
 		
 		matrix = new ComplexNumber[mat.length][mat[0].length];
 		
@@ -166,7 +166,7 @@ public class Matrix {
 	 */
 	public double length() {
 		
-		float sum = 0;
+		double sum = 0;
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
@@ -318,15 +318,40 @@ public class Matrix {
 	}
 
 	/**
-	 * Multiplies each element of the matrix by a float
+	 * Multiplies each element of the matrix by a double
 	 * @param factor the scalar to multiply the matrix by
 	 * @return the matrix factor*this
 	 */
-	public Matrix scale(float factor) {
+	public Matrix scale(double factor) {
 		
 		return scale(new ComplexNumber(factor, 0));
 	}
 
+	/**
+	 * Computes an orthonormal basis for the column space of the matrix
+	 * using the numerically stable modified Gram-Schmidt procedure
+	 * @return the matrix whose columns are an orthonormal basis for the column space of the matrix
+	 * @throws DimensionMismatchException 
+	 */
+	public Matrix orthonormalize() throws DimensionMismatchException {
+		
+		Vector[] result = new Vector[cols()];
+		for (int j = 0; j < cols(); j++) {
+			result[j] = this.getVector(j);
+		}
+		
+		for (int j = 0; j < cols(); j++) {
+			//r.set(j, j, result.getVector(j).normalize());
+			result[j] = result[j].normalize();
+			
+			for (int i = j+1; i < cols(); i++) {
+				result[i] = result[i].subtract(result[j].scale(result[j].dot(result[i])).toVector());
+			}
+		}
+		
+		return new Matrix(result);
+	}
+	
 	/**
 	 * Performs a QR decomposition on this matrix
 	 * @return an ordered pair {Q, R}
@@ -335,21 +360,7 @@ public class Matrix {
 	public Matrix[] QRDecompose() throws DimensionMismatchException {
 		
 		Matrix[] qr = new Matrix[2];
-		Vector[] u = new Vector[cols()];
-		Vector[] e = new Vector[cols()];
-		
-		for (int i = 0; i < cols(); i++) {
-			u[i] = getVector(i);
-			//System.out.println("u["+i+"]: " + u[i]);
-			for (int j = 0; j < i; j++) {
-				u[i] = u[i].subtract(getVector(i).proj(e[j]));
-			}
-			//System.out.println("u["+i+"]: " + u[i]);
-			e[i] = u[i].normalize();
-			//System.out.println("e["+i+"]: " + e[i]);
-		}
-		
-		qr[0] = new Matrix(e);
+		qr[0] = this.orthonormalize();
 		qr[1] = qr[0].transpose().multiply(this);
 		
 		return qr;
@@ -450,6 +461,94 @@ public class Matrix {
 		return v;
 	}
 	
+	// helper method for rref() and determinant()
+	// type=0: rref; type=1: determinant
+	protected Matrix rref_stable(int type) {
+		
+		Matrix rref = new Matrix(matrix);
+		ComplexNumber det = new ComplexNumber(1,0);
+		
+		int i = 0, j = 0;
+		while (i < rows() && j < cols()) {
+			// find pivot in column j, starting in row i
+			int maxi = i;
+			for (int k = i+1; k < rows(); k++) {
+				if (rref.getAt(k,j).abs() > rref.getAt(maxi,j).abs()) {
+					maxi = k;
+				}
+			}
+			if (!rref.getAt(maxi,j).isZero()) {
+				// swap rows i and maxi
+				if (i != maxi) {
+					for (int a = 0; a < cols(); a++) {
+						ComplexNumber temp = rref.getAt(i, a);
+						rref.set(i, a, rref.getAt(maxi, a));
+						rref.set(maxi, a, temp);
+					}
+					// swapping rows negates the determinant
+					det = det.multiply(-1);
+				}
+				
+				// divide row i by [i,j]
+				ComplexNumber div = rref.getAt(i, j);
+				for (int a = 0; a < cols(); a++) {
+					rref.set(i, a, rref.getAt(i, a).divide(div));
+				}
+				// scaling the matrix scales the determinant
+				det = det.multiply(div);
+				
+				for (int u = i+1; u < rows(); u++) {
+					// subtract row i times [u,j] from row u - det unchanged
+					ComplexNumber c = rref.getAt(u, j); 
+					for (int a = 0; a < cols(); a++) {
+						rref.set(u, a, rref.getAt(u, a).subtract(rref.getAt(i, a).multiply(c)));
+					}
+				}
+				i++;
+			}
+			j++;
+		}
+		System.out.println(rref);
+//if(1==1)return rref;
+		// use back substitution to convert to rref
+		for (int r = rows()-1; r > 0; r--) {
+			// find the pivot column
+			int pivot = -1;
+			for (int k = 0; k < cols(); k++) {
+				if (!rref.getAt(r,k).isZero()) {
+					pivot = k;
+					System.out.println("pivot: "+ k);
+					break;
+				}
+			}
+			if (pivot != -1) { // if the row is empty it won't help
+				for (int u = 0; u < r; u++) {
+					ComplexNumber c_first = rref.getAt(u, pivot); // since [r,pivot]=1
+					rref.set(u, pivot, new ComplexNumber(0, 0));
+					for (int a = pivot+1; a < cols(); a++) {
+						rref.set(u, a, rref.getAt(u,a).subtract(c_first.multiply(rref.getAt(r, a))));
+					}
+					System.out.println("u: " + u);
+					System.out.println(rref);
+				}
+			}
+		}
+
+		if (type == 0) {
+			return rref;
+		}
+		else {
+			if (rref.isIdentity()) {
+				rref.set(0, 0, det);
+			}
+			else {
+				rref.set(0, 0, new ComplexNumber(0, 0));
+			}
+		}
+		
+		return rref;
+	}
+	
 	// helper method for public rref()
 	// used for computing either rref or the determinant
 	// type=0: rref, type=1: det
@@ -529,7 +628,8 @@ public class Matrix {
 	 */
 	public Matrix rref() throws DimensionMismatchException {
 		
-		return rref(0);
+		//return rref(0);
+		return rref_stable(0);
 	}
 	
 	/**

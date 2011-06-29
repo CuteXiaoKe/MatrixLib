@@ -9,7 +9,6 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
-	public final double pi = 3.1415926536; // used in arg()
 
 	/**
 	 * Creates the complex number z= (0, 0)
@@ -161,10 +160,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		
 		if (re == 0.0) {
 			if (im > 0) {
-				return pi/2;
+				return Math.PI/2;
 			}
 			else {
-				return -pi/2;
+				return -Math.PI/2;
 			}
 		}
 		
@@ -173,10 +172,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		}
 		else {
 			if (im < 0) {
-				return Math.atan(im/re) - pi;
+				return Math.atan(im/re) - Math.PI;
 			}
 			else {
-				return Math.atan(im/re) + pi;
+				return Math.atan(im/re) + Math.PI;
 			}
 		}
 	}
@@ -236,7 +235,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public boolean isZero() {
 		
-		return this.re == 0 && this.im == 0;
+		double epsilon = 1.11e-15;
+		
+		return Math.abs(this.re)<epsilon && Math.abs(this.im)<epsilon;
+		//return this.re == 0 && this.im == 0;
 	}
 
 	/**

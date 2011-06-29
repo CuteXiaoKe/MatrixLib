@@ -6,6 +6,7 @@ fast matrix multiplication
 eigenvectors
 fix eigenvalues
 fix multiplication?
+modified gram schmidt
 junit tests
 change throws to try/catch blocks
 optimize
