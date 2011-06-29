@@ -256,6 +256,26 @@ public class Vector extends Matrix {
 	}
 	
 	/**
+	 * Determine the elementary reflector associated with this vector
+	 * @return the elementary reflector associated with this vector
+	 * @throws NotSquareException 
+	 */
+	public SquareMatrix reflector() throws NotSquareException {
+		
+		double factor = 2.0/Math.pow(this.length(), 2);
+		ComplexNumber[][] ref = new ComplexNumber[this.dim()][this.dim()];
+		
+		for (int i = 0; i < this.dim(); i++) {
+			for (int j = 0; j < this.dim(); j++) {
+				ref[i][j] = (i==j) ? new ComplexNumber(1,0) : new ComplexNumber(0,0);
+				ref[i][j] = ref[i][j].subtract(getAt(i).multiply(getAt(j)).multiply(factor));
+			}
+		}
+		
+		return new SquareMatrix(ref);
+	}
+	
+	/**
 	 * Returns a string representation of this vector
 	 * @return a string representation <a, b, ...>
 	 */

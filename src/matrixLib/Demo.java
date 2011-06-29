@@ -162,7 +162,15 @@ public class Demo {
 		System.out.println(m.orthonormalize());
 	}
 	
+	public static void test_reflector() throws NotSquareException {
+		double[] f = {1,2};
+		Vector v = new Vector(f);
+		System.out.println(v.reflector());
+	}
+	
 	public static void main(String[] args) throws Exception {
+		
+		test_reflector();
 		
 		//test_gs();
 		//test_schur();
@@ -173,7 +181,7 @@ public class Demo {
 		
 		//test_multiply();
 		
-		test_det();
+		//test_det();
 		//test_rref();
 		//test_lu();
 		//test_eigen();

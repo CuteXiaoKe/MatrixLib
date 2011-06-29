@@ -176,6 +176,88 @@ public class SquareMatrix extends Matrix {
 	}
 
 	/**
+	 * Computes the tridiagonalized form of the matrix via Householder reflections
+	 * @return the tridiagonalized form of the matrix
+	 * @throws NotSquareException 
+	 */
+	public SquareMatrix tridiagonalized() throws NotSquareException {
+		
+		SquareMatrix hess = new SquareMatrix(getData());
+		
+		for (int k = 0; k < rows(); k++) {
+			ComplexNumber sum = new ComplexNumber(0,0);
+			for (int j = k+1; j < rows(); j++) {
+				sum = sum.add(hess.getAt(j, k).multiply(hess.getAt(j, k)));
+			}
+			ComplexNumber alpha = sum.sqrt().multiply(-Math.signum(hess.getAt(k+1,k).Re()));
+			ComplexNumber r = alpha.multiply(alpha).subtract(hess.getAt(k+1,k).multiply(alpha)).multiply(.5).sqrt().reciprocal();
+			
+			ComplexNumber[] vec = new ComplexNumber[rows()];
+			for (int j = 0; j <= k; j++) {
+				vec[j] = new ComplexNumber(0,0);
+			}
+			vec[k+1] = hess.getAt(k+1,k).subtract(alpha).multiply(0.5*r.Re());
+			for (int j = k+2; j < rows(); j++) {
+				vec[j] = hess.getAt(j,k).multiply(0.5*r.Re());
+			}
+			
+			ComplexNumber[][] p = new ComplexNumber[rows()][rows()];
+			for (int i = 0; i < rows(); i++) {
+				for (int j = 0; j < rows(); j++) {
+					p[i][j] = (i==j) ? new ComplexNumber(1,0) : new ComplexNumber(0,0);
+					p[i][j] = p[i][j].subtract(vec[i].multiply(vec[j]).multiply(2.0));
+				}
+			}
+			
+			SquareMatrix hh = new SquareMatrix(p);
+			hess = hh.multiply(hess).multiply(hh);
+		}
+		
+		return hess;
+	}
+	
+	/**
+	 * Returns the upper Hessenberg form of this matrix,
+	 * which has zero entries below the first subdiagonal
+	 * @return the upper Hessenberg form of this matrix
+	 * @throws NotSquareException 
+	 */
+	public SquareMatrix hessenbergForm() throws NotSquareException {
+		
+		SquareMatrix prev = new SquareMatrix(getData());
+		
+		for (int k = 0; k < rows()-2; k++) {
+			// x is the kth column, restricted to below the diagonal
+			ComplexNumber[] vec = new ComplexNumber[rows()-k-1];
+			for (int i = k+1; i < rows(); i++) {
+				vec[i-k-1] = prev.getAt(i, k);
+			}
+			Vector x = new Vector(vec);
+			x.set(0, x.getAt(0).add(new ComplexNumber(x.length(),0)));
+			
+			SquareMatrix ref = x.reflector();
+			ComplexNumber[][] p = new ComplexNumber[k*2][k*2];
+			for (int i = 0; i < k*2; i++) {
+				for (int j = 0; j < k*2; j++) {
+					if (i >= k && j >= k) {
+						p[i][j] = ref.getAt(i-k, j-k);
+					}
+					else if (i == j) {
+						p[i][j] = new ComplexNumber(1,0);
+					}
+					else {
+						p[i][j] = new ComplexNumber(0,0);
+					}
+				}
+			}
+			SquareMatrix block = new SquareMatrix(p);
+			prev = block.transpose().multiply(prev).multiply(block);
+		}
+		
+		return prev;
+	}
+	
+	/**
 	 * Tells whether the matrix is symmetric or not
 	 * @return whether the matrix is symmetric
 	 */
