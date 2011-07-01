@@ -62,8 +62,13 @@ public class Vector extends Matrix {
 	 * Gets a value at a certain coordinate
 	 * @param i the coordinate whose value we wish to retrieve
 	 * @return the value at the ith coordinate in the vector
+	 * @throws ArrayIndexOutOfBoundsException tried to access an invalid coordinate
 	 */
-	public ComplexNumber getAt(int i) {
+	public ComplexNumber getAt(int i) throws IndexOutOfBoundsException {
+		
+		if (i < 0 || i >= dim()) {
+			throw new IndexOutOfBoundsException();
+		}
 		
 		return super.getAt(i, 0);
 	}
@@ -72,8 +77,13 @@ public class Vector extends Matrix {
 	 * Sets the element at a given coordinate to something
 	 * @param coord the coordinate to set the value at
 	 * @param val the value to set at the given coordinate
+	 * @throws ArrayIndexOutOfBoundsException tried to access an invalid coordinate
 	 */
-	public void set(int coord, ComplexNumber val) {
+	public void set(int coord, ComplexNumber val) throws IndexOutOfBoundsException {
+		
+		if (coord < 0 || coord >= dim()) {
+			throw new IndexOutOfBoundsException();
+		}
 		
 		super.set(coord, 0, val);
 	}
@@ -91,7 +101,7 @@ public class Vector extends Matrix {
 	 * Adds two vectors
 	 * @param v the vector to add to this one
 	 * @return the vector sum of this vector and v
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the vectors to add do not have matching dimension
 	 */
 	public Vector add(Vector v) throws DimensionMismatchException {
 		
@@ -102,7 +112,7 @@ public class Vector extends Matrix {
 	 * Subtracts a vector from this one
 	 * @param v the vector to subtract
 	 * @return the vector difference of this vector and v
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the vectors do not have matching dimension
 	 */
 	public Vector subtract(Vector v) throws DimensionMismatchException {
 		
@@ -112,12 +122,13 @@ public class Vector extends Matrix {
 	/**
 	 * Compute the Hermetian inner product (dot product) of two vectors
 	 * @param v the vector to dot against this
-	 * @return the inner product <this, v> of this vector with v 
+	 * @return the inner product <this, v> of this vector with v
+	 * @throws DimensionMismatchException the vectors do not have matching dimension 
 	 */
 	public ComplexNumber dot(Vector v) throws DimensionMismatchException {
 		
 		if (this.dim() != v.dim()) {
-			throw new DimensionMismatchException();
+			 new DimensionMismatchException();
 		}
 		
 		ComplexNumber dotprod = new ComplexNumber(0, 0);
@@ -131,13 +142,13 @@ public class Vector extends Matrix {
 	 * Compute the cross product between two vectors
 	 * @param v The vector to cross this with
 	 * @return The cross product between this and v, this x v
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the vectors do not have three coordinates
 	 */
 	public Vector cross(Vector v) throws DimensionMismatchException {
 		
 		// cross product is only defined for vectors in F^3, e.g. R^3
 		if (this.dim() != 3 || v.dim() != 3) {
-			throw new DimensionMismatchException();
+			 new DimensionMismatchException();
 		}
 		
 		ComplexNumber[] coords = new ComplexNumber[3];
@@ -153,21 +164,15 @@ public class Vector extends Matrix {
 	 * Return the vector that is the projection of this onto a certain vector
 	 * @param onto the vector onto which we project this
 	 * @return the projection proj_onto(this)
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the vectors do not have matching dimension
 	 */
 	public Vector proj(Vector onto) throws DimensionMismatchException {
 		
 		if (this.dim() != onto.dim()) {
-			throw new DimensionMismatchException();
-		}
-		
-		if (onto.dot(onto).isZero()) {
-			System.out.println("onto: " + onto);
+			 new DimensionMismatchException();
 		}
 		
 		return onto.scale(onto.dot(this).divide(onto.dot(onto))).toVector();
-		//return onto.scale(onto.dot(this).multiply(1/Math.pow(onto.length(),2))).toVector();
-
 	}
 	
 	/**
@@ -211,10 +216,9 @@ public class Vector extends Matrix {
 
 	/**
 	 * Generates a unitary matrix whose first column is this vector
-	 * @return a unitary matrix whose first column is this vector
-	 * @throws DimensionMismatchException 
+	 * @return a unitary matrix whose first column is this vector 
 	 */
-	public SquareMatrix generateUnitaryMatrix() throws DimensionMismatchException {
+	public SquareMatrix generateUnitaryMatrix() {
 		
 		Vector[] overspan = new Vector[this.dim()+1];
 		overspan[0] = this.normalize();
@@ -258,9 +262,9 @@ public class Vector extends Matrix {
 	/**
 	 * Determine the elementary reflector associated with this vector
 	 * @return the elementary reflector associated with this vector
-	 * @throws NotSquareException 
+	 * @s NotSquareException 
 	 */
-	public SquareMatrix reflector() throws NotSquareException {
+	public SquareMatrix reflector() {
 		
 		double factor = 2.0/Math.pow(this.length(), 2);
 		ComplexNumber[][] ref = new ComplexNumber[this.dim()][this.dim()];
@@ -276,7 +280,7 @@ public class Vector extends Matrix {
 	}
 	
 	/**
-	 * Returns a string representation of this vector
+	 * Returns a string representation of this vector <a, b, ...>
 	 * @return a string representation <a, b, ...>
 	 */
 	public String toString() {

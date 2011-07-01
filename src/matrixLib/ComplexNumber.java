@@ -82,12 +82,12 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 * Divides this complex number by z (through multiplying by the inverse)
 	 * @param z the complex number to divide this by
 	 * @return the quotient of this and the argument
-	 * @throws ArithmeticException
+	 * @throws ArithmeticException trying to divide by 0
 	 */
 	public ComplexNumber divide(ComplexNumber z) throws ArithmeticException {
 		
 		if (z.isZero()) {
-			throw new ArithmeticException();
+			 throw new ArithmeticException();
 		}
 		
 		return this.multiply(z.conjugate()).multiply(1.0/(z.Re()*z.Re()+z.Im()*z.Im()));
@@ -96,12 +96,12 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	/**
 	 * Returns the reciprocal 1/z of this complex number
 	 * @return the reciprocal of this complex number
-	 * @throws ArithmeticException
+	 * @throws ArithmeticException trying to take the reciprocal of zero
 	 */
 	public ComplexNumber reciprocal() throws ArithmeticException {
 		
 		if (this.isZero()) {
-			throw new ArithmeticException();
+			 throw new ArithmeticException();
 		}
 		
 		return this.conjugate().multiply(1.0/(this.abs()*this.abs()));
@@ -127,7 +127,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 	
 	/**
-	 * Returns the modulus |z| of this complex number
+	 * Returns the modulus |z| of this complex number, sqrt(Re^2+Im^2)
 	 * @return The absolute value of this complex number
 	 */
 	public double abs() {
@@ -147,15 +147,14 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	/**
 	 * Returns the argument of this complex number
-	 * according to the definition at
-	 * http://upload.wikimedia.org/math/c/e/6/ce60fee0f163f054266695db496b8c34.png
 	 * @return the argument of this complex number
+	 * @throws ArtithmeticException trying to take the argument of 0
 	 */
 	public double arg() throws ArithmeticException {
 		
 		// arg is undefined for the complex number (0,0)
 		if (re == 0.0 && im == 0.0) {
-			throw new ArithmeticException();
+			 throw new ArithmeticException();
 		}
 		
 		if (re == 0.0) {

@@ -7,7 +7,7 @@ package matrixLib;
  *
  */
 
-public class DimensionMismatchException extends Exception {
+public class DimensionMismatchException extends RuntimeException {
 
 	private static final long serialVersionUID = -7526472151302870197L;
 

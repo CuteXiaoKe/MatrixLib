@@ -1,6 +1,6 @@
 package matrixLib;
 
-public class NotSquareException extends Exception {
+public class NotSquareException extends RuntimeException {
 
 	private static final long serialVersionUID = -1623777304308609186L;
 

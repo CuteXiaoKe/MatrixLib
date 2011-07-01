@@ -19,42 +19,42 @@ public class SquareMatrix extends Matrix {
 	/**
 	 * Construct the matrix with specified underlying data
 	 * @param mat the underlying data of the matrix
-	 * @throws NotSquareException
+	 * @throws NotSquareException the array to build the matrix from is not square
 	 */
 	public SquareMatrix(ComplexNumber[][] mat) throws NotSquareException {
 		
 		super(mat);
 		
 		if (mat.length != mat[0].length) {
-			throw new NotSquareException();
+			 new NotSquareException();
 		}
 	}
 
 	/**
 	 * Construct the matrix with specified underlying data
 	 * @param mat the underlying data of the matrix
-	 * @throws NotSquareException
+	 * @throws NotSquareException the array to build the matrix from is not square
 	 */
 	public SquareMatrix(double[][] mat) throws NotSquareException {
 		
 		super(mat);
 		
 		if (mat.length != mat[0].length) {
-			throw new NotSquareException();
+			 new NotSquareException();
 		}
 	}
 	
 	/**
 	 * Construct the square matrix made up of the specified vectors
 	 * @param cols the vectors that make up the matrix
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the vectors do not form a square matrix
 	 */
 	public SquareMatrix(Vector[] cols) throws DimensionMismatchException {
 		
 		super(cols);
 		
 		if (cols.length != cols[0].dim()) {
-			throw new DimensionMismatchException();
+			 new DimensionMismatchException();
 		}
 	}
 
@@ -104,12 +104,10 @@ public class SquareMatrix extends Matrix {
 	}
 	
 	/**
-	 * Returns the inverse of this matrix
+	 * Computes the inverse of the matrix via Gauss-Jordan elimination
 	 * @return the corresponding inverse matrix, or null if the matrix is not invertible
-	 * @throws DimensionMismatchException 
-	 * @throws NotSquareException 
 	 */
-	public SquareMatrix inverse() throws DimensionMismatchException, NotSquareException {
+	public SquareMatrix inverse() {
 		
 		ComplexNumber[][] augmented = new ComplexNumber[rows()][cols()*2];
 		
@@ -178,9 +176,9 @@ public class SquareMatrix extends Matrix {
 	/**
 	 * Computes the tridiagonalized form of the matrix via Householder reflections
 	 * @return the tridiagonalized form of the matrix
-	 * @throws NotSquareException 
+	 * @s NotSquareException 
 	 */
-	public SquareMatrix tridiagonalized() throws NotSquareException {
+	public SquareMatrix tridiagonalized() s NotSquareException {
 		
 		SquareMatrix hess = new SquareMatrix(getData());
 		
@@ -220,9 +218,9 @@ public class SquareMatrix extends Matrix {
 	 * Returns the upper Hessenberg form of this matrix,
 	 * which has zero entries below the first subdiagonal
 	 * @return the upper Hessenberg form of this matrix
-	 * @throws NotSquareException 
+	 * @s NotSquareException 
 	 */
-	public SquareMatrix hessenbergForm() throws NotSquareException {
+	public SquareMatrix hessenbergForm() s NotSquareException {
 		
 		SquareMatrix prev = new SquareMatrix(getData());
 		
@@ -295,10 +293,9 @@ public class SquareMatrix extends Matrix {
 
 	/**
 	 * Tells whether the matrix is orthogonal (A^T A = I) or not
-	 * @return whether the matrix is orthogonal
-	 * @throws DimensionMismatchException 
+	 * @return whether the matrix is orthogonal 
 	 */
-	public boolean isOrthogonal() throws DimensionMismatchException {
+	public boolean isOrthogonal() {
 		
 		return ((SquareMatrix)this.multiply(this.transpose())).isIdentity();
 	}
@@ -306,9 +303,9 @@ public class SquareMatrix extends Matrix {
 	/**
 	 * Tells whether the matrix is unitary (its inverse is its conjugate transpose)
 	 * @return whether the matrix is unitary or not
-	 * @throws DimensionMismatchException
+	 * @s DimensionMismatchException
 	 */
-	public boolean isUnitary() throws DimensionMismatchException {
+	public boolean isUnitary() {
 		
 		return ((SquareMatrix)this.multiply(this.conjugateTranspose())).isIdentity();
 	}
@@ -334,10 +331,8 @@ public class SquareMatrix extends Matrix {
 	/**
 	 * Computes the Schur decomposition of the matrix
 	 * @return an array containing the unitary and triangular matrices
-	 * @throws NotSquareException 
-	 * @throws DimensionMismatchException 
 	 */
-	public SquareMatrix[] schurDecompose() throws NotSquareException, DimensionMismatchException {
+	public SquareMatrix[] schurDecompose() {
 		
 		SquareMatrix[] ut = new SquareMatrix[2];
 		SquareMatrix u = null, prev = new SquareMatrix(getData());
@@ -387,12 +382,9 @@ public class SquareMatrix extends Matrix {
 	
 	/**
 	 * Computes and returns the LU decomposition of the matrix
-	 * @return the result of the LU decomposition {L,D,U}, or null if no LU decomposition is admitted
-	 * @throws DimensionMismatchException 
-	 * @throws SingularMatrixException 
-	 * @throws NotSquareException 
+	 * @return the result of the LU decomposition {L,D,U}, or null if no LU decomposition is admitted 
 	 */
-	public Matrix[] luDecompose() throws DimensionMismatchException, SingularMatrixException, NotSquareException {
+	public Matrix[] luDecompose() {
 		
 		// returns {null, null} if the matrix does not admit an LU-decomposition
 		
@@ -484,10 +476,9 @@ public class SquareMatrix extends Matrix {
 	
 	/**
 	 * Returns a list of the eigenvalues of the matrix
-	 * @return an array containing the eigenvalues of the matrix
-	 * @throws DimensionMismatchException 
+	 * @return an array containing the eigenvalues of the matrix 
 	 */
-	public ComplexNumber[] eigenvalues() throws DimensionMismatchException {
+	public ComplexNumber[] eigenvalues() {
 		
 		// max amount of eigenvalues is the dimension of the matrix
 		ComplexNumber[] evals = new ComplexNumber[rows()];
@@ -511,10 +502,8 @@ public class SquareMatrix extends Matrix {
 	/**
 	 * Computes the normalized eigenvectors
 	 * @return an array of normalized eigenvectors for the matrix
-	 * @throws DimensionMismatchException
-	 * @throws NotSquareException
 	 */
-	public Vector[] eigenvectors() throws DimensionMismatchException, NotSquareException {
+	public Vector[] eigenvectors() {
 		
 		return eigenvectors(eigenvalues());
 	}
@@ -523,10 +512,10 @@ public class SquareMatrix extends Matrix {
 	 * Computes the normalized eigenvectors of the matrix corresponding to certain eigenvalues
 	 * @param evals The list of eigenvalues to compute the associated eigenvectors of
 	 * @return an array of normalized eigenvectors for the matrix
-	 * @throws DimensionMismatchException 
-	 * @throws NotSquareException 
+	 * @s DimensionMismatchException 
+	 * @s NotSquareException 
 	 */
-	public Vector[] eigenvectors(ComplexNumber[] evals) throws DimensionMismatchException, NotSquareException {
+	public Vector[] eigenvectors(ComplexNumber[] evals) {
 		
 		Vector[] evecs = new Vector[rows()];
 		int vec_pos = 0;
@@ -562,9 +551,8 @@ public class SquareMatrix extends Matrix {
 	 * positive definite Hermetian matrix in terms of a 
 	 * lower triangular matrix and its conjugate transpose
 	 * @return the lower triangular matrix L in A=LL* or null if no Cholesky decomposition is admitted
-	 * @throws NotSquareException 
 	 */
-	public SquareMatrix choleskyDecompose() throws NotSquareException {
+	public SquareMatrix choleskyDecompose() {
 		
 		if (!isHermetian()) {
 			return null;

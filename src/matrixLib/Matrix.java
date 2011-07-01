@@ -32,7 +32,7 @@ public class Matrix {
 		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				matrix[i][j] = new RealNumber((i == j) ? 1 : 0);
+				matrix[i][j] = new ComplexNumber((i == j) ? 1 : 0, 0);
 			}
 		}
 	}
@@ -74,7 +74,7 @@ public class Matrix {
 	}
 	
 	/**
-	 * Create a new unpopulated rxc matrix
+	 * Create a new unpopulated r by c matrix
 	 * @param r the number of rows in the matrix
 	 * @param c the number of columns in the matrix
 	 */
@@ -95,7 +95,7 @@ public class Matrix {
 	/**
 	 * Constructs a matrix from a collection of vectors
 	 * @param vectors the vectors to create the matrix from
-	 * @throws DimensionMismatchException
+	 * @s DimensionMismatchException the vectors do not all have the same dimension
 	 */
 	public Matrix(Vector[] vectors) throws DimensionMismatchException {
 		
@@ -106,7 +106,7 @@ public class Matrix {
 		for (int j = 0; j < cols; j++) {
 			if (j != 0 && vectors[j].dim() != vectors[j-1].dim()) {
 				// the vectors did not all have the same number of coordinates
-				throw new DimensionMismatchException();
+				 throw new DimensionMismatchException();
 			}
 			for (int i = 0; i < rows; i++) {
 				matrix[i][j] = vectors[j].getAt(i);
@@ -134,9 +134,15 @@ public class Matrix {
 	 * Gets the element at location (r,c) in the matrix
 	 * @param r the row to retrieve the element from
 	 * @param c the column to retrieve the element from
+	 * @throws ArrayIndexOutOfBoundsException trying to access an element out of the bounds of the matrix
 	 * @return the element in the matrix at (r,c)
 	 */
-	public ComplexNumber getAt(int r, int c) {
+	public ComplexNumber getAt(int r, int c) throws ArrayIndexOutOfBoundsException {
+		
+		if (r >= rows() || c >= cols()) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
+		
 		return matrix[r][c];
 	}
 	
@@ -145,8 +151,13 @@ public class Matrix {
 	 * @param r the row of the element to set
 	 * @param c the column of the element to set
 	 * @param val the value to set (r, c) to
+	 * @throws ArrayIndexOutOfBoundsException trying to access an element out of the bounds of the matrix
 	 */
-	public void set(int r, int c, ComplexNumber val) {
+	public void set(int r, int c, ComplexNumber val) throws ArrayIndexOutOfBoundsException {
+		
+		if (r >= rows() || c >= cols()) {
+			throw new ArrayIndexOutOfBoundsException();
+		}
 		
 		matrix[r][c] = val;
 	}
@@ -160,9 +171,9 @@ public class Matrix {
 	}
 
 	/**
-	 * Computes the length (Frobenius norm) of the matrix,
+	 * Computes the length (2-norm) of the matrix,
 	 * which is the square root of the sum of each element squared
-	 * @return the length (Frobenius norm) of the matrix
+	 * @return the length (2-norm) of the matrix
 	 */
 	public double length() {
 		
@@ -177,6 +188,24 @@ public class Matrix {
 		return Math.sqrt(sum);
 	}
 
+	/**
+	 * Computes the p-norm of the matrix
+	 * @return the p-norm of the matrix
+	 */
+	public double pnorm(double p) {
+		
+		double sum = 0;
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				sum += Math.pow(matrix[i][j].Re(), p) + Math.pow(matrix[i][j].Im(), p); 
+			}
+		}
+		
+		return Math.pow(sum, 1.0/((double)p));
+	}
+
+	
 	/**
 	 * Returns the matrix transpose of this matrix
 	 * @return the transpsoe of this matrix
@@ -231,13 +260,13 @@ public class Matrix {
 	 * Returns the result of multiplying this matrix by m
 	 * @param m the matrix to multiply this one by
 	 * @return the product this*m
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the matrices do not have the right dimensions to be multiplied
 	 */
 	public Matrix multiply(Matrix m) throws DimensionMismatchException {
 		
 		// can only multiply matrices of dimension nxm by mxp
 		if (cols != m.rows()) {
-			throw new DimensionMismatchException();
+			 throw new DimensionMismatchException();
 		}
 		
 		Matrix prod = new Matrix(rows, m.cols());
@@ -258,7 +287,7 @@ public class Matrix {
 	 * Multiplies this matrix by the given vector
 	 * @param v the vector by which to multiply the matrix
 	 * @return the product of this matrix and the given vector
-	 * @throws DimensionMismatchException
+	 * @throws DimensionMismatchException the vector is not in the domain of this matrix
 	 */
 	public Vector multiply(Vector v) throws DimensionMismatchException {
 		
@@ -280,13 +309,13 @@ public class Matrix {
 	/**
 	 * Adds this matrix to m
 	 * @param m the matrix to add to this one
-	 * @return the sum this+m
-	 * @throws DimensionMismatchException
+	 * @return the matrix sum this+m
+	 * @throws DimensionMismatchException the matrices do not have matching dimensions
 	 */
 	public Matrix add(Matrix m) throws DimensionMismatchException {
 		
 		if (m.rows() != rows || m.cols() != cols) {
-			throw new DimensionMismatchException();
+			 throw new DimensionMismatchException();
 		}
 		
 		Matrix sum = new Matrix(rows, cols);
@@ -331,9 +360,8 @@ public class Matrix {
 	 * Computes an orthonormal basis for the column space of the matrix
 	 * using the numerically stable modified Gram-Schmidt procedure
 	 * @return the matrix whose columns are an orthonormal basis for the column space of the matrix
-	 * @throws DimensionMismatchException 
 	 */
-	public Matrix orthonormalize() throws DimensionMismatchException {
+	public Matrix orthonormalize() {
 		
 		Vector[] result = new Vector[cols()];
 		for (int j = 0; j < cols(); j++) {
@@ -355,9 +383,9 @@ public class Matrix {
 	/**
 	 * Performs a QR decomposition on this matrix
 	 * @return an ordered pair {Q, R}
-	 * @throws DimensionMismatchException 
+	 * @s DimensionMismatchException 
 	 */
-	public Matrix[] QRDecompose() throws DimensionMismatchException {
+	public Matrix[] QRDecompose() {
 		
 		Matrix[] qr = new Matrix[2];
 		qr[0] = this.orthonormalize();
@@ -378,9 +406,8 @@ public class Matrix {
 	/**
 	 * Gets the canonical basis for the image of the matrix
 	 * @return the vectors forming a basis for the image of the matrix
-	 * @throws DimensionMismatchException 
 	 */
-	public LinkedList<Vector> imageBasis() throws DimensionMismatchException {
+	public LinkedList<Vector> imageBasis() {
 		
 		Matrix rref = this.rref();
 		LinkedList<Vector> basis = new LinkedList<Vector>();
@@ -401,10 +428,10 @@ public class Matrix {
 	 * Computes the singular value decomposition (SVD) of this matrix,
 	 * writing it as a product of a unitary matrix, a diagonal matrix, and another unitary matrix.
 	 * @return the matrices composing the factorization M={unitary, diagonal, unitary*}
-	 * @throws DimensionMismatchException 
-	 * @throws NotSquareException 
+	 * @s DimensionMismatchException 
+	 * @s NotSquareException 
 	 */
-	public Matrix[] singularValueDecomposition() throws NotSquareException, DimensionMismatchException {
+	public Matrix[] singularValueDecomposition() {
 		
 		Matrix[] svd = new Matrix[3];
 		ComplexNumber[] singvals = singularValues();
@@ -427,10 +454,10 @@ public class Matrix {
 	/**
 	 * Gets the singular values of the matrix
 	 * @return an array of singular values of the matrix, sorted in descending order by absolute value
-	 * @throws DimensionMismatchException 
-	 * @throws NotSquareException 
+	 * @s DimensionMismatchException 
+	 * @s NotSquareException 
 	 */
-	public ComplexNumber[] singularValues() throws NotSquareException, DimensionMismatchException {
+	public ComplexNumber[] singularValues() {
 		
 		ComplexNumber[] sv = new ComplexNumber[cols()];
 		SquareMatrix sm = new SquareMatrix(this.conjugateTranspose().multiply(this).getData());
@@ -445,7 +472,8 @@ public class Matrix {
 	}
 	
 	/**
-	 * Converts this matrix to a vector through the standard isomorphism
+	 * Converts this matrix to a vector through the canonical isomorphism
+	 * (reading the elements top to bottom, left to right)
 	 * @return a vector with the elements from this matrix
 	 */
 	public Vector toVector() {
@@ -621,12 +649,11 @@ public class Matrix {
 	}
 	
 	/**
-	 * Computes the row-reduced echelon form of
-	 * of this Matrix by Gaussian elimination
+	 * Computes the row-reduced echelon form of this Matrix by
+	 * Gaussian elimination with partial pivoting for numerical stability
 	 * @return the row-reduced echelon form of this matrix
-	 * @throws DimensionMismatchException 
 	 */
-	public Matrix rref() throws DimensionMismatchException {
+	public Matrix rref() {
 		
 		//return rref(0);
 		return rref_stable(0);
@@ -634,10 +661,9 @@ public class Matrix {
 	
 	/**
 	 * Returns the rank of this matrix (the dimension of its image)
-	 * @return the rank of this matrix
-	 * @throws DimensionMismatchException 
+	 * @return the rank of this matrix 
 	 */
-	public int rank() throws DimensionMismatchException {
+	public int rank() {
 		
 		int rk = 0;
 		
@@ -660,9 +686,9 @@ public class Matrix {
 	/**
 	 * Returns the nullity of this matrix (the dimension of its kernel)
 	 * @return the nullity of this matrix
-	 * @throws DimensionMismatchException 
+	 * @s DimensionMismatchException 
 	 */
-	public int nullity() throws DimensionMismatchException {
+	public int nullity() {
 		
 		return cols() - rank();
 	}
