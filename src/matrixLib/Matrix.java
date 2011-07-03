@@ -26,7 +26,7 @@ public class Matrix {
 	 */
 	public Matrix(int n) {
 		
-		matrix = new RealNumber[n][n];
+		matrix = new ComplexNumber[n][n];
 		rows = n;
 		cols = n;
 		
@@ -161,14 +161,6 @@ public class Matrix {
 		
 		matrix[r][c] = val;
 	}
-	
-	/**
-	 * Returns the underlying data array
-	 * @return the data array underlying the matrix
-	 */
-	public ComplexNumber[][] getMatrix() {
-		return matrix;
-	}
 
 	/**
 	 * Computes the length (2-norm) of the matrix,
@@ -205,7 +197,6 @@ public class Matrix {
 		return Math.pow(sum, 1.0/((double)p));
 	}
 
-	
 	/**
 	 * Returns the matrix transpose of this matrix
 	 * @return the transpsoe of this matrix
@@ -255,7 +246,7 @@ public class Matrix {
 	public int cols() {
 		return cols;
 	}
-
+	
 	/**
 	 * Returns the result of multiplying this matrix by m
 	 * @param m the matrix to multiply this one by
@@ -269,18 +260,17 @@ public class Matrix {
 			 throw new DimensionMismatchException();
 		}
 		
-		Matrix prod = new Matrix(rows, m.cols());
+		ComplexNumber[][] prod = new ComplexNumber[rows()][m.cols()];
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < m.cols(); j++) {
 				for (int k = 0; k < cols; k++) {
-					prod.set(i, j, prod.getAt(i, j).add(matrix[i][k].multiply(m.getAt(k, j))));
+					prod[i][j] = prod[i][j].add(matrix[i][k].multiply(m.getAt(k, j)));
 				}
 			}
 		}
 		
-		//return new Matrix(prod);
-		return prod;
+		return new Matrix(prod);
 	}
 	
 	/**
@@ -381,20 +371,6 @@ public class Matrix {
 	}
 	
 	/**
-	 * Performs a QR decomposition on this matrix
-	 * @return an ordered pair {Q, R}
-	 * @s DimensionMismatchException 
-	 */
-	public Matrix[] QRDecompose() {
-		
-		Matrix[] qr = new Matrix[2];
-		qr[0] = this.orthonormalize();
-		qr[1] = qr[0].transpose().multiply(this);
-		
-		return qr;
-	}
-	
-	/**
 	 * Gets the underlying data array for this matrix
 	 * @return the underlying data array for this matrix
 	 */
@@ -423,45 +399,16 @@ public class Matrix {
 		
 		return basis;
 	}
-
-	/**
-	 * Computes the singular value decomposition (SVD) of this matrix,
-	 * writing it as a product of a unitary matrix, a diagonal matrix, and another unitary matrix.
-	 * @return the matrices composing the factorization M={unitary, diagonal, unitary*}
-	 * @s DimensionMismatchException 
-	 * @s NotSquareException 
-	 */
-	public Matrix[] singularValueDecomposition() {
-		
-		Matrix[] svd = new Matrix[3];
-		ComplexNumber[] singvals = singularValues();
-		
-		ComplexNumber[][] build = new ComplexNumber[singvals.length][singvals.length];
-		int sv_pos = 0;
-		for (int i = 0; i < build.length; i++) {
-			for (int j = 0; j < build[0].length; j++) {
-				build[i][j] = (i == j) ? singvals[sv_pos++] : new ComplexNumber(0, 0);
-			}
-		}
-		SquareMatrix diag = new SquareMatrix(build);
-		System.out.println(diag);
-		System.out.println(diag.inverse());
-		
-		
-		return null; // fix this
-	}
 	
 	/**
 	 * Gets the singular values of the matrix
 	 * @return an array of singular values of the matrix, sorted in descending order by absolute value
-	 * @s DimensionMismatchException 
-	 * @s NotSquareException 
 	 */
 	public ComplexNumber[] singularValues() {
 		
 		ComplexNumber[] sv = new ComplexNumber[cols()];
-		SquareMatrix sm = new SquareMatrix(this.conjugateTranspose().multiply(this).getData());
-		ComplexNumber[] evals = sm.eigenvalues();
+		Matrix sm = new Matrix(this.conjugateTranspose().multiply(this).getData());
+		ComplexNumber[] evals = SquareMatrixOps.eigenvalues(sm);
 		
 		for (int i = 0; i < evals.length; i++) {
 			sv[i] = evals[i].sqrt();
@@ -566,7 +513,7 @@ public class Matrix {
 			return rref;
 		}
 		else {
-			if (rref.isIdentity()) {
+			if (SquareMatrixOps.isIdentity(rref)) {
 				rref.set(0, 0, det);
 			}
 			else {
@@ -637,7 +584,7 @@ public class Matrix {
 			return rref;
 		}
 		else {
-			if (rref.isIdentity()) {
+			if (SquareMatrixOps.isIdentity(rref)) {
 				rref.set(0, 0, det);
 			}
 			else {
@@ -686,7 +633,6 @@ public class Matrix {
 	/**
 	 * Returns the nullity of this matrix (the dimension of its kernel)
 	 * @return the nullity of this matrix
-	 * @s DimensionMismatchException 
 	 */
 	public int nullity() {
 		
@@ -713,28 +659,6 @@ public class Matrix {
 		}
 		
 		return mstr;
-	}
-	
-	/**
-	 * Tells whether the matrix is the identity matrix
-	 * @return whether the matrix is the identity matrix
-	 */
-	public boolean isIdentity() {
-		
-		if (rows() != cols()) {
-			return false;
-		}
-		
-		for (int i = 0; i < rows(); i++) {
-			for (int j = 0; j < cols(); j++) {
-				if ((i != j && !getAt(i, j).equals(new ComplexNumber(0, 0)))
-					|| (i == j && !getAt(i, j).equals(new ComplexNumber(1, 0)))) {
-					return false;
-				}
-			}
-		}
-		
-		return true;
 	}
 	
 	/**

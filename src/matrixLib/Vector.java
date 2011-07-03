@@ -218,7 +218,7 @@ public class Vector extends Matrix {
 	 * Generates a unitary matrix whose first column is this vector
 	 * @return a unitary matrix whose first column is this vector 
 	 */
-	public SquareMatrix generateUnitaryMatrix() {
+	public Matrix generateUnitaryMatrix() {
 		
 		Vector[] overspan = new Vector[this.dim()+1];
 		overspan[0] = this.normalize();
@@ -256,15 +256,14 @@ public class Vector extends Matrix {
 		System.out.println(new Matrix(basis));
 		
 		// apply Gram-Schmidt to orthogonalize the vectors
-		return (SquareMatrix) (new SquareMatrix(basis)).orthonormalize();
+		return (new Matrix(basis)).orthonormalize();
 	}
 	
 	/**
 	 * Determine the elementary reflector associated with this vector
-	 * @return the elementary reflector associated with this vector
-	 * @s NotSquareException 
+	 * @return the elementary reflector associated with this vector 
 	 */
-	public SquareMatrix reflector() {
+	public Matrix reflector() {
 		
 		double factor = 2.0/Math.pow(this.length(), 2);
 		ComplexNumber[][] ref = new ComplexNumber[this.dim()][this.dim()];
@@ -276,7 +275,7 @@ public class Vector extends Matrix {
 			}
 		}
 		
-		return new SquareMatrix(ref);
+		return new Matrix(ref);
 	}
 	
 	/**

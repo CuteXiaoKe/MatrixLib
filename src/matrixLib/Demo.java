@@ -129,11 +129,14 @@ public class Demo {
 	public static void test_multiply() {
 		//ComplexNumber[][] z = {{new ComplexNumber(1,1),new ComplexNumber(2,0)},{new ComplexNumber(1,0),new ComplexNumber(0,1)}};
 		//Matrix m = new Matrix(z);
-		double[][] f = {{1,2,3},{4,5,6}};
-		double[] g = {7, 8, 9};
-		Matrix m = new Matrix(f);
-		Vector v = new Vector(g);
-		System.out.println(m.multiply(v));
+		//double[][] f = {{1,2,3},{4,5,6}};
+		//double[] g = {7, 8, 9};
+		double[][] f= {{1,2},{3,4}};
+		SquareMatrix m1 = new SquareMatrix(f);
+		SquareMatrix m2 = new SquareMatrix(f);
+		SquareMatrix res = m1.multiply(m2);
+		System.out.println("blah");
+		System.out.println(res);
 	}
 	
 	public static void test_bases() {
@@ -170,7 +173,7 @@ public class Demo {
 	
 	public static void main(String[] args) {
 		
-		test_reflector();
+		//test_reflector();
 		
 		//test_gs();
 		//test_schur();
@@ -179,7 +182,7 @@ public class Demo {
 		
 		//test_bases();
 		
-		//test_multiply();
+		test_multiply();
 		
 		//test_det();
 		//test_rref();
