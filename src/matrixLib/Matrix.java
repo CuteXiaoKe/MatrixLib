@@ -161,42 +161,7 @@ public class Matrix {
 		
 		matrix[r][c] = val;
 	}
-
-	/**
-	 * Computes the length (2-norm) of the matrix,
-	 * which is the square root of the sum of each element squared
-	 * @return the length (2-norm) of the matrix
-	 */
-	public double length() {
-		
-		double sum = 0;
-		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				sum += Math.pow(matrix[i][j].Re(), 2) + Math.pow(matrix[i][j].Im(), 2); 
-			}
-		}
-		
-		return Math.sqrt(sum);
-	}
-
-	/**
-	 * Computes the p-norm of the matrix
-	 * @return the p-norm of the matrix
-	 */
-	public double pnorm(double p) {
-		
-		double sum = 0;
-		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				sum += Math.pow(matrix[i][j].Re(), p) + Math.pow(matrix[i][j].Im(), p); 
-			}
-		}
-		
-		return Math.pow(sum, 1.0/((double)p));
-	}
-
+	
 	/**
 	 * Returns the matrix transpose of this matrix
 	 * @return the transpsoe of this matrix
