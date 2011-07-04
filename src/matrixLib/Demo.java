@@ -46,15 +46,6 @@ public class Demo {
 	}
 	
 	
-	@Test public void test_dot() {
-		// dot product over complex numbers multiplies
-		ComplexNumber[] a = {new ComplexNumber(1,1),new ComplexNumber(2,1)};
-		ComplexNumber[] b = {new ComplexNumber(3,-1), new ComplexNumber(4,1)};
-		
-		assertTrue((new Vector(a)).dot(new Vector(b)).equals(new ComplexNumber(14, -6)));
-		
-		System.out.println((new Vector(a)).dot(new Vector(b)));
-	}
 	
 	public static void test_qr() {
 		double[][] c = {{1,2},{3,4}};
@@ -93,12 +84,6 @@ public class Demo {
 		System.out.println(lu[1]);
 	}
 	
-	public static void test_norm() {
-		ComplexNumber[] a = {new ComplexNumber(1,0),new ComplexNumber(0,1)};
-		Vector v = new Vector(a);
-		System.out.println(v.normalize());
-	}
-	
 	public static void test_rref() {
 		double[][] f = {{1,2,3},{4,5,6},{7,8,9}};
 		//double[][] f = {{1,2},{2,4}};
@@ -130,18 +115,6 @@ public class Demo {
 		System.out.println(diag);
 		diag = diag.inverse();
 		System.out.println(diag);*/
-	}
-	
-	public static void test_multiply() {
-		//ComplexNumber[][] z = {{new ComplexNumber(1,1),new ComplexNumber(2,0)},{new ComplexNumber(1,0),new ComplexNumber(0,1)}};
-		//Matrix m = new Matrix(z);
-		//double[][] f = {{1,2,3},{4,5,6}};
-		//double[] g = {7, 8, 9};
-		double[][] f= {{1,2},{3,4}};
-		Matrix m1 = new Matrix(f);
-		Matrix m2 = new Matrix(f);
-		Matrix res = m1.multiply(m2);
-		System.out.println(res);
 	}
 	
 	public static void test_bases() {

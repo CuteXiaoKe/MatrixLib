@@ -69,6 +69,8 @@ public class MatrixTest {
 	}
 	
 	@Test public void orthonormalize() {
-		
+		double[][] original = {{1,-1,4},{1,4,-2},{1,4,2},{1,-1,0}};
+		double[][] basis = {{.5,-.5,.5},{.5,.5,-.5},{.5,.5,.5},{.5,-.5,-.5}};
+		assertTrue((new Matrix(original)).orthonormalize().equals(new Matrix(basis)));
 	}
 }

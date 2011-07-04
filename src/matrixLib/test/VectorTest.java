@@ -82,13 +82,15 @@ public class VectorTest {
 		double[] vec2 = {9,3,-6};
 		double[][] ref1 = {{.6,-.8},{-.8,-.6}};
 		double[][] ref2 = {{-2.0/7,-3.0/7,6.0/7},{-3.0/7,6.0/7,2.0/7},{6.0/7,2.0/7,3.0/7}};
-		System.out.println((new Vector(vec1)).reflector());
+		//System.out.println((new Vector(vec1)).reflector());
 		
 		assertTrue((new Vector(vec1)).reflector().equals(new Matrix(ref1)));
 		assertTrue((new Vector(vec2)).reflector().equals(new Matrix(ref2)));
 	}
 	
 	@Test public void generateUnitaryMatrix() {
-		
+		double[] firstcol = {0,1,0};
+		double[][] mat = {{0,1,0},{1,0,0},{0,0,1}};
+		assertTrue((new Vector(firstcol)).generateUnitaryMatrix().equals(new Matrix(mat)));
 	}
 }
