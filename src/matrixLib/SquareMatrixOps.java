@@ -479,4 +479,40 @@ public class SquareMatrixOps {
 		
 		return true;
 	}
+	
+	/**
+	 * Computes the value of the matrix raised to a particular power
+	 * @param m the matrix that is raised to the specified power
+	 * @param power the power to which the matrix is raised
+	 * @return the matrix raised to the specified power
+	 * @throws NotSquareException the supplied matrix is not square
+	 */
+	public static Matrix pow(Matrix m, int power) throws NotSquareException {
+		
+		if (m.rows() != m.cols()) {
+			// A^p is only really defined for square A
+			throw new NotSquareException();
+		}
+		
+		if (power == 0) {
+			// a matrix to the zero power is the identity matrix
+			return new Matrix(m.rows());
+		}
+		else if (power < 0) {
+			// A^-p = (A^-1)^p
+			return pow(SquareMatrixOps.inverse(m), -power);
+		}
+		else if (power == 1) {
+			// A^1 = A
+			return m;
+		}
+		else {
+			// multiply the matrix by itself a number of times
+			Matrix temp = new Matrix(m.getData());
+			for (int i = 0; i < power; i++) {
+				temp = temp.multiply(m);
+			}
+			return temp;
+		}
+	}
 }
