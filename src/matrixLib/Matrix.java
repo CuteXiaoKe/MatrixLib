@@ -6,7 +6,6 @@ import java.util.LinkedList;
 /**
  * Represents a matrix over either R or C
  * @author Bryan Cuccioli
- *
  */
 public class Matrix {
 
@@ -229,6 +228,7 @@ public class Matrix {
 		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < m.cols(); j++) {
+				prod[i][j] = new ComplexNumber(0,0);
 				for (int k = 0; k < cols; k++) {
 					prod[i][j] = prod[i][j].add(matrix[i][k].multiply(m.getAt(k, j)));
 				}
@@ -603,7 +603,11 @@ public class Matrix {
 		
 		return cols() - rank();
 	}
-	
+
+	/**
+	 * Computes a string representation of this matrix
+	 * @return a string representation of this matrix
+	 */
 	public String toString() {
 		
 		String mstr = "[";

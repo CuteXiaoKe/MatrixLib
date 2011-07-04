@@ -9,6 +9,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
+	private double epsilon;
 
 	/**
 	 * Creates the complex number z= (0, 0)
@@ -16,6 +17,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	public ComplexNumber() {
 		this.re = 0;
 		this.im = 0;
+		epsilon = 1e-8;
 	}
 	
 	/**
@@ -90,7 +92,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 			 throw new ArithmeticException();
 		}
 		
-		return this.multiply(z.conjugate()).multiply(1.0/(z.Re()*z.Re()+z.Im()*z.Im()));
+		// this is more numerically stable than the concise formulation
+		ComplexNumber quot = this.multiply(z.conjugate());
+		double recmod = (z.Re()*z.Re() + z.Im()*z.Im());
+		return new ComplexNumber(quot.Re()/recmod, quot.Im()/recmod);
 	}
 
 	/**
@@ -104,7 +109,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 			 throw new ArithmeticException();
 		}
 		
-		return this.conjugate().multiply(1.0/(this.abs()*this.abs()));
+		// this is more numerically stable than the concise formulation
+		ComplexNumber quot = this.conjugate();
+		double recmod = (re*re + im*im);
+		return new ComplexNumber(quot.Re()/recmod, quot.Im()/recmod);
 	}
 	
 	/**
@@ -225,7 +233,16 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public boolean equals(ComplexNumber z) {
 		
-		return this.re == z.Re() && this.im == z.Im();
+		//return this.re == z.Re() && this.im == z.Im();
+		/*if (Math.abs(re-z.Re()) > epsilon) {
+			System.out.println("---------------");
+			System.out.println(re);
+			System.out.println(z.Re());
+		}
+		
+		return Math.abs(re-z.Re()) < epsilon
+			&& Math.abs(im-z.Im()) < epsilon;*/
+		return re == z.Re() && im == z.Im();
 	}
 	
 	/**
@@ -233,8 +250,6 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 * @return whether this is the complex number equal to 0
 	 */
 	public boolean isZero() {
-		
-		double epsilon = 1.11e-15;
 		
 		return Math.abs(this.re)<epsilon && Math.abs(this.im)<epsilon;
 		//return this.re == 0 && this.im == 0;

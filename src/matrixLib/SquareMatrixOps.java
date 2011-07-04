@@ -211,7 +211,7 @@ public class SquareMatrixOps {
 				vec[i-k-1] = prev.getAt(i, k);
 			}
 			Vector x = new Vector(vec);
-			x.set(0, x.getAt(0).add(new ComplexNumber(x.length(),0)));
+			x.set(0, x.getAt(0).add(new ComplexNumber(Norm.frobeniusNorm(x),0)));
 			
 			Matrix ref = x.reflector();
 			ComplexNumber[][] p = new ComplexNumber[k*2][k*2];
