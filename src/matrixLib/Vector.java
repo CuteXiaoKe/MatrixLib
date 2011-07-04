@@ -153,9 +153,9 @@ public class Vector extends Matrix {
 		
 		ComplexNumber[] coords = new ComplexNumber[3];
 		
-		coords[0] = getAt(2).multiply(v.getAt(3)).subtract(getAt(3).multiply(v.getAt(2)));
-		coords[1] = getAt(3).multiply(v.getAt(1)).subtract(getAt(1).multiply(v.getAt(3)));
-		coords[2] = getAt(1).multiply(v.getAt(2)).subtract(getAt(2).multiply(v.getAt(1)));
+		coords[0] = getAt(1).multiply(v.getAt(2)).subtract(getAt(2).multiply(v.getAt(1)));
+		coords[1] = getAt(2).multiply(v.getAt(0)).subtract(getAt(0).multiply(v.getAt(2)));
+		coords[2] = getAt(0).multiply(v.getAt(1)).subtract(getAt(1).multiply(v.getAt(0)));
 		
 		return new Vector(coords);
 	}
@@ -172,7 +172,14 @@ public class Vector extends Matrix {
 			 new DimensionMismatchException();
 		}
 		
-		return onto.scale(onto.dot(this).divide(onto.dot(onto))).toVector();
+		ComplexNumber factor = onto.dot(this).divide(onto.dot(onto));
+		ComplexNumber[] entries = new ComplexNumber[dim()];
+		
+		for (int i = 0; i < dim(); i++) {
+			entries[i] = onto.getAt(i).multiply(factor);
+		}
+		
+		return new Vector(entries);
 	}
 	
 	/**
@@ -265,7 +272,7 @@ public class Vector extends Matrix {
 	 */
 	public Matrix reflector() {
 		
-		double factor = 2.0/Math.pow(Norm.frobeniusNorm(this), 2);
+		double factor = 2.0/Math.pow(Norm.pnorm(this, 2), 2);
 		ComplexNumber[][] ref = new ComplexNumber[this.dim()][this.dim()];
 		
 		for (int i = 0; i < this.dim(); i++) {

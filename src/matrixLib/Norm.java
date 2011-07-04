@@ -19,11 +19,16 @@ public class Norm {
 		
 		for (int i = 0; i < m.rows(); i++) {
 			for (int j = 0; j < m.cols(); j++) {
-				//sum += Math.pow(m.getAt(i,j).Re(), p) + Math.pow(m.getAt(i,j).Im(), p);
-				sum += Math.pow(m.getAt(i, j).abs(), p);
+				if (p == 2) {
+					// use as few square roots as possible for speed/numerical stability
+					sum += Math.pow(m.getAt(i,j).Re(), p) + Math.pow(m.getAt(i,j).Im(), p);
+				}
+				else {
+					sum += Math.pow(m.getAt(i, j).abs(), p);
+				}
 			}
 		}
-		
+
 		return Math.pow(sum, 1.0/((double)p));
 	}
 	

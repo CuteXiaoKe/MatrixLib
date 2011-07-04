@@ -302,7 +302,7 @@ public class Matrix {
 	}
 
 	/**
-	 * Multiplies each element of the matrix by a double
+	 * Multiplies each element of the matrix by a real scalar
 	 * @param factor the scalar to multiply the matrix by
 	 * @return the matrix factor*this
 	 */

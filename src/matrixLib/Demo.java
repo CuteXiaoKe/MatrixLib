@@ -45,24 +45,6 @@ public class Demo {
 		}
 	}
 	
-	@Test public void test_proj() {
-		ComplexNumber[] a = {new ComplexNumber(3,1), new ComplexNumber(3, -1)};
-		ComplexNumber[] b = {new ComplexNumber(2,1), new ComplexNumber(2, -1)};
-		Vector v1 = new Vector(a);
-		Vector v2 = new Vector(b);
-
-		assertTrue(v1.dot(v2) == new ComplexNumber(14,0));
-		//assertTrue(v2.dot(v2))
-		
-		System.out.println("dot: " + v1.dot(v2));
-		System.out.println("dot: " + v2.dot(v2));
-		
-		// projection of v1 onto v2
-		System.out.println(v1.proj(v2));
-		ComplexNumber[] expected={new ComplexNumber(2.8,1.4),new ComplexNumber(2.8,-1.4)};
-
-		assertTrue(v1.proj(v2).equals(new Vector(expected)));
-	}
 	
 	@Test public void test_dot() {
 		// dot product over complex numbers multiplies

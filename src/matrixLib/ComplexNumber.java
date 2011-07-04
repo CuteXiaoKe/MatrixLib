@@ -17,7 +17,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	public ComplexNumber() {
 		this.re = 0;
 		this.im = 0;
-		epsilon = 1e-8;
+		epsilon = 1e-15;
 	}
 	
 	/**
@@ -141,10 +141,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	public double abs() {
 		
 		// if the number is real or imaginary, |z| is simple:
-		if (re == 0.0) {
+		if (re == 0) {
 			return Math.abs(im);
 		}
-		else if (im == 0.0) {
+		else if (im == 0) {
 			return Math.abs(re);
 		}
 		// otherwise it's the more complicated modulus formula:
