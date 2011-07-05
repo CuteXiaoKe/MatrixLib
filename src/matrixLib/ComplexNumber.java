@@ -5,7 +5,7 @@ package matrixLib;
  * Enables using matrices over the field C instead of just R
  * @author Bryan Cuccioli
  */
-public class ComplexNumber implements Comparable<ComplexNumber> {
+public class ComplexNumber implements Field, Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
@@ -45,6 +45,22 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public double Im() {
 		return this.im;
+	}
+	
+	/**
+	 * Sets the epsilon to use in comparing complex numbers
+	 * @param eps the epsilon to use
+	 */
+	public void setEpsilon(double eps) {
+		this.epsilon = eps;
+	}
+	
+	/**
+	 * Gets the epsilon currently in use in comparing complex numbers
+	 * @return the epsilon currently in use
+	 */
+	public double getEpsilon() {
+		return this.epsilon;
 	}
 	
 	/**
@@ -238,11 +254,11 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 			System.out.println("---------------");
 			System.out.println(re);
 			System.out.println(z.Re());
-		}
+		}*/
 		
 		return Math.abs(re-z.Re()) < epsilon
-			&& Math.abs(im-z.Im()) < epsilon;*/
-		return re == z.Re() && im == z.Im();
+			&& Math.abs(im-z.Im()) < epsilon;
+		//return re == z.Re() && im == z.Im();
 	}
 	
 	/**

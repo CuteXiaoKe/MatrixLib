@@ -43,6 +43,18 @@ public interface Field {
 	public double abs();
 	
 	/**
+	 * Sets the epsilon to use in comparing field elements
+	 * @param eps the value to set the epsilon to
+	 */
+	public void setEpsilon(double eps);
+	
+	/**
+	 * Returns the epsilon currently in use in comparing field elements
+	 * @return the epsilon currently in use
+	 */
+	public double getEpsilon();
+	
+	/**
 	 * Determines whether two field elements are equal
 	 * @param f the field element to which this is compared
 	 * @return whether the two field elements are equal
