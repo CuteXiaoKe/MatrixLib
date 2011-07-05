@@ -82,8 +82,19 @@ public class MatrixTest {
 		double[][] mat3 = {{1,2,3},{4,5,6}};
 		double[][] ref3 = {{1,0,-1},{0,1,2}};
 		
+		// test row reductions
 		assertTrue((new Matrix(mat1)).rref().equals(new Matrix(ref1)));
 		assertTrue((new Matrix(mat2)).rref().equals(new Matrix(ref2)));
 		assertTrue((new Matrix(mat3)).rref().equals(new Matrix(ref3)));
+		
+		// test rank and nullity computations
+		assertTrue((new Matrix(mat1)).rank() == 2);
+		assertTrue((new Matrix(mat1)).nullity() == 0);
+		assertTrue((new Matrix(mat2)).rank() == 2);
+		assertTrue((new Matrix(mat2)).nullity() == 1);
+	}
+	
+	@Test public void imageBases() {
+		double[][] mat = {{0,0,0},{1,2,3},{2,4,7}};
 	}
 }

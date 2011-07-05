@@ -70,7 +70,6 @@ public class VectorTest {
 	@Test public void normalize() {
 		ComplexNumber[] a = {new ComplexNumber(3,1), new ComplexNumber(3, -1)};
 		Vector normal = (new Vector(a)).normalize();
-		System.out.println(matrixLib.Norm.pnorm(normal,2));
 		
 		// make sure the normal vector has magnitude 1
 		double magnitude = matrixLib.Norm.pnorm(normal, 2);

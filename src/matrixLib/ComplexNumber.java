@@ -1,7 +1,5 @@
 package matrixLib;
 
-import java.math.BigDecimal;
-
 /**
  * Represents a complex number, which has a real and imaginary part
  * Enables using matrices over the field C instead of just R
@@ -11,7 +9,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
-	private static double epsilon;
+	private static double epsilon = 1e-15; // default epsilon
 
 	/**
 	 * Creates the complex number z= (0, 0)
@@ -19,7 +17,6 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	public ComplexNumber() {
 		this.re = 0;
 		this.im = 0;
-		epsilon = 1.0e-3; // default epsilon to use
 	}
 	
 	/**
@@ -31,7 +28,6 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		
 		this.re = re;
 		this.im = im;
-		epsilon = 1.0e-15; // default epsilon to use
 	}
 
 	/**

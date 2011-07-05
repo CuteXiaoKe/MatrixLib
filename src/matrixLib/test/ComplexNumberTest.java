@@ -60,4 +60,10 @@ public class ComplexNumberTest {
 		ComplexNumber c = new ComplexNumber(12, 16);
 		assertTrue(c.sqrt().equals(new ComplexNumber(4,2)));
 	}
+	
+	@Test public void epsilon() {
+		ComplexNumber.setEpsilon(1337);
+		assertTrue(ComplexNumber.getEpsilon() == 1337);
+		ComplexNumber.setEpsilon(1e-15);
+	}
 }
