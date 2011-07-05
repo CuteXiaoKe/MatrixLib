@@ -84,15 +84,6 @@ public class Demo {
 		System.out.println(lu[1]);
 	}
 	
-	public static void test_rref() {
-		double[][] f = {{1,2,3},{4,5,6},{7,8,9}};
-		//double[][] f = {{1,2},{2,4}};
-		Matrix m = new Matrix(f);
-		System.out.println(m.rref());
-		//System.out.println("rank: " + m.rank());
-		//System.out.println("nullity: " + m.nullity());
-	}
-	
 	public static void test_inverse() {
 		double[][] f = {{5,19},{1,4}};
 		System.out.println(SquareMatrixOps.inverse(new Matrix(f)));
@@ -142,13 +133,7 @@ public class Demo {
 		Matrix m = new Matrix(f);
 		System.out.println(m.orthonormalize());
 	}
-	
-	public static void test_reflector() {
-		double[] f = {1,2};
-		Vector v = new Vector(f);
-		System.out.println(v.reflector());
-	}
-	
+		
 	public static void main(String[] args) {
 		
 		//test_reflector();

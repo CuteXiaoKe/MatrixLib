@@ -82,7 +82,6 @@ public class VectorTest {
 		double[] vec2 = {9,3,-6};
 		double[][] ref1 = {{.6,-.8},{-.8,-.6}};
 		double[][] ref2 = {{-2.0/7,-3.0/7,6.0/7},{-3.0/7,6.0/7,2.0/7},{6.0/7,2.0/7,3.0/7}};
-		//System.out.println((new Vector(vec1)).reflector());
 		
 		assertTrue((new Vector(vec1)).reflector().equals(new Matrix(ref1)));
 		assertTrue((new Vector(vec2)).reflector().equals(new Matrix(ref2)));

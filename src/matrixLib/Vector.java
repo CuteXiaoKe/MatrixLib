@@ -245,22 +245,18 @@ public class Vector extends Matrix {
 		}
 		
 		// choose a maximal subset of independent vectors
-		System.out.println(new Matrix(overspan));
 		Matrix allvectors = new Matrix(overspan);
 		Matrix rref = allvectors.rref();
-		System.out.println(rref);
 		Vector[] basis = new Vector[this.dim()];
 		int vec_pos = 0;
 		for (int i = 0; i < this.dim(); i++) {
 			for (int j = 0; j <= this.dim(); j++) {
-				if (!getAt(i,j).isZero()) {
+				if (!rref.getAt(i,j).isZero()) {
 					basis[vec_pos++] = allvectors.getVector(j);
-					System.out.println("added vector " + j + ": " + allvectors.getVector(j));
 					break;
 				}
 			}
 		}
-		System.out.println(new Matrix(basis));
 		
 		// apply Gram-Schmidt to orthogonalize the vectors
 		return (new Matrix(basis)).orthonormalize();

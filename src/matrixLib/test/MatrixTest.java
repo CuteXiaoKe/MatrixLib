@@ -65,8 +65,6 @@ public class MatrixTest {
 		double[][] f = {{1,2},{3,4}};
 		double[][] g = {{5,6},{7,8}};
 		double[][] h = {{6,8},{10,12}};
-		System.out.println((new Matrix(f)).add(new Matrix(g)));
-		System.out.println(new Matrix(h));
 		assertTrue((new Matrix(f)).add(new Matrix(g)).equals(new Matrix(h)));
 	}
 	
@@ -74,5 +72,18 @@ public class MatrixTest {
 		double[][] original = {{1,-1,4},{1,4,-2},{1,4,2},{1,-1,0}};
 		double[][] basis = {{.5,-.5,.5},{.5,.5,-.5},{.5,.5,.5},{.5,-.5,-.5}};
 		assertTrue((new Matrix(original)).orthonormalize().equals(new Matrix(basis)));
+	}
+	
+	@Test public void rref() {
+		double[][] mat1 = {{1,2},{3,4}};
+		double[][] ref1 = {{1,0},{0,1}};
+		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,9}};
+		double[][] ref2 = {{1,0,-1},{0,1,2},{0,0,0}};
+		double[][] mat3 = {{1,2,3},{4,5,6}};
+		double[][] ref3 = {{1,0,-1},{0,1,2}};
+		
+		assertTrue((new Matrix(mat1)).rref().equals(new Matrix(ref1)));
+		assertTrue((new Matrix(mat2)).rref().equals(new Matrix(ref2)));
+		assertTrue((new Matrix(mat3)).rref().equals(new Matrix(ref3)));
 	}
 }

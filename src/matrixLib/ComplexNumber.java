@@ -1,5 +1,7 @@
 package matrixLib;
 
+import java.math.BigDecimal;
+
 /**
  * Represents a complex number, which has a real and imaginary part
  * Enables using matrices over the field C instead of just R
@@ -17,7 +19,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	public ComplexNumber() {
 		this.re = 0;
 		this.im = 0;
-		epsilon = 1e-15; // default epsilon to use
+		epsilon = 1.0e-3; // default epsilon to use
 	}
 	
 	/**
@@ -29,6 +31,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		
 		this.re = re;
 		this.im = im;
+		epsilon = 1.0e-15; // default epsilon to use
 	}
 
 	/**
@@ -249,22 +252,12 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public boolean equals(ComplexNumber z) {
 		
-		//return this.re == z.Re() && this.im == z.Im();
-		/*if (Math.abs(re-z.Re()) > epsilon) {
-			System.out.println("---------------");
-			System.out.println(re);
-			System.out.println(z.Re());
-		}*/
-		/*System.out.println("|re-z.re|=" + Math.abs(re-z.Re()));
-		if (Math.abs(re-z.Re()) < epsilon) {
-			System.out.println("pony");
-		}
-		else {
-			System.out.println("wtf: " + epsilon);
-		}*/
+		//return (new BigDecimal(Math.abs(re-z.Re()))).compareTo(epsilon) != 1
+		//&& (new BigDecimal(Math.abs(im-z.Im()))).compareTo(epsilon) != 1;
+		
+		
 		return Math.abs(re-z.Re()) <= epsilon
 			&& Math.abs(im-z.Im()) <= epsilon;
-		//return re == z.Re() && im == z.Im();
 	}
 	
 	/**
@@ -273,7 +266,9 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public boolean isZero() {
 		
-		return Math.abs(this.re)<epsilon && Math.abs(this.im)<epsilon;
+		
+		
+		return Math.abs(this.re)<=epsilon && Math.abs(this.im)<=epsilon;
 		//return this.re == 0 && this.im == 0;
 	}
 
