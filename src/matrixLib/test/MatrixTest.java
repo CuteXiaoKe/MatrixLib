@@ -65,6 +65,8 @@ public class MatrixTest {
 		double[][] f = {{1,2},{3,4}};
 		double[][] g = {{5,6},{7,8}};
 		double[][] h = {{6,8},{10,12}};
+		System.out.println((new Matrix(f)).add(new Matrix(g)));
+		System.out.println(new Matrix(h));
 		assertTrue((new Matrix(f)).add(new Matrix(g)).equals(new Matrix(h)));
 	}
 	

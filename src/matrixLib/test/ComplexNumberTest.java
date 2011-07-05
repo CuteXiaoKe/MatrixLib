@@ -11,6 +11,12 @@ import matrixLib.ComplexNumber;
 
 public class ComplexNumberTest {
 
+	@Test public void equals() {
+		ComplexNumber a = new ComplexNumber(3, 4);
+		ComplexNumber b = new ComplexNumber(3, 4);
+		assertTrue(a.equals(b));
+	}
+	
 	@Test public void add() {
 		ComplexNumber a = new ComplexNumber(4,3);
 		ComplexNumber b = new ComplexNumber(2,-6.5);

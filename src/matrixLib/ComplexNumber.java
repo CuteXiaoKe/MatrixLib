@@ -5,11 +5,11 @@ package matrixLib;
  * Enables using matrices over the field C instead of just R
  * @author Bryan Cuccioli
  */
-public class ComplexNumber implements Field, Comparable<ComplexNumber> {
+public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
-	private double epsilon;
+	private static double epsilon;
 
 	/**
 	 * Creates the complex number z= (0, 0)
@@ -17,7 +17,7 @@ public class ComplexNumber implements Field, Comparable<ComplexNumber> {
 	public ComplexNumber() {
 		this.re = 0;
 		this.im = 0;
-		epsilon = 1e-15;
+		epsilon = 1e-15; // default epsilon to use
 	}
 	
 	/**
@@ -51,16 +51,16 @@ public class ComplexNumber implements Field, Comparable<ComplexNumber> {
 	 * Sets the epsilon to use in comparing complex numbers
 	 * @param eps the epsilon to use
 	 */
-	public void setEpsilon(double eps) {
-		this.epsilon = eps;
+	public static void setEpsilon(double eps) {
+		epsilon = eps;
 	}
 	
 	/**
 	 * Gets the epsilon currently in use in comparing complex numbers
 	 * @return the epsilon currently in use
 	 */
-	public double getEpsilon() {
-		return this.epsilon;
+	public static double getEpsilon() {
+		return epsilon;
 	}
 	
 	/**
@@ -255,9 +255,15 @@ public class ComplexNumber implements Field, Comparable<ComplexNumber> {
 			System.out.println(re);
 			System.out.println(z.Re());
 		}*/
-		
-		return Math.abs(re-z.Re()) < epsilon
-			&& Math.abs(im-z.Im()) < epsilon;
+		/*System.out.println("|re-z.re|=" + Math.abs(re-z.Re()));
+		if (Math.abs(re-z.Re()) < epsilon) {
+			System.out.println("pony");
+		}
+		else {
+			System.out.println("wtf: " + epsilon);
+		}*/
+		return Math.abs(re-z.Re()) <= epsilon
+			&& Math.abs(im-z.Im()) <= epsilon;
 		//return re == z.Re() && im == z.Im();
 	}
 	
