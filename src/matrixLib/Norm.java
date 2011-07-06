@@ -15,6 +15,11 @@ public class Norm {
 	 */
 	public static double pnorm(Matrix m, double p) {
 		
+		if (p == 1) {
+			// interface with 1-norm, which is a different procedure
+			return oneNorm(m);
+		}
+		
 		double sum = 0;
 		
 		for (int i = 0; i < m.rows(); i++) {
@@ -30,6 +35,28 @@ public class Norm {
 		}
 
 		return Math.pow(sum, 1.0/((double)p));
+	}
+	
+	/**
+	 * Computes the one norm of the matrix, the largest column sum of absolute value
+	 * @param m the matrix whose one norm is to be computed
+	 * @return the one norm of the given matrix
+	 */
+	public static double oneNorm(Matrix m) {
+		
+		double largest = 0;
+		
+		for (int i = 0; i < m.cols(); i++) {
+			double sum = 0;
+			for (int j = 0; j < m.rows(); j++) {
+				sum += m.getAt(j, i).abs();
+			}
+			if (sum > largest) {
+				largest = sum;
+			}
+		}
+		
+		return largest;
 	}
 	
 	/**
