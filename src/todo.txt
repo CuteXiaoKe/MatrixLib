@@ -1,12 +1,10 @@
 todo:
 
-svd
-schur
-fast matrix multiplication
-eigenvectors
-fix eigenvalues
-fix multiplication?
-modified gram schmidt
-junit tests
-change throws to try/catch blocks
-optimize
+Strassen multiplication
+Fix eigenvalues/eigenvectors
+Numerically stable matrix inverse
+Orthonormalization via Householder/Givens
+Schur
+SVD
+QR decomposition - stable / complex
+positive definite for Cholesky

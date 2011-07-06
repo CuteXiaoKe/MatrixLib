@@ -6,6 +6,9 @@ package matrixLib.test;
  */
 
 import static org.junit.Assert.*;
+
+import java.util.LinkedList;
+
 import org.junit.Test;
 
 import matrixLib.ComplexNumber;
@@ -94,7 +97,19 @@ public class MatrixTest {
 		assertTrue((new Matrix(mat2)).nullity() == 1);
 	}
 	
-	@Test public void imageBases() {
-		double[][] mat = {{0,0,0},{1,2,3},{2,4,7}};
+	@Test public void imageBasis() {
+		double[][] mat = {{1,0,1,3,0},{0,1,1,2,0},{1,1,2,5,1},{0,0,0,0,0}};
+		LinkedList<Vector> basis = (new Matrix(mat)).imageBasis();
+		
+		// build the list of expected vectors
+		LinkedList<Vector> expected = new LinkedList<Vector>();
+		double[] vec1 = {1,0,1,0}; double[] vec2 = {0,1,1,0}; double[] vec3 = {0,0,1,0};
+		Vector v1 = new Vector(vec1), v2 = new Vector(vec2), v3 = new Vector(vec3);
+		expected.add(v1); expected.add(v2); expected.add(v3);
+		
+		for (Vector v : basis) {
+			System.out.println(v);
+			//assertTrue(expected.contains(v));
+		}
 	}
 }

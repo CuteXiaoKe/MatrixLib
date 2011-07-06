@@ -35,4 +35,21 @@ public class SquareMatrixOpsTest {
 		assertTrue(SquareMatrixOps.determinant(z).equals(new ComplexNumber(-118,-84)));
 	}
 	
+	@Test public void triangular() {
+		double[][] mat = {{1,2,3,4},{0,5,6,7},{0,0,8,9},{0,0,0,10}};
+		Matrix m = new Matrix(mat);
+		assertTrue(SquareMatrixOps.isUpperTriangular(m));
+		assertTrue(SquareMatrixOps.isLowerTriangular(m.transpose()));
+	}
+	
+	@Test public void inverse() {
+		double[][] mat = {{5,19},{1,4}};
+		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,9}};
+		double[][] inv = {{4,-19},{-1,5}};
+		
+		System.out.println(SquareMatrixOps.inverse(new Matrix(mat)));
+		//ComplexNumber.setEpsilon(1e-13);
+		assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
+		assertTrue(SquareMatrixOps.inverse(new Matrix(mat2)) == null);
+	}
 }

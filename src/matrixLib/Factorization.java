@@ -8,7 +8,8 @@ package matrixLib;
 public class Factorization {
 
 	/**
-	 * Performs a QR decomposition on the given matrix
+	 * Performs a QR decomposition on the given matrix, writing a matrix as a product of
+	 * a unitary matrix Q and upper triangular matrix R
 	 * @param m the matrix whose QR factorization we wish to compute
 	 * @return an ordered pair {Q, R} 
 	 */
@@ -182,29 +183,42 @@ public class Factorization {
 			return null;
 		}
 		
+		// need to check if m is postive definite too
+		
 		ComplexNumber[][] L = new ComplexNumber[m.rows()][m.rows()];
 		
-		for (int i = 0; i < m.cols(); i++) {
-			for (int j = 0; j < m.rows(); j++) {
-				if (j < i) {
-					L[j][i] = new ComplexNumber(0, 0);
+		// this loop is for debugging
+		for (int i = 0; i < m.rows(); i++) {
+			for (int j = i+1; j < m.rows(); j++) {
+				L[i][j] = new ComplexNumber(0, 0);
+			}
+		}
+		
+		// initialize the first column of L
+		L[0][0] = m.getAt(0,0).sqrt();
+		for (int i = 1; i < m.rows(); i++) {
+			L[i][0] = m.getAt(i,0).divide(L[0][0]);
+		}
+		
+		for (int j = 1; j < m.rows(); j++) {
+			// the next computation is based on the previously computed column
+			// each row in the below matrix is a vector; there are rows-j vectors
+			ComplexNumber[][] prevcols = new ComplexNumber[m.rows()-j][j];
+			// first j elements in the ith row
+			for (int i = j; i < m.rows(); i++) {
+				for (int k = 0; k < j; k++) {
+					prevcols[i-j][k] = L[i][k];
 				}
-				else {
-					ComplexNumber entry = m.getAt(j, i);
-					for (int k = 0; k < i-1; k++) {
-						//System.out.printf("(%d, %d)\n", j, k);
-						//System.out.printf("(%d, %d)\n", i, k);
-						entry = entry.subtract(L[j][k].multiply(L[i][k].conjugate()));
-					}
-					if (i == j) {
-						entry = entry.sqrt();
-					}
-					else {
-						//System.out.printf("(%d, %d)\n", i, i);
-						entry = entry.divide(L[i][i]);
-					}
-					//System.out.printf("adding (%d, %d)\n", j, i);
-					L[j][i] = new ComplexNumber(entry.Re(), entry.Im());
+			}
+			
+			Vector temp_ip = new Vector(prevcols[0]);
+			L[j][j] = m.getAt(j,j).subtract(temp_ip.dot(temp_ip)).sqrt();
+			
+			if (j != m.rows()-1) {
+				Vector temp_arg = new Vector(prevcols[0]);
+				for (int i = j+1; i < m.rows(); i++) {
+					temp_ip = new Vector(prevcols[i-j]);
+					L[i][j] = m.getAt(i,j).subtract(temp_ip.dot(temp_arg)).divide(L[j][j]);
 				}
 			}
 		}

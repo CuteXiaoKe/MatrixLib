@@ -25,32 +25,6 @@ public class Demo {
 	
 	
 	
-	public static void test_qr() {
-		double[][] c = {{1,2},{3,4}};
-		Matrix m = new Matrix(c);
-		
-		//Matrix[] qr1 = m.QRDecompose();
-		//System.out.println(qr1[0]);
-		//System.out.println(qr1[1]);
-		
-		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
-		ComplexNumber[][] z = {{new ComplexNumber(0,1), new ComplexNumber(2, 0)},{new ComplexNumber(1,0),new ComplexNumber(1,1)}};
-		Matrix zm = new Matrix(z);
-		
-		Matrix[] qr = Factorization.QRDecompose(zm);
-		System.out.println(qr[0]);
-		System.out.println(qr[1]);
-	}
-	
-	public static void test_cholesky() {
-		
-		double[][] f = {{2,-1,0},{-1,2,-1},{0,-1,2}};
-		Matrix m = new Matrix(f);
-		
-		Matrix L = Factorization.choleskyDecompose(m);
-		System.out.println(L);
-		System.out.println(L.multiply(L.conjugateTranspose()));
-	}
 	
 	public static void test_lu() {
 		double[][] a = {{1,2},{3,4}};
@@ -86,12 +60,6 @@ public class Demo {
 		System.out.println(diag);*/
 	}
 	
-	public static void test_bases() {
-		double[][] f = {{0,0,0},{1,2,3},{2,4,7}};
-		Matrix m = new Matrix(f);
-		System.out.println("Basis for image: " + m.imageBasis());
-	}
-	
 	public static void test_svd() {
 		double[][] f = {{4,0},{3,-5}};
 		Matrix m = new Matrix(f);
@@ -104,12 +72,6 @@ public class Demo {
 		Matrix[] schur = Factorization.schurDecompose(m);
 		System.out.println(schur[0]);
 		System.out.println(schur[1]);
-	}
-	
-	public static void test_gs() {
-		double[][] f = {{.7000, .70711},{.70001, .70711}};
-		Matrix m = new Matrix(f);
-		System.out.println(m.orthonormalize());
 	}
 		
 	public static void main(String[] args) {
