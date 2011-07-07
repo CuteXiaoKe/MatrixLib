@@ -69,8 +69,25 @@ public class FactorizationTest {
 		double[][] m = {{2,-1,0},{-1,2,-1},{0,-1,2}};
 		double[][] m_exp = {{Math.sqrt(2),0,0},{-.5*Math.sqrt(2),.5*Math.sqrt(6),0},{0,-Math.sqrt(6)/3.0,2.0/Math.sqrt(3)}};
 		//double[][] big = {{16,-3,5,-8},{-3,16,-5,-8},{5,-5,24,0},{-8,-8,0,21}};
+		ComplexNumber[][] c = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
+		ComplexNumber[][] c_exp = {{new ComplexNumber(2,0),new ComplexNumber(0,0),new ComplexNumber(0,0)},{new ComplexNumber(0,-1),new ComplexNumber(3,0),new ComplexNumber(0,0)},{new ComplexNumber(0,.5),new ComplexNumber(.5,0),new ComplexNumber(Math.sqrt(8.5),0)}};
 		
 		assertTrue(Factorization.choleskyDecompose(new Matrix(diag)).equals(new Matrix(d_exp)));
 		assertTrue(Factorization.choleskyDecompose(new Matrix(m)).equals(new Matrix(m_exp)));
+		assertTrue(Factorization.choleskyDecompose(new Matrix(c)).equals(new Matrix(c_exp)));
+	}
+	
+	@Test public static void test_svd() {
+		/*double[][] f = {{4,0},{3,-5}};
+		Matrix m = new Matrix(f);
+		System.out.println(Factorization.singularValueDecomposition(m));*/
+	}
+	
+	@Test public static void test_schur() {
+		/*double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
+		Matrix m = new Matrix(f);
+		Matrix[] schur = Factorization.schurDecompose(m);
+		System.out.println(schur[0]);
+		System.out.println(schur[1]);*/
 	}
 }

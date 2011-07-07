@@ -1,12 +1,11 @@
 package matrixLib.test;
 
-import static org.junit.Assert.assertTrue;
 import matrixLib.ComplexNumber;
 import matrixLib.Matrix;
 import matrixLib.SquareMatrixOps;
 
 import org.junit.Test;
-import org.junit.Assert;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Library of test routines for the SquareMatrixOps class
