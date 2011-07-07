@@ -142,9 +142,6 @@ public class Factorization {
 				U[j][i] = new ComplexNumber(0,0);
 			}
 		}
-		//System.out.println(new Matrix(L));
-		//System.out.println(new Matrix(U));
-		//if (1==1)return null;
 		
 		for (int n = 1; n < m.rows(); n++) {
 			
@@ -160,19 +157,14 @@ public class Factorization {
 				}
 			}
 			
-			//System.out.println(new Vector(u_prev[0]));
-			//System.out.println(new Vector(u_prev[1]));
-			//System.out.println(new Vector(u_prev[2]));
-			//if (1==1) return null;
-			
 			// compute the nth column of L
 			for (int i = n; i < m.rows(); i++) {
-				//System.out.println((new Vector(u_prev[n])));
-				L[i][n] = m.getAt(i,n).subtract((new Vector(l_prev[i-n])).dot(new Vector(u_prev[0])));
-				//System.out.println(L[i][n]);
-				// set the remaining elements of the nth row of L to 0
+				ComplexNumber sum = new ComplexNumber(0,0);
+				for (int k = 0; k < n; k++) {
+					sum = sum.add(l_prev[i-n][k].multiply(u_prev[0][k]));
+				}
+				L[i][n] = m.getAt(i,n).subtract(sum);
 			}
-			//if(1==1)return null;
 			if (L[n][n].isZero() && n != m.rows()-1) {
 				// the factorization is not possible
 				return null;
@@ -182,17 +174,15 @@ public class Factorization {
 			if (n != m.rows() - 1) {
 				// compute the nth row of U, right of the diagonal
 				for (int j = n+1; j < m.cols(); j++) {
-					//System.out.println("U_prev: " + (new Vector(u_prev[j-n])));
-					U[n][j] = m.getAt(n,j).subtract((new Vector(l_prev[0])).dot(new Vector(u_prev[j-n]))).divide(L[n][n]);
-					//System.out.println("j: " + j);
-					//System.out.println(U[n][j]);
+					ComplexNumber sum = new ComplexNumber(0,0);
+					for (int k = 0; k < n; k++) {
+						sum = sum.add(l_prev[0][k].multiply(u_prev[j-n][k]));
+					}
+					U[n][j] = m.getAt(n,j).subtract(sum).divide(L[n][n]);
 				}
-				//if (1==1)return null;
 			}
 		}
-//		System.out.println(new Matrix(L));
-//		System.out.println(new Matrix(U));
-
+		
 		// return the matrices {L, U}
 		Matrix[] lu = new Matrix[2];
 		lu[0] = new Matrix(L);
