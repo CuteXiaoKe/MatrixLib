@@ -3,6 +3,7 @@ package matrixLib.test;
 import matrixLib.ComplexNumber;
 import matrixLib.Factorization;
 import matrixLib.Matrix;
+import matrixLib.SquareMatrixOps;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -37,6 +38,19 @@ public class FactorizationTest {
 		Matrix[] qr = Factorization.QRDecompose(zm);
 		System.out.println(qr[0]);
 		System.out.println(qr[1]);*/
+	}
+	
+	@Test public void luDecompose() {
+		double[][] mat1 = {{1,2},{3,4}};
+		double[][] mat2 = {{1,2,-2,3},{-1,1,0,2},{3,-3,4,1},{2,1,1,-2}};
+		
+		Matrix[] lu = Factorization.luDecompose(new Matrix(mat1));
+		assertTrue(SquareMatrixOps.isLowerTriangular(lu[0]) && SquareMatrixOps.isUpperTriangular(lu[1])
+				&& lu[0].multiply(lu[1]).equals(new Matrix(mat1)));
+		
+		lu = Factorization.luDecompose(new Matrix(mat2));
+		assertTrue(SquareMatrixOps.isLowerTriangular(lu[0]) && SquareMatrixOps.isUpperTriangular(lu[1])
+				&& lu[0].multiply(lu[1]).equals(new Matrix(mat2)));
 	}
 	
 	@Test public void choleskyDecompose() {

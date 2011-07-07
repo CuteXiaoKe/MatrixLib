@@ -24,18 +24,6 @@ public class Demo {
 	}
 	
 	
-	
-	
-	public static void test_lu() {
-		double[][] a = {{1,2},{3,4}};
-		Matrix m = new Matrix(a);
-		
-		Matrix[] lu = Factorization.luDecompose(m);
-		
-		System.out.println(lu[0]);
-		System.out.println(lu[1]);
-	}
-	
 	public static void test_inverse() {
 		double[][] f = {{5,19},{1,4}};
 		System.out.println(SquareMatrixOps.inverse(new Matrix(f)));

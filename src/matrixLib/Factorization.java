@@ -108,65 +108,95 @@ public class Factorization {
 	/**
 	 * Computes and returns the LU decomposition of the matrix
 	 * @param m the matrix whose LU decomposition we are computing
-	 * @return the result of the LU decomposition {L,U}, or null if no LU decomposition is admitted 
+	 * @return the result of the LU decomposition {L,U}, or null if no LU decomposition is admitted
+	 * @throws NotSquareException the supplied matrix is not square 
 	 */
-	public static Matrix[] luDecompose(Matrix m) {
+	public static Matrix[] luDecompose(Matrix m) throws NotSquareException {
 		
 		// returns {null, null} if the matrix does not admit an LU-decomposition
 		
+		if (m.rows() != m.cols()) {
+			throw new NotSquareException();
+		}
+		
+		ComplexNumber[][] L = new ComplexNumber[m.rows()][m.rows()];
+		ComplexNumber[][] U = new ComplexNumber[m.rows()][m.rows()];
+		
+		// initialize the L and U matrices
+		if (m.getAt(0,0).isZero()) {
+			return null; // no factorization if (0,0) is 0
+		}
+		
+		// initialize the first row of U
+		for (int j = 0; j < m.cols(); j++) {
+			U[0][j] = m.getAt(0,j).divide(m.getAt(0,0));
+		}
+		// initialize the first column of L
+		for (int j = 0; j < m.rows(); j++) {
+			L[j][0] = m.getAt(j,0);
+		}
+		// initialize the remainder of L and U to zero
+		for (int i = 0; i < m.rows(); i++) {
+			for (int j = 1; j < m.cols(); j++) {
+				L[i][j] = new ComplexNumber(0,0);
+				U[j][i] = new ComplexNumber(0,0);
+			}
+		}
+		//System.out.println(new Matrix(L));
+		//System.out.println(new Matrix(U));
+		//if (1==1)return null;
+		
+		for (int n = 1; n < m.rows(); n++) {
+			
+			// next computations are based on the previously determined rows
+			// there are rows-n vectors of n coordinates to consider
+			ComplexNumber[][] l_prev = new ComplexNumber[m.rows()-n][n];
+			ComplexNumber[][] u_prev = new ComplexNumber[m.rows()-n][n];
+			
+			for (int i = n; i < m.rows(); i++) {
+				for (int j = 0; j < n; j++) {
+					l_prev[i-n][j] = L[i][j];
+					u_prev[i-n][j] = U[j][i];
+				}
+			}
+			
+			//System.out.println(new Vector(u_prev[0]));
+			//System.out.println(new Vector(u_prev[1]));
+			//System.out.println(new Vector(u_prev[2]));
+			//if (1==1) return null;
+			
+			// compute the nth column of L
+			for (int i = n; i < m.rows(); i++) {
+				//System.out.println((new Vector(u_prev[n])));
+				L[i][n] = m.getAt(i,n).subtract((new Vector(l_prev[i-n])).dot(new Vector(u_prev[0])));
+				//System.out.println(L[i][n]);
+				// set the remaining elements of the nth row of L to 0
+			}
+			//if(1==1)return null;
+			if (L[n][n].isZero() && n != m.rows()-1) {
+				// the factorization is not possible
+				return null;
+			}
+			
+			U[n][n] = new ComplexNumber(1,0);
+			if (n != m.rows() - 1) {
+				// compute the nth row of U, right of the diagonal
+				for (int j = n+1; j < m.cols(); j++) {
+					//System.out.println("U_prev: " + (new Vector(u_prev[j-n])));
+					U[n][j] = m.getAt(n,j).subtract((new Vector(l_prev[0])).dot(new Vector(u_prev[j-n]))).divide(L[n][n]);
+					//System.out.println("j: " + j);
+					//System.out.println(U[n][j]);
+				}
+				//if (1==1)return null;
+			}
+		}
+//		System.out.println(new Matrix(L));
+//		System.out.println(new Matrix(U));
+
+		// return the matrices {L, U}
 		Matrix[] lu = new Matrix[2];
-		
-		// check all leading principal minors are nonzero
-		// this encompasses checking that the matrix is invertible too
-		for (int i = 1; i <= m.rows(); i++) {
-			ComplexNumber[][] build = new ComplexNumber[i][i];
-			for (int j = 0; j < i; j++) {
-				for (int k = 0; k < i; k++) {
-					build[j][k] = m.getAt(j, k);
-				}
-			}
-			if (SquareMatrixOps.determinant(new Matrix(build)).isZero()) {
-				lu[0] = lu[1] = null;
-				return lu;
-			}
-		}
-		
-		Matrix[] lowers = new Matrix[m.rows()-1];
-		Matrix temp = m;
-		
-		for (int n = 0; n < m.rows()-1; n++) {
-			ComplexNumber[] ls = new ComplexNumber[m.rows()];
-			ComplexNumber[][] build = new ComplexNumber[m.rows()][m.cols()];
-			
-			for (int i = n+1; i < m.rows(); i++) {
-				ls[i] = temp.getAt(i, n).divide(temp.getAt(n, n)).multiply(-1);
-			}
-			
-			for (int a = 0; a < m.rows(); a++) {
-				for (int b = 0; b < m.cols(); b++) {
-					if (a == b) {
-						build[a][b] = new ComplexNumber(1,0);
-					}
-					else if (b == n && a > n) {
-						build[a][b] = ls[a];
-					}
-					else {
-						build[a][b] = new ComplexNumber(0,0);
-					}
-				}
-			}
-			
-			lowers[n] = new Matrix(build);
-			temp = lowers[n].multiply(temp);
-		}
-		
-		lu[1] = temp;
-		
-		lu[0] = SquareMatrixOps.inverse(lowers[0]);
-		for (int i = 1; i < m.rows()-1; i++) {
-			lu[0] = lu[0].multiply(SquareMatrixOps.inverse(lowers[i]));
-		}
-		
+		lu[0] = new Matrix(L);
+		lu[1] = new Matrix(U);
 		return lu;
 	}
 	
