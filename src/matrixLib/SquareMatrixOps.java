@@ -202,6 +202,51 @@ public class SquareMatrixOps {
 			throw new NotSquareException();
 		}
 		
+		Matrix curr = new Matrix(m.getData()); // iterate on this matrix 
+		
+		for (int k = 0; k < m.rows()-2; k++) {
+			// use the kth column of curr, below the diagonal
+			ComplexNumber[] col_arr = new ComplexNumber[m.rows()-k-1];
+			for (int i = k+1; i <= col_arr.length; i++) {
+				col_arr[i-k-1] = m.getAt(i,k);
+			}
+			Vector col = new Vector(col_arr);
+			
+			//System.out.println(col);
+			//if(1==1)return null;
+			Vector reflecting = col;
+			reflecting.set(0, reflecting.getAt(0).add(new ComplexNumber(Norm.pnorm(reflecting, 2),0)));
+			//System.out.println(reflecting);
+			Matrix reflector = reflecting.reflector();
+			//System.out.println(reflector);
+			//if(1==1)return null;
+			
+			// construct the matrix with Id in the upper left and the reflector in the lower right
+			int sidelen = k+1+reflector.cols(); // compensate because k starts at 0, not 1
+			ComplexNumber[][] aug = new ComplexNumber[sidelen][sidelen];
+			for (int i = 0; i < sidelen; i++) {
+				for (int j = 0; j < sidelen; j++) {
+					//System.out.println("i: " + i + ", j: " + j);
+					if (i > k && j > k) {
+						aug[i][j] = reflector.getAt(i-k-1,j-k-1);
+					}
+					else {
+						//System.out.println("id");
+						// construct the identity matrix I_k in the upper left
+						aug[i][j] = new ComplexNumber(i == j ? 1 : 0, 0);
+					}
+				}
+			}
+			Matrix aug_mat = new Matrix(aug);
+			//System.out.println(aug_mat);
+			//if(1==1)return null;
+			
+			curr = aug_mat.transpose().multiply(curr).multiply(aug_mat);
+		}
+		if (1==1)return curr;
+		
+		///////////////////
+		
 		Matrix prev = new Matrix(m.getData());
 		
 		for (int k = 0; k < m.rows()-2; k++) {

@@ -46,9 +46,17 @@ public class SquareMatrixOpsTest {
 		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,9}};
 		double[][] inv = {{4,-19},{-1,5}};
 		
-		System.out.println(SquareMatrixOps.inverse(new Matrix(mat)));
+		//System.out.println(SquareMatrixOps.inverse(new Matrix(mat)));
 		//ComplexNumber.setEpsilon(1e-13);
-		assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
-		assertTrue(SquareMatrixOps.inverse(new Matrix(mat2)) == null);
+		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
+		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat2)) == null);
+	}
+	
+	@Test public void hessenberg() {
+		
+		double[][] mat1 = {{2,1,-2},{-3,1,0},{4,3,1}};
+		double[][] exp1 = {{2,11.0/5,2.0/5},{-5,-11.0/25,48.0/25},{0,-27.0/25,61.0/25}};
+		
+		assertTrue(SquareMatrixOps.hessenbergForm(new Matrix(mat1)).equals(new Matrix(exp1)));
 	}
 }

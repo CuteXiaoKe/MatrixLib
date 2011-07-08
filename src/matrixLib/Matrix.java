@@ -57,8 +57,13 @@ public class Matrix {
 	/**
 	 * Constructs the matrix that wraps the array mat[][]
 	 * @param mat the data to go in the matrix
+	 * @throws DimensionMismatchException the supplied array does not have valid dimensions
 	 */
-	public Matrix(ComplexNumber[][] mat) {
+	public Matrix(ComplexNumber[][] mat) throws DimensionMismatchException {
+		
+		if (mat.length == 0 || mat[0].length == 0) {
+			throw new DimensionMismatchException();
+		}
 		
 		matrix = new ComplexNumber[mat.length][mat[0].length];
 		

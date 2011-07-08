@@ -9,3 +9,4 @@ SVD
 QR decomposition - stable / complex
 positive definite for Cholesky
 Matrix functions - sin, exp, etc.
+Comment code better

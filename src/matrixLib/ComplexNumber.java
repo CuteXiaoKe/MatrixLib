@@ -9,7 +9,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
-	private static double epsilon = 1e-15; // default epsilon
+	private static double epsilon = 1e-14; // default epsilon
 
 	/**
 	 * Creates the complex number z= (0, 0)
