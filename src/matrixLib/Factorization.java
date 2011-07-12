@@ -59,6 +59,27 @@ public class Factorization {
 			throw new NotSquareException();
 		}
 		
+		Matrix curr = new Matrix(m.getData()); // iterate, recomputing this matrix
+		
+		for (int k = 0; k < m.rows()-1; k++) {
+			// build the block matrix from the n-k size lower right hand corner
+			ComplexNumber[][] block_arr = new ComplexNumber[m.rows()-k][m.rows()-k];
+			for (int i = k; i < m.rows(); i++) {
+				for (int j = k; j < m.rows(); j++) {
+					block_arr[i-k][j-k] = curr.getAt(i,j);
+				}
+			}
+			Matrix block = new Matrix(block_arr);
+			System.out.println(block);
+			// determine an eigenvalue/eigenvector for the block
+			ComplexNumber[] eigenval = {(SquareMatrixOps.eigenvalues(block))[0]};
+			System.out.println("eigenvalue: " + eigenval[0]);
+			Matrix unitary = SquareMatrixOps.eigenvectors(block, eigenval)[0].generateUnitaryMatrix();
+			if(1==1)return null;
+		}
+		
+		////////////////////
+		
 		Matrix[] ut = new Matrix[2];
 		Matrix u = null, prev = new Matrix(m.getData());
 		

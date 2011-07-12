@@ -21,7 +21,7 @@ public class SquareMatrixOps {
 		
 		for (int i = 1; i < m.rows(); i++) {
 			for (int j = 0; j < i; j++) {
-				if (!m.getAt(i,j).equals(new ComplexNumber(0, 0))) {
+				if (!m.getAt(i,j).isZero()) {
 					return false;
 				}
 			}
@@ -44,7 +44,7 @@ public class SquareMatrixOps {
 
 		for (int i = 0; i < m.rows(); i++) {
 			for (int j = i+1; j < m.cols(); j++) {
-				if (!m.getAt(i,j).equals(new ComplexNumber(0, 0))) {
+				if (!m.getAt(i,j).isZero()) {
 					return false;
 				}
 			}
@@ -144,140 +144,111 @@ public class SquareMatrixOps {
 	}
 
 	/**
-	 * Computes the tridiagonalized form of the matrix via Householder reflections
-	 * @param m the matrix to tridiagonalize
-	 * @return the tridiagonalized form of the matrix
-	 * @throws NotSquareException the supplied matrix is not square
-	 */
-	public static Matrix tridiagonalized(Matrix m) throws NotSquareException {
-		
-		if (m.rows() != m.cols()) {
-			throw new NotSquareException();
-		}
-		
-		Matrix hess = new Matrix(m.getData());
-		
-		for (int k = 0; k < m.rows(); k++) {
-			ComplexNumber sum = new ComplexNumber(0,0);
-			for (int j = k+1; j < m.rows(); j++) {
-				sum = sum.add(hess.getAt(j, k).multiply(hess.getAt(j, k)));
-			}
-			ComplexNumber alpha = sum.sqrt().multiply(-Math.signum(hess.getAt(k+1,k).Re()));
-			ComplexNumber r = alpha.multiply(alpha).subtract(hess.getAt(k+1,k).multiply(alpha)).multiply(.5).sqrt().reciprocal();
-			
-			ComplexNumber[] vec = new ComplexNumber[m.rows()];
-			for (int j = 0; j <= k; j++) {
-				vec[j] = new ComplexNumber(0,0);
-			}
-			vec[k+1] = hess.getAt(k+1,k).subtract(alpha).multiply(0.5*r.Re());
-			for (int j = k+2; j < m.rows(); j++) {
-				vec[j] = hess.getAt(j,k).multiply(0.5*r.Re());
-			}
-			
-			ComplexNumber[][] p = new ComplexNumber[m.rows()][m.rows()];
-			for (int i = 0; i < m.rows(); i++) {
-				for (int j = 0; j < m.rows(); j++) {
-					p[i][j] = (i==j) ? new ComplexNumber(1,0) : new ComplexNumber(0,0);
-					p[i][j] = p[i][j].subtract(vec[i].multiply(vec[j]).multiply(2.0));
-				}
-			}
-			
-			Matrix hh = new Matrix(p);
-			hess = hh.multiply(hess).multiply(hh);
-		}
-		
-		return hess;
-	}
-	
-	/**
-	 * Returns the upper Hessenberg form of this matrix,
-	 * which has zero entries below the first subdiagonal
-	 * @param m the matrix whose upper Hessenberg form is computed
-	 * @return the upper Hessenberg form of this matrix
+	 * Runs Householder's algorithm on the matrix, finding a similar matrix that is
+	 * tridiagonalized if it is symmetric or upper Hessenberg otherwise
+	 * @param m the matrix on which the algorithm is run
+	 * @return the similar tridiagonal/Hessenberg matrix
 	 * @throws NotSquareException the given matrix is not square
 	 */
-	public static Matrix hessenbergForm(Matrix m) throws NotSquareException {
+	public static Matrix householder(Matrix m) throws NotSquareException {
 		
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
 		}
 		
-		Matrix curr = new Matrix(m.getData()); // iterate on this matrix 
+		Matrix curr = new Matrix(m.getData()); // iterate on this matrix
+		// the below loop implements the algorithm from "Numerical Analysis" 7th ed.
 		
 		for (int k = 0; k < m.rows()-2; k++) {
-			// use the kth column of curr, below the diagonal
-			ComplexNumber[] col_arr = new ComplexNumber[m.rows()-k-1];
-			for (int i = k+1; i <= col_arr.length; i++) {
-				col_arr[i-k-1] = m.getAt(i,k);
+			// sum the current column
+			ComplexNumber colsum = new ComplexNumber(0,0);
+			for (int j = k+1; j < m.rows(); j++) {
+				colsum = colsum.add(curr.getAt(j,k).multiply(curr.getAt(j,k)));
 			}
-			Vector col = new Vector(col_arr);
 			
-			//System.out.println(col);
-			//if(1==1)return null;
-			Vector reflecting = col;
-			reflecting.set(0, reflecting.getAt(0).add(new ComplexNumber(Norm.pnorm(reflecting, 2),0)));
-			//System.out.println(reflecting);
-			Matrix reflector = reflecting.reflector();
-			//System.out.println(reflector);
-			//if(1==1)return null;
+			ComplexNumber alpha = new ComplexNumber(-Math.sqrt(colsum.Re()),0);
+			if (!curr.getAt(k+1,k).isZero()) {
+				ComplexNumber factor = curr.getAt(k+1,k).multiply(1.0/curr.getAt(k+1,k).abs());
+				alpha = alpha.multiply(factor);
+			}
 			
-			// construct the matrix with Id in the upper left and the reflector in the lower right
-			int sidelen = k+1+reflector.cols(); // compensate because k starts at 0, not 1
-			ComplexNumber[][] aug = new ComplexNumber[sidelen][sidelen];
-			for (int i = 0; i < sidelen; i++) {
-				for (int j = 0; j < sidelen; j++) {
-					//System.out.println("i: " + i + ", j: " + j);
-					if (i > k && j > k) {
-						aug[i][j] = reflector.getAt(i-k-1,j-k-1);
-					}
-					else {
-						//System.out.println("id");
-						// construct the identity matrix I_k in the upper left
-						aug[i][j] = new ComplexNumber(i == j ? 1 : 0, 0);
-					}
+			ComplexNumber rsq = alpha.multiply(alpha.subtract(curr.getAt(k+1,k)));
+			
+			// build vectors
+			ComplexNumber[] v = new ComplexNumber[m.rows()-k];
+			v[0] = new ComplexNumber(0,0);
+			v[1] = curr.getAt(k+1,k).subtract(alpha);
+			for (int j = k+2; j < m.rows(); j++) {
+				v[j-k] = curr.getAt(j,k);
+			}
+			ComplexNumber[] w = new ComplexNumber[v.length+k];
+			for (int i = 0; i < v.length+k; i++) {
+				if (i < k) {
+					w[i] = new ComplexNumber(0,0);
+				}
+				else {
+					w[i] = v[i-k].divide(rsq.multiply(2).sqrt());
 				}
 			}
-			Matrix aug_mat = new Matrix(aug);
-			//System.out.println(aug_mat);
-			//if(1==1)return null;
 			
-			curr = aug_mat.transpose().multiply(curr).multiply(aug_mat);
-		}
-		if (1==1)return curr;
-		
-		///////////////////
-		
-		Matrix prev = new Matrix(m.getData());
-		
-		for (int k = 0; k < m.rows()-2; k++) {
-			// x is the kth column, restricted to below the diagonal
-			ComplexNumber[] vec = new ComplexNumber[m.rows()-k-1];
+			ComplexNumber[] u = new ComplexNumber[m.rows()];
+			ComplexNumber[] y = new ComplexNumber[m.rows()];
+			for (int j = 0; j < m.rows(); j++) {
+				ComplexNumber sum_u = new ComplexNumber(0,0);
+				ComplexNumber sum_y = new ComplexNumber(0,0);
+				for (int i = k+1; i < m.rows(); i++) {
+					sum_u = sum_u.add(curr.getAt(j,i).multiply(v[i-k]));
+					sum_y = sum_y.add(curr.getAt(i,j).multiply(v[i-k]));
+				}
+				u[j] = sum_u.divide(rsq);
+				y[j] = sum_y.divide(rsq);
+			}
+
+			ComplexNumber prod = new ComplexNumber(0,0);
 			for (int i = k+1; i < m.rows(); i++) {
-				vec[i-k-1] = prev.getAt(i, k);
+				prod = prod.add(v[i-k].multiply(u[i-k]));
 			}
-			Vector x = new Vector(vec);
-			x.set(0, x.getAt(0).add(new ComplexNumber(Norm.frobeniusNorm(x),0)));
 			
-			Matrix ref = x.reflector();
-			ComplexNumber[][] p = new ComplexNumber[k*2][k*2];
-			for (int i = 0; i < k*2; i++) {
-				for (int j = 0; j < k*2; j++) {
-					if (i >= k && j >= k) {
-						p[i][j] = ref.getAt(i-k, j-k);
+			// scale the u vector
+			ComplexNumber factor = prod.divide(rsq);
+			ComplexNumber[] scaled = new ComplexNumber[m.rows()];
+			for (int i = 0; i < m.rows(); i++) {
+				if (i < k) {
+					scaled[i] = u[i]; // v[i] is 0
+				}
+				else {
+					scaled[i] = u[i].subtract(factor.multiply(v[i-k]));
+				}
+			}
+			
+			// compute the new iteration of the matrix
+			ComplexNumber[][] next = new ComplexNumber[curr.rows()][curr.rows()]; // all square
+			for (int i = k+1; i < m.rows(); i++) {
+				for (int j = 0; j <= k; j++) {
+					next[j][i] = curr.getAt(j,i);
+					next[i][j] = curr.getAt(i,j);
+					if (i >= k) { // v[k] and below are 0
+						next[j][i] = next[j][i].subtract(scaled[j].multiply(v[i-k]));
+						next[i][j] = next[i][j].subtract(y[j].multiply(v[i-k]));
 					}
-					else if (i == j) {
-						p[i][j] = new ComplexNumber(1,0);
-					}
-					else {
-						p[i][j] = new ComplexNumber(0,0);
+				}
+				
+				for (int j = k+1; j < m.rows(); j++) {
+					next[j][i] = curr.getAt(j,i).subtract(scaled[j].multiply(v[i-k])).subtract(y[i].multiply(v[j-k]));
+				}
+			}
+
+			// merge the newly computed matrix into the current marker
+			for (int l = 0; l < next.length; l++) {
+				for (int j = 0; j < next.length; j++) {
+					if (next[l][j] != null) {
+						curr.set(l,j,next[l][j]);
 					}
 				}
 			}
-			Matrix block = new Matrix(p);
-			prev = block.transpose().multiply(prev).multiply(block);
 		}
 		
-		return prev;
+		return curr;
 	}
 	
 	/**
@@ -403,21 +374,6 @@ public class SquareMatrixOps {
 		
 		return tr;
 	}
-
-	private static boolean isAlmostUpperTriangular(Matrix m) {
-		
-		double epsilon = 1E-6;
-		
-		for (int i = 1; i < m.rows(); i++) {
-			for (int j = 0; j < i; j++) {
-				if (m.getAt(i, j).abs() > epsilon) {
-					return false;
-				}
-			}
-		}
-		
-		return true;
-	}
 	
 	/**
 	 * Returns a list of the eigenvalues of the matrix
@@ -430,15 +386,20 @@ public class SquareMatrixOps {
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
 		}
-		
+
 		// max amount of eigenvalues is the dimension of the matrix
 		ComplexNumber[] evals = new ComplexNumber[m.rows()];
 		
 		Matrix temp = m;
-		while (!isAlmostUpperTriangular(temp)) {
+		ComplexNumber.setEpsilon(1e-8);
+		while (!isUpperTriangular(temp)) {
 			//System.out.println("QR decomposing...");
+			ComplexNumber shift = temp.getAt(temp.rows()-1,temp.rows()-1);
 			Matrix[] qr = Factorization.QRDecompose(temp);
 			temp = qr[1].multiply(qr[0]);
+			for (int i = 0; i < temp.rows(); i++) {
+				//temp.set(i, i, shift.add(temp.getAt(temp.rows()-1,temp.rows()-1)));
+			}
 			//System.out.println(temp);
 		}
 		

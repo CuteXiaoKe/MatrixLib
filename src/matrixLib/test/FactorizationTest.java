@@ -77,17 +77,17 @@ public class FactorizationTest {
 		assertTrue(Factorization.choleskyDecompose(new Matrix(c)).equals(new Matrix(c_exp)));
 	}
 	
-	@Test public static void test_svd() {
+	@Test public void test_svd() {
 		/*double[][] f = {{4,0},{3,-5}};
 		Matrix m = new Matrix(f);
 		System.out.println(Factorization.singularValueDecomposition(m));*/
 	}
 	
-	@Test public static void test_schur() {
-		/*double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
-		Matrix m = new Matrix(f);
-		Matrix[] schur = Factorization.schurDecompose(m);
-		System.out.println(schur[0]);
+	@Test public void test_schur() {
+		double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
+		Matrix[] schur = Factorization.schurDecompose(new Matrix(f));
+		
+		/*System.out.println(schur[0]);
 		System.out.println(schur[1]);*/
 	}
 }

@@ -52,11 +52,29 @@ public class SquareMatrixOpsTest {
 		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat2)) == null);
 	}
 	
+	@Test public void householder() {
+		double[][] mat1 = {{4,1,-2,2},{1,2,0,1},{-2,0,3,-2},{2,1,-2,-1}};
+		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,7}};
+		
+		//System.out.println(SquareMatrixOps.householder(new Matrix(mat1)));
+		System.out.println(SquareMatrixOps.householder(new Matrix(mat2)));
+	}
+	
 	@Test public void hessenberg() {
 		
 		double[][] mat1 = {{2,1,-2},{-3,1,0},{4,3,1}};
 		double[][] exp1 = {{2,11.0/5,2.0/5},{-5,-11.0/25,48.0/25},{0,-27.0/25,61.0/25}};
 		
-		assertTrue(SquareMatrixOps.hessenbergForm(new Matrix(mat1)).equals(new Matrix(exp1)));
+		//assertTrue(SquareMatrixOps.hessenbergForm(new Matrix(mat1)).equals(new Matrix(exp1)));
+	}
+	
+	@Test public void eigenvalues() {
+		
+		//double[][] mat = {{0,-1},{1,0}};
+		double[][] mat = {{3,0,0},{1,3,1},{2,-1,1}};
+		/*ComplexNumber[] evs = SquareMatrixOps.eigenvalues(new Matrix(mat));
+		for (ComplexNumber ev : evs) {
+			System.out.println(ev);
+		}*/
 	}
 }
