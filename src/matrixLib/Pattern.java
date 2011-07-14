@@ -227,4 +227,54 @@ public class Pattern {
 		
 		return true;
 	}
+
+	/**
+	 * Generates the block diagonal matrix with Id in the upper left
+	 * and the given matrix in the lower right
+	 * @param m the matrix that goes in the lower right
+	 * @return the generated block diagonal matrix
+	 * @throws NotSquareException the given matrix is not square
+	 */
+	public static Matrix blockDiagonal(Matrix m) throws NotSquareException {
+		
+		if (m.rows() != m.cols()) {
+			throw new NotSquareException();
+		}
+		
+		int k = m.rows(); 
+		ComplexNumber[][] bdiag = new ComplexNumber[k*2][k*2];
+		
+		for (int i = 0; i < k*2; i++) {
+			for (int j = 0; j < k*2; j++) {
+				if (i >= k && j >= k) { // if in the lower right
+					// insert the corresponding element in the given matrix
+					bdiag[i][j] = m.getAt(i-k,j-k);
+				}
+				else {
+					// construct the identity matrix; i != j everywhere outside Id
+					bdiag[i][j] = new ComplexNumber((i==j)?1:0, 0);
+				}
+			}
+		}
+		
+		return new Matrix(bdiag);
+	}
+	
+	/**
+	 * Generates the diagonal matrix with the given diagonal elements
+	 * @param diagonals the elements that lie along the diagonal
+	 * @return the diagonal matrix with the given diagonal elements
+	 */
+	public static Matrix diag(ComplexNumber[] diagonals) {
+		
+		ComplexNumber[][] mat = new ComplexNumber[diagonals.length][diagonals.length];
+		
+		for (int i = 0; i < diagonals.length; i++) {
+			for (int j = 0; j < diagonals.length; j++) {
+				mat[i][j] = (i==j) ? diagonals[i] : new ComplexNumber(0,0);
+			}
+		}
+		
+		return new Matrix(mat);
+	}
 }

@@ -148,6 +148,14 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		
 		return new ComplexNumber(re, -im);
 	}
+
+	/**
+	 * Returns the negation (additive inverse) of this complex number
+	 * @return the negative of this complex number
+	 */
+	public ComplexNumber negative() {
+		return new ComplexNumber(-re, -im);
+	}
 	
 	/**
 	 * Returns the modulus |z| of this complex number, sqrt(Re^2+Im^2)
@@ -248,10 +256,6 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public boolean equals(ComplexNumber z) {
 		
-		//return (new BigDecimal(Math.abs(re-z.Re()))).compareTo(epsilon) != 1
-		//&& (new BigDecimal(Math.abs(im-z.Im()))).compareTo(epsilon) != 1;
-		
-		
 		return Math.abs(re-z.Re()) <= epsilon
 			&& Math.abs(im-z.Im()) <= epsilon;
 	}
@@ -262,10 +266,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public boolean isZero() {
 		
-		
-		
 		return Math.abs(this.re)<=epsilon && Math.abs(this.im)<=epsilon;
-		//return this.re == 0 && this.im == 0;
 	}
 
 	/**

@@ -40,6 +40,11 @@ public class SquareMatrixOpsTest {
 		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,9}};
 		double[][] inv = {{4,-19},{-1,5}};
 		
+		double[][] tri = {{1,0,0},{3,2,0},{4,6,5}};
+		System.out.println("******************");
+		SquareMatrixOps.inverse(new Matrix(tri));
+		System.out.println("******************");
+		
 		//System.out.println(SquareMatrixOps.inverse(new Matrix(mat)));
 		//ComplexNumber.setEpsilon(1e-13);
 		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));

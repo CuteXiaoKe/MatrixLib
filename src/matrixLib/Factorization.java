@@ -34,6 +34,8 @@ public class Factorization {
 		Matrix[] svd = new Matrix[3];
 		ComplexNumber[] singvals = m.singularValues();
 		
+		
+		
 		ComplexNumber[][] build = new ComplexNumber[singvals.length][singvals.length];
 		int sv_pos = 0;
 		for (int i = 0; i < build.length; i++) {
@@ -85,23 +87,9 @@ public class Factorization {
 				unit_ref = unitary;
 			}
 			else {
-				ComplexNumber[][] ur_arr = new ComplexNumber[m.rows()][m.rows()];
-				for (int i = 0; i < ur_arr.length; i++) {
-					for (int j = 0; j < ur_arr[0].length; j++) {
-						if (i >= k && j >= k) {
-							ur_arr[i][j] = unitary.getAt(i-k,j-k);
-						}
-						else if (i == j) {
-							ur_arr[i][j] = new ComplexNumber(1,0);
-						}
-						else {
-							ur_arr[i][j] = new ComplexNumber(0,0);
-						}
-					}
-				}
-				unit_ref = new Matrix(ur_arr);
-				unitary_prod = unitary_prod.multiply(unit_ref);
+				unit_ref = Pattern.blockDiagonal(unitary);
 			}
+			unitary_prod = unitary_prod.multiply(unit_ref);
 			System.out.println(unit_ref);
 			curr = unit_ref.conjugateTranspose().multiply(curr).multiply(unit_ref);
 		}

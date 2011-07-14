@@ -6,6 +6,40 @@ package matrixLib;
  */
 
 public class SquareMatrixOps {
+
+	// inverts a lower triangular matrix; called by inverse()
+	private static Matrix inverse_lt(Matrix tri) {
+		ComplexNumber[][] tri_inv = new ComplexNumber[tri.rows()][tri.rows()];
+
+		for (int j = 0; j < tri.rows(); j++) {
+			tri_inv[0][j] = new ComplexNumber(0,0);
+		}
+		
+		// compute the inverse of the triangular matrix, which is easier
+		tri_inv[0][0] = tri.getAt(0,0).reciprocal();
+		for (int i = 1; i < tri.rows(); i++) {
+			// just compute the reciprocal of the diagonal elements
+			if (tri.getAt(i,i).isZero()) {
+				return null; // if 0 is on the diagonal, matrix is singular
+			}
+			tri_inv[i][i] = tri.getAt(i,i).reciprocal();
+			
+			for (int j = 0; j < i; j++) {
+				// found by solving L L^-1 = I
+				ComplexNumber sum = new ComplexNumber(0,0);
+				for (int k = j; k < i; k++) {
+					sum = sum.add(tri.getAt(i,k).multiply(tri_inv[k][j]));
+				}
+				tri_inv[i][j] = sum.divide(tri.getAt(i,i)).negative();
+			}
+			// inverse of lower triangular is lower triangular, so fill the rest with 0's
+			for (int j = i+1; j < tri.rows(); j++) {
+				tri_inv[i][j] = new ComplexNumber(0,0);
+			}
+		}
+		
+		return new Matrix(tri_inv);
+	}
 	
 	/**
 	 * Computes the inverse of the matrix via Gauss-Jordan elimination
@@ -18,7 +52,21 @@ public class SquareMatrixOps {
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
 		}
+
+		// test for common easy cases
+		if (Pattern.isUpperTriangular(m)) {
+			return inverse_lt(m.transpose());
+		}
+		else if (Pattern.isLowerTriangular(m)) {
+			return inverse_lt(m);
+		}
+		else if (Pattern.isHermetian(m)) {
+			Matrix tri = Factorization.choleskyDecompose(m);
+			Matrix l_inv = inverse_lt(tri);
+			return l_inv.conjugateTranspose().multiply(l_inv);
+		}
 		
+		// otherwise we have to use the generic algorithm
 		ComplexNumber[][] augmented = new ComplexNumber[m.rows()][m.cols()*2];
 		
 		for (int i = 0; i < m.rows(); i++) {
@@ -27,12 +75,7 @@ public class SquareMatrixOps {
 					augmented[i][j] = m.getAt(i, j);
 				}
 				else {
-					if (i == j - m.cols()) {
-						augmented[i][j] = new ComplexNumber(1,0);
-					}
-					else {
-						augmented[i][j] = new ComplexNumber(0,0);
-					}
+					augmented[i][j] = new ComplexNumber((i==j-m.cols())?1:0,0);
 				}
 			}
 		}
