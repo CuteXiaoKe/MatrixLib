@@ -203,25 +203,6 @@ public class Vector extends Matrix {
 	}
 	
 	/**
-	 * Tells whether the absolute value of each component of this vector
-	 * is within epsilon of the corresponding component of the given vector
-	 * @param v the vector to compare this one too
-	 * @return whether this vector is "almost" v
-	 */
-	public boolean isAlmost(Vector v) {
-		
-		double epsilon = 1e-6;
-		
-		for (int i = 0; i < dim(); i++) {
-			if (Math.abs(getAt(i).abs() - v.getAt(i).abs()) > epsilon) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
-
-	/**
 	 * Generates a unitary matrix whose first column is this vector
 	 * @return a unitary matrix whose first column is this vector 
 	 */

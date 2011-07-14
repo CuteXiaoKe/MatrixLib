@@ -17,6 +17,7 @@ public class Factorization {
 		
 		Matrix[] qr = new Matrix[2];
 		qr[0] = m.orthonormalize();
+		//qr[0] = SquareMatrixOps.householder(m);
 		qr[1] = qr[0].transpose().multiply(m);
 		
 		return qr;
@@ -50,16 +51,17 @@ public class Factorization {
 	/**
 	 * Computes the Schur decomposition of the matrix
 	 * @param m the matrix whose Schur decomposition we are computing
-	 * @return an array containing the unitary and triangular matrices
+	 * @return the unitary matrix that can transform it to triangular form
 	 * @throws NotSquareException the given matrix is not square
 	 */
-	public static Matrix[] schurDecompose(Matrix m) throws NotSquareException {
+	public static Matrix schurDecompose(Matrix m) throws NotSquareException {
 	
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
 		}
 		
 		Matrix curr = new Matrix(m.getData()); // iterate, recomputing this matrix
+		Matrix unitary_prod = new Matrix(m.rows());
 		
 		for (int k = 0; k < m.rows()-1; k++) {
 			// build the block matrix from the n-k size lower right hand corner
@@ -71,59 +73,40 @@ public class Factorization {
 			}
 			Matrix block = new Matrix(block_arr);
 			System.out.println(block);
+			
 			// determine an eigenvalue/eigenvector for the block
 			ComplexNumber[] eigenval = {(SquareMatrixOps.eigenvalues(block))[0]};
 			System.out.println("eigenvalue: " + eigenval[0]);
 			Matrix unitary = SquareMatrixOps.eigenvectors(block, eigenval)[0].generateUnitaryMatrix();
-			if(1==1)return null;
-		}
-		
-		////////////////////
-		
-		Matrix[] ut = new Matrix[2];
-		Matrix u = null, prev = new Matrix(m.getData());
-		
-		for (int k = 0; k < m.rows()-1; k++) {
-			ComplexNumber[][] build_a = new ComplexNumber[m.rows()-k][m.rows()-k];
+			//System.out.println(unitary);
 			
-			for (int i = k; i < m.rows(); i++) {
-				for (int j = k; j < m.rows(); j++) {
-					build_a[i-k][j-k] = prev.getAt(i, j);
-				}
-			}
-			Matrix temp = new Matrix(build_a);
-			ComplexNumber[] eigenval = {(SquareMatrixOps.eigenvalues(temp))[0]};
-			System.out.println("eigenvalue: " + eigenval[0]);
-			
-			Matrix unitary = SquareMatrixOps.eigenvectors(temp, eigenval)[0].generateUnitaryMatrix();
-			
+			Matrix unit_ref;
 			if (k == 0) {
-				u = unitary;
+				unit_ref = unitary;
 			}
 			else {
-				ComplexNumber[][] build_u = new ComplexNumber[k*2][k*2];
-				for (int i = 0; i < k*2; i++) {
-					for (int j = 0; j < k*2; j++) {
+				ComplexNumber[][] ur_arr = new ComplexNumber[m.rows()][m.rows()];
+				for (int i = 0; i < ur_arr.length; i++) {
+					for (int j = 0; j < ur_arr[0].length; j++) {
 						if (i >= k && j >= k) {
-							build_u[i][j] = unitary.getAt(i-k, j-k);
+							ur_arr[i][j] = unitary.getAt(i-k,j-k);
 						}
 						else if (i == j) {
-							build_u[i][j] = new ComplexNumber(1,0);
+							ur_arr[i][j] = new ComplexNumber(1,0);
 						}
 						else {
-							build_u[i][j] = new ComplexNumber(0,0);
+							ur_arr[i][j] = new ComplexNumber(0,0);
 						}
 					}
 				}
-				u = new Matrix(build_u);
+				unit_ref = new Matrix(ur_arr);
+				unitary_prod = unitary_prod.multiply(unit_ref);
 			}
-			
-			prev = (Matrix) u.conjugateTranspose().multiply(prev).multiply(u);
+			System.out.println(unit_ref);
+			curr = unit_ref.conjugateTranspose().multiply(curr).multiply(unit_ref);
 		}
 		
-		ut[0] = u;
-		ut[1] = prev;
-		return ut;
+		return unitary_prod;
 	}
 	
 	/**
@@ -220,7 +203,7 @@ public class Factorization {
 	 */
 	public static Matrix choleskyDecompose(Matrix m) {
 		
-		if (!SquareMatrixOps.isHermetian(m)) {
+		if (!Pattern.isHermetian(m)) {
 			return null;
 		}
 		

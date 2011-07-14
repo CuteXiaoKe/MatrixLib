@@ -267,7 +267,7 @@ public class Matrix {
 	}
 	
 	/**
-	 * Adds this matrix to m
+	 * Adds this matrix to the given matrix
 	 * @param m the matrix to add to this one
 	 * @return the matrix sum this+m
 	 * @throws DimensionMismatchException the matrices do not have matching dimensions
@@ -289,6 +289,29 @@ public class Matrix {
 		return sum;
 	}
 
+	/**
+	 * Subtracts the given matrix from this one
+	 * @param m the matrix to subtract from this one
+	 * @return the difference between this matrix and the given
+	 * @throws DimensionMismatchException the matrices do not have matching dimensions
+	 */
+	public Matrix subtract(Matrix m) throws DimensionMismatchException {
+		
+		if (m.rows() != rows || m.cols() != cols) {
+			 throw new DimensionMismatchException();
+		}
+		
+		Matrix diff = new Matrix(rows, cols);
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				diff.set(i, j, matrix[i][j].subtract(m.getAt(i, j)));
+			}
+		}
+		
+		return diff;
+	}
+	
 	/**
 	 * Multiplies each element of the matrix by a complex number
 	 * @param factor the scalar to multiply the matrix by
@@ -473,8 +496,8 @@ public class Matrix {
 					for (int a = pivot+1; a < cols(); a++) {
 						rref.set(u, a, rref.getAt(u,a).subtract(c_first.multiply(rref.getAt(r, a))));
 					}
-					System.out.println("u: " + u);
-					System.out.println(rref);
+					//System.out.println("u: " + u);
+					//System.out.println(rref);
 				}
 			}
 		}
@@ -483,7 +506,7 @@ public class Matrix {
 			return rref;
 		}
 		else {
-			if (SquareMatrixOps.isIdentity(rref)) {
+			if (Pattern.isIdentity(rref)) {
 				rref.set(0, 0, det);
 			}
 			else {
@@ -554,7 +577,7 @@ public class Matrix {
 			return rref;
 		}
 		else {
-			if (SquareMatrixOps.isIdentity(rref)) {
+			if (Pattern.isIdentity(rref)) {
 				rref.set(0, 0, det);
 			}
 			else {
@@ -572,8 +595,8 @@ public class Matrix {
 	 */
 	public Matrix rref() {
 		
-		return rref(0);
-		//return rref_stable(0);
+		//return rref(0);
+		return rref_stable(0);
 	}
 	
 	/**

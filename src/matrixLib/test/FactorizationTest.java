@@ -4,6 +4,7 @@ import matrixLib.ComplexNumber;
 import matrixLib.Factorization;
 import matrixLib.Matrix;
 import matrixLib.SquareMatrixOps;
+import matrixLib.Pattern;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -47,15 +48,15 @@ public class FactorizationTest {
 		double[][] mat4 = {{1,2,-2,3},{-1,-2,0,2},{3,-3,0,1},{2,1,1,-2}};
 		
 		Matrix[] lu = Factorization.luDecompose(new Matrix(mat1));
-		assertTrue(SquareMatrixOps.isLowerTriangular(lu[0]) && SquareMatrixOps.isUpperTriangular(lu[1])
+		assertTrue(Pattern.isLowerTriangular(lu[0]) && Pattern.isUpperTriangular(lu[1])
 				&& lu[0].multiply(lu[1]).equals(new Matrix(mat1)));
 		
 		lu = Factorization.luDecompose(new Matrix(mat2));
-		assertTrue(SquareMatrixOps.isLowerTriangular(lu[0]) && SquareMatrixOps.isUpperTriangular(lu[1])
+		assertTrue(Pattern.isLowerTriangular(lu[0]) && Pattern.isUpperTriangular(lu[1])
 				&& lu[0].multiply(lu[1]).equals(new Matrix(mat2)));
 		
 		lu = Factorization.luDecompose(new Matrix(mat3));
-		assertTrue(SquareMatrixOps.isLowerTriangular(lu[0]) && SquareMatrixOps.isUpperTriangular(lu[1])
+		assertTrue(Pattern.isLowerTriangular(lu[0]) && Pattern.isUpperTriangular(lu[1])
 				&& lu[0].multiply(lu[1]).equals(new Matrix(mat3)));
 		
 		lu = Factorization.luDecompose(new Matrix(mat4));
@@ -85,9 +86,7 @@ public class FactorizationTest {
 	
 	@Test public void test_schur() {
 		double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
-		Matrix[] schur = Factorization.schurDecompose(new Matrix(f));
+		Matrix schur = Factorization.schurDecompose(new Matrix(f));
 		
-		/*System.out.println(schur[0]);
-		System.out.println(schur[1]);*/
 	}
 }

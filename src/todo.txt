@@ -10,4 +10,4 @@ QR decomposition - stable / complex
 positive definite for Cholesky
 Matrix functions - sin, exp, etc.
 Comment code better
-Hessenberg/tridiagonal more stable
+More tests for pattern/squarematrixops

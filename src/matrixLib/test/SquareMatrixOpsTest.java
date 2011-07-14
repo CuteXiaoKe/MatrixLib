@@ -3,6 +3,7 @@ package matrixLib.test;
 import matrixLib.ComplexNumber;
 import matrixLib.Matrix;
 import matrixLib.SquareMatrixOps;
+import matrixLib.Pattern;
 
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
@@ -34,13 +35,6 @@ public class SquareMatrixOpsTest {
 		assertTrue(SquareMatrixOps.determinant(z).equals(new ComplexNumber(-118,-84)));
 	}
 	
-	@Test public void triangular() {
-		double[][] mat = {{1,2,3,4},{0,5,6,7},{0,0,8,9},{0,0,0,10}};
-		Matrix m = new Matrix(mat);
-		assertTrue(SquareMatrixOps.isUpperTriangular(m));
-		assertTrue(SquareMatrixOps.isLowerTriangular(m.transpose()));
-	}
-	
 	@Test public void inverse() {
 		double[][] mat = {{5,19},{1,4}};
 		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,9}};
@@ -52,29 +46,24 @@ public class SquareMatrixOpsTest {
 		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat2)) == null);
 	}
 	
-	@Test public void householder() {
-		double[][] mat1 = {{4,1,-2,2},{1,2,0,1},{-2,0,3,-2},{2,1,-2,-1}};
-		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,7}};
-		
-		//System.out.println(SquareMatrixOps.householder(new Matrix(mat1)));
-		System.out.println(SquareMatrixOps.householder(new Matrix(mat2)));
-	}
-	
-	@Test public void hessenberg() {
-		
-		double[][] mat1 = {{2,1,-2},{-3,1,0},{4,3,1}};
-		double[][] exp1 = {{2,11.0/5,2.0/5},{-5,-11.0/25,48.0/25},{0,-27.0/25,61.0/25}};
-		
-		//assertTrue(SquareMatrixOps.hessenbergForm(new Matrix(mat1)).equals(new Matrix(exp1)));
-	}
-	
 	@Test public void eigenvalues() {
 		
 		//double[][] mat = {{0,-1},{1,0}};
 		double[][] mat = {{3,0,0},{1,3,1},{2,-1,1}};
-		/*ComplexNumber[] evs = SquareMatrixOps.eigenvalues(new Matrix(mat));
+		System.out.println(Pattern.hessenberg(new Matrix(mat)));
+		//double[][] mat1 = {{2,1,-2},{-3,1,0},{4,3,1}};
+		ComplexNumber[] evs = SquareMatrixOps.eigenvalues(new Matrix(mat));
 		for (ComplexNumber ev : evs) {
 			System.out.println(ev);
-		}*/
+		}
+	}
+	
+	@Test public void pow() {
+		double[][] mat_arr = {{1,2},{3,4}}, matcube = {{37,54},{81,118}};
+		Matrix mat = new Matrix(mat_arr);
+		
+		assertTrue(SquareMatrixOps.pow(mat,1).equals(mat));
+		assertTrue(SquareMatrixOps.pow(mat,3).equals(new Matrix(matcube)));
+		assertTrue(Pattern.isIdentity(SquareMatrixOps.pow(mat,0)));
 	}
 }
