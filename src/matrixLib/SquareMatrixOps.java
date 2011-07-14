@@ -79,8 +79,12 @@ public class SquareMatrixOps {
 				}
 			}
 		}
+		System.out.println("augmented:");
+		System.out.println(new Matrix(augmented));
 		
 		Matrix aug_rref = (new Matrix(augmented)).rref();
+		System.out.println("rref:");
+		System.out.println(aug_rref);
 		
 		// if the left wasn't reduced to Id, inverse doesn't exist
 		for (int i = 0; i < m.rows(); i++) {

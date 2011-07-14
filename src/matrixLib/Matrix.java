@@ -13,13 +13,6 @@ public class Matrix {
 	private int rows, cols;
 	
 	/**
-	 * Blank constructor
-	 */
-	public Matrix() {
-		
-	}
-	
-	/**
 	 * Constructs the nxn identity matrix
 	 * @param n the number of rows and columns in this identity matrix
 	 */
@@ -352,7 +345,6 @@ public class Matrix {
 		}
 		
 		for (int j = 0; j < cols(); j++) {
-			//r.set(j, j, result.getVector(j).normalize());
 			result[j] = result[j].normalize();
 			
 			for (int i = j+1; i < cols(); i++) {
@@ -454,7 +446,7 @@ public class Matrix {
 						rref.set(maxi, a, temp);
 					}
 					// swapping rows negates the determinant
-					det = det.multiply(-1);
+					det = det.negative();
 				}
 				
 				// divide row i by [i,j]
@@ -476,8 +468,7 @@ public class Matrix {
 			}
 			j++;
 		}
-		//System.out.println(rref);
-//if(1==1)return rref;
+		
 		// use back substitution to convert to rref
 		for (int r = rows()-1; r > 0; r--) {
 			// find the pivot column
@@ -485,7 +476,6 @@ public class Matrix {
 			for (int k = 0; k < cols(); k++) {
 				if (!rref.getAt(r,k).isZero()) {
 					pivot = k;
-					//System.out.println("pivot: "+ k);
 					break;
 				}
 			}
@@ -496,8 +486,6 @@ public class Matrix {
 					for (int a = pivot+1; a < cols(); a++) {
 						rref.set(u, a, rref.getAt(u,a).subtract(c_first.multiply(rref.getAt(r, a))));
 					}
-					//System.out.println("u: " + u);
-					//System.out.println(rref);
 				}
 			}
 		}
@@ -595,8 +583,8 @@ public class Matrix {
 	 */
 	public Matrix rref() {
 		
-		//return rref(0);
-		return rref_stable(0);
+		return rref(0);
+		//return rref_stable(0);
 	}
 	
 	/**

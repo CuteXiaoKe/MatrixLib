@@ -37,30 +37,34 @@ public class SquareMatrixOpsTest {
 	
 	@Test public void inverse() {
 		double[][] mat = {{5,19},{1,4}};
-		double[][] mat2 = {{1,2,3},{4,5,6},{7,8,9}};
+		double[][] sing = {{1,2,3},{4,5,6},{7,8,9}}; // not invertible
 		double[][] inv = {{4,-19},{-1,5}};
 		
-		double[][] tri = {{1,0,0},{3,2,0},{4,6,5}};
-		System.out.println("******************");
-		SquareMatrixOps.inverse(new Matrix(tri));
-		System.out.println("******************");
+		double[][] tri = {{1,0,0},{3,2,0},{4,6,5}}, tri_exp = {{1,0,0},{-1.5,.5,0},{1,-.6,.2}};
+		double[][] herm = {{6,2,-2},{2,6,-2},{-2,-2,10}}, herm_exp = {{7.0/36,-1.0/18,1.0/36},{-1.0/18,7.0/36,1.0/36},{1.0/36,1.0/36,1.0/9}};
 		
-		//System.out.println(SquareMatrixOps.inverse(new Matrix(mat)));
-		//ComplexNumber.setEpsilon(1e-13);
-		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
-		//assertTrue(SquareMatrixOps.inverse(new Matrix(mat2)) == null);
+		ComplexNumber[][] c = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
+		ComplexNumber[][] c_exp = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
+		
+		assertTrue(SquareMatrixOps.inverse(new Matrix(tri)).equals(new Matrix(tri_exp)));
+		assertTrue(SquareMatrixOps.inverse(new Matrix(herm)).equals(new Matrix(herm_exp)));
+		
+		System.out.println(SquareMatrixOps.inverse(new Matrix(mat)));
+		ComplexNumber.setEpsilon(1e-13);
+		assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
+		assertTrue(SquareMatrixOps.inverse(new Matrix(sing)) == null); // shouldn't exist
 	}
 	
 	@Test public void eigenvalues() {
 		
 		//double[][] mat = {{0,-1},{1,0}};
-		double[][] mat = {{3,0,0},{1,3,1},{2,-1,1}};
+		/*double[][] mat = {{3,0,0},{1,3,1},{2,-1,1}};
 		System.out.println(Pattern.hessenberg(new Matrix(mat)));
 		//double[][] mat1 = {{2,1,-2},{-3,1,0},{4,3,1}};
 		ComplexNumber[] evs = SquareMatrixOps.eigenvalues(new Matrix(mat));
 		for (ComplexNumber ev : evs) {
 			System.out.println(ev);
-		}
+		}*/
 	}
 	
 	@Test public void pow() {
