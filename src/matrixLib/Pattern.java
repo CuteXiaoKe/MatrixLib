@@ -137,7 +137,7 @@ public class Pattern {
 		}
 		
 		// an antisymmetric matrix equals the negative of its transpose
-		return (m.equals(m.transpose().scale(-1)));
+		return (m.equals(m.transpose().multiply(-1)));
 	}
 	
 	/**
@@ -232,23 +232,24 @@ public class Pattern {
 	 * Generates the block diagonal matrix with Id in the upper left
 	 * and the given matrix in the lower right
 	 * @param m the matrix that goes in the lower right
+	 * @param size the size of the identity matrix to append
 	 * @return the generated block diagonal matrix
 	 * @throws NotSquareException the given matrix is not square
 	 */
-	public static Matrix blockDiagonal(Matrix m) throws NotSquareException {
+	public static Matrix blockDiagonal(Matrix m, int size) throws NotSquareException {
 		
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
 		}
-		
+
 		int k = m.rows(); 
-		ComplexNumber[][] bdiag = new ComplexNumber[k*2][k*2];
+		ComplexNumber[][] bdiag = new ComplexNumber[k+size][k+size];
 		
-		for (int i = 0; i < k*2; i++) {
-			for (int j = 0; j < k*2; j++) {
-				if (i >= k && j >= k) { // if in the lower right
-					// insert the corresponding element in the given matrix
-					bdiag[i][j] = m.getAt(i-k,j-k);
+		for (int i = 0; i < k+size; i++) {
+			for (int j = 0; j < k+size; j++) {
+				if (i >= size && j >= size) { // if in the lower right
+					// insert the corresponding element in the given matri
+					bdiag[i][j] = m.getAt(i-size,j-size);
 				}
 				else {
 					// construct the identity matrix; i != j everywhere outside Id

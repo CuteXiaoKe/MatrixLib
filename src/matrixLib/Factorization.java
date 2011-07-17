@@ -15,10 +15,95 @@ public class Factorization {
 	 */
 	public static Matrix[] QRDecompose(Matrix m) {
 		
-		Matrix[] qr = new Matrix[2];
-		qr[0] = m.orthonormalize();
+		Matrix[] qr = new Matrix[2]; // Q and R will be returned in this array
+		Matrix curr = new Matrix(m.getData()); // iterate on this matrix
+		Matrix tri = new Matrix(m.getData()), uni = new Matrix(m.rows());
+		
+		for (int k = 0; k < m.cols()-1; k++) { // suspect
+			
+			Vector column = curr.getVector(0), original = curr.getVector(0);
+			
+			// find the pivot element
+			int pivot = column.dim()-1;
+			while (column.getAt(pivot).isZero()) {
+				pivot--;
+				if (pivot == 0) {
+					break; // 0 vector
+				}
+			}
+			
+			if (column.getAt(pivot).Re() > 0) {
+				column.set(0, column.getAt(0).subtract(new ComplexNumber(Norm.pnorm(column,2),0)));
+			}
+			else {
+				column.set(0, column.getAt(0).add(new ComplexNumber(Norm.pnorm(column,2),0)));
+			}
+			//System.out.println("x: " + original);
+			//System.out.println("u: " + column);
+			
+			// compute the 2-norm squared (avoiding sqrt)
+			double normsqr = 0;
+			for (int j = 0; j < column.dim(); j++) {
+				ComplexNumber coord = column.getAt(j);
+				normsqr += coord.Re()*coord.Re()+coord.Im()*coord.Im();
+			}
+			
+			// build the householder matrix, Q = I - 2uu^T/||u||^2
+			ComplexNumber[][] hh_arr = new ComplexNumber[curr.rows()][curr.rows()]; // suspect
+			// cfactor is used in computing the householder matrix when using complex numbers
+			//ComplexNumber cfactor = original.dot(column).divide(column.dot(original)).add(new ComplexNumber(1,0));
+			
+			//System.out.println("cfactor: " + cfactor);
+			//System.out.println("norm sqr: " + normsqr);
+			
+			for (int i = 0; i < curr.rows(); i++) {
+				for (int j = 0; j < curr.rows(); j++) {
+					//hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j)).multiply(cfactor).multiply(1.0/normsqr).negative();
+					hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j)).multiply(2.0/normsqr).negative();
+					// account for subtracting the above from the identity matrix
+					if (i == j) {
+						hh_arr[i][j] = hh_arr[i][j].add(new ComplexNumber(1,0));
+					}
+				}
+			}
+			Matrix householder = new Matrix(hh_arr);
+			
+			if (k > 0) {
+				// append 1's in upper left diagonal so we can multiply them all together
+				householder = Pattern.blockDiagonal(householder, k);
+			}
+
+			//System.out.println("householder:");
+			//System.out.println(householder);
+			
+			uni = uni.multiply(householder.transpose()); // compute running Q
+			tri = householder.multiply(tri); // compute running R
+			
+			// now operate on the (1,1)-minor of the current matrix
+			ComplexNumber[][] minor = new ComplexNumber[tri.rows()-1][tri.cols()-1];
+			for (int i = 1; i < tri.rows(); i++) {
+				for (int j = 1; j < tri.rows(); j++) {
+					minor[i-1][j-1] = tri.getAt(i,j);
+				}
+			}
+			curr = new Matrix(minor);
+			
+			//System.out.println(householder);
+			//System.out.println(tri);
+			//System.out.println(curr);
+			//if(1==1)return null;
+		}
+		
+		qr[0] = uni;
+		qr[1] = tri;
+		
+		//System.out.println("----------------------------");
+		//System.out.println(qr[0]);
+		//System.out.println(qr[1]);
+		
+		//qr[0] = m.orthonormalize();
 		//qr[0] = SquareMatrixOps.householder(m);
-		qr[1] = qr[0].transpose().multiply(m);
+		//qr[1] = qr[0].transpose().multiply(m);
 		
 		return qr;
 	}
@@ -87,7 +172,7 @@ public class Factorization {
 				unit_ref = unitary;
 			}
 			else {
-				unit_ref = Pattern.blockDiagonal(unitary);
+				unit_ref = Pattern.blockDiagonal(unitary, unitary.cols());
 			}
 			unitary_prod = unitary_prod.multiply(unit_ref);
 			System.out.println(unit_ref);

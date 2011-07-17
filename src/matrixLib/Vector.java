@@ -116,7 +116,7 @@ public class Vector extends Matrix {
 	 */
 	public Vector subtract(Vector v) throws DimensionMismatchException {
 		
-		return super.add((Matrix)v.scale(-1)).toVector();
+		return super.add((Matrix)v.multiply(-1)).toVector();
 	}
 	
 	/**

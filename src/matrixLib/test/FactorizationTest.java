@@ -17,13 +17,16 @@ import static org.junit.Assert.*;
 public class FactorizationTest {
 
 	@Test public void QRDecompose() {
-		double[][] m1 = {{1.92,2.32},{.56,2.76}};
+		double[][] m1 = {{12,-51,4},{6,167,-68},{-4,24,-41}};
+		Factorization.QRDecompose(new Matrix(m1));
+		
+		/*double[][] m1 = {{1.92,2.32},{.56,2.76}};
 		double[][] q1 = {{.96, -.28},{.28, .96}};
 		double[][] r1 = {{2,3},{0,2}};
 		
 		Matrix[] qr1 = Factorization.QRDecompose(new Matrix(m1));
 		assertTrue(qr1[0].equals(new Matrix(q1)));
-		assertTrue(qr1[1].equals(new Matrix(r1)));
+		assertTrue(qr1[1].equals(new Matrix(r1)));*/
 		
 		//double[][] q2 = {{1,2},{3,4}};
 		//System.out.println(Factorization.QRDecompose(new Matrix(q2))[1]);
@@ -86,7 +89,7 @@ public class FactorizationTest {
 	
 	@Test public void test_schur() {
 		double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
-		Matrix schur = Factorization.schurDecompose(new Matrix(f));
+		//Matrix schur = Factorization.schurDecompose(new Matrix(f));
 		
 	}
 }

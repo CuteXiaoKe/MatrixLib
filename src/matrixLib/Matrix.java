@@ -212,7 +212,7 @@ public class Matrix {
 	/**
 	 * Returns the result of multiplying this matrix by m
 	 * @param m the matrix to multiply this one by
-	 * @return the product this*m
+	 * @return the matrix product this*m
 	 * @throws DimensionMismatchException the matrices do not have the right dimensions to be multiplied
 	 */
 	public Matrix multiply(Matrix m) throws DimensionMismatchException {
@@ -310,7 +310,7 @@ public class Matrix {
 	 * @param factor the scalar to multiply the matrix by
 	 * @return the matrix factor*this
 	 */
-	public Matrix scale(ComplexNumber factor) {
+	public Matrix multiply(ComplexNumber factor) {
 		
 		Matrix scaled = new Matrix(rows, cols);
 		for (int i = 0; i < rows; i++) {
@@ -327,9 +327,9 @@ public class Matrix {
 	 * @param factor the scalar to multiply the matrix by
 	 * @return the matrix factor*this
 	 */
-	public Matrix scale(double factor) {
+	public Matrix multiply(double factor) {
 		
-		return scale(new ComplexNumber(factor, 0));
+		return multiply(new ComplexNumber(factor, 0));
 	}
 
 	/**
@@ -348,7 +348,7 @@ public class Matrix {
 			result[j] = result[j].normalize();
 			
 			for (int i = j+1; i < cols(); i++) {
-				result[i] = result[i].subtract(result[j].scale(result[j].dot(result[i])).toVector());
+				result[i] = result[i].subtract(result[j].multiply(result[j].dot(result[i])).toVector());
 			}
 		}
 		
