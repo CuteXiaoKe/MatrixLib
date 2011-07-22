@@ -79,12 +79,8 @@ public class SquareMatrixOps {
 				}
 			}
 		}
-		System.out.println("augmented:");
-		System.out.println(new Matrix(augmented));
 		
 		Matrix aug_rref = (new Matrix(augmented)).rref();
-		System.out.println("rref:");
-		System.out.println(aug_rref);
 		
 		// if the left wasn't reduced to Id, inverse doesn't exist
 		for (int i = 0; i < m.rows(); i++) {
@@ -120,6 +116,10 @@ public class SquareMatrixOps {
 	 */
 	public static ComplexNumber determinant(Matrix m) throws NotSquareException {
 
+		if (m.rows() != m.cols()) {
+			throw new NotSquareException();
+		}
+		
 		// try shortcuts for common sizes first
 		if (m.rows() == 1) {
 			return m.getAt(0,0);
@@ -153,11 +153,33 @@ public class SquareMatrixOps {
 		return tr;
 	}
 	
-	public static ComplexNumber[] fast_eigenvalues(Matrix m) {
+	// helper method used for the QR algorithm
+	// returns min(the no. of rows of 0s in the bottom left block,2)
+	private static int getForm(Matrix m) {
 		
-		return null;
+		ComplexNumber[][] entries = m.getData();
+		int n = m.rows() - 2;
+		
+		boolean form2 = true;
+		for (int i = 0; i < n; i++) {
+			if (!entries[n][i].isZero() || !entries[n+1][i].isZero()) {
+				form2 = false;
+			}
+		}
+		if (form2) return 2;
+		
+		n++;
+		for (int i = 0; i < n; i++) {
+			if (!entries[n][i].isZero()) {
+				// isn't 1, and we already know it isn't 2
+				return 0;
+			}
+		}
+		
+		// no evidence against 1, but we know it isn't 2
+		return 1;
 	}
-	
+
 	/**
 	 * Returns a list of the eigenvalues of the matrix
 	 * @param m the matrix whose eigenvalues we compute
@@ -166,44 +188,49 @@ public class SquareMatrixOps {
 	 */
 	public static ComplexNumber[] eigenvalues(Matrix m) {
 		
-		if (m.rows() != m.cols()) {
-			throw new NotSquareException();
-		}
-
-		// max amount of eigenvalues is the dimension of the matrix
+		Matrix curr = Pattern.hessenberg(m);
 		ComplexNumber[] evals = new ComplexNumber[m.rows()];
-		double[][] shift_arr = {{2.8,0,0},{0,2.8,0},{0,0,2.8}};
-		Matrix shift = new Matrix (shift_arr);
+		int pos = 0; // where we are in the evals array
+		int size = m.rows(); // the size of the current array
 		
-		Matrix temp = Pattern.hessenberg(m);
-		//Matrix temp = new Matrix(m.getData());
-		
-		ComplexNumber.setEpsilon(1e-8);
-		int count = 0;
-
-		System.out.println("loop");
-		while (!Pattern.isUpperTriangular(temp)) {
-			count++;
-			//System.out.println("QR decomposing...");
+		while (size != 1) {
+			Matrix shift = Pattern.diag(curr.getAt(size-1,size-1),size);
+			Matrix[] qr = Factorization.QRDecompose(curr.subtract(shift));
+			curr = qr[1].multiply(qr[0]).add(shift); // similarity transform, preserves spectrum
 			
-			//Matrix[] qr = Factorization.QRDecompose(temp.subtract(shift));
-			//temp = qr[1].multiply(qr[0].transpose()).add(shift);
-			
-			Matrix[] qr = Factorization.QRDecompose(temp);
-			temp = qr[1].multiply(qr[0]);
-			
-			if(count>650000)break;
+			int form = getForm(curr);
+			if (form == 1) {
+				size--;
+				evals[pos++] = curr.getAt(size, size);
+			}
+			else if (form == 2) {
+				size -= 2;
+				// apply formula for eigenvalues of a 2x2 matrix
+				ComplexNumber left = curr.getAt(size,size).add(curr.getAt(size+1,size+1));
+				ComplexNumber leftprime = curr.getAt(size,size).subtract(curr.getAt(size+1,size+1));
+				ComplexNumber right = curr.getAt(size,size+1).multiply(curr.getAt(size+1,size)).multiply(4).add(leftprime.multiply(leftprime)).sqrt();
+				evals[pos++] = left.add(right).multiply(.5);
+				evals[pos++] = left.subtract(right).multiply(.5);
+			}
+			if (size == 0) {
+				return evals;
+			}
+			if (form != 0) {
+				// build the new matrix to operate on if an eval was found
+				ComplexNumber[][] newmat = new ComplexNumber[size][size];
+				for (int i = 0; i < size; i++) {
+					for (int j = 0; j < size; j++) {
+						newmat[i][j] = curr.getAt(i,j);
+					}
+				}
+				curr = new Matrix(newmat);
+			}
 		}
-		System.out.printf("Completed in %d iterations.\n", count);
-		
-		// temp is now upper triangular, so the evals are on the diagonal
-		for (int i = 0; i < m.rows(); i++) {
-			evals[i] = temp.getAt(i, i);
-		}
+		evals[pos++] = curr.getAt(0,0); // there is a 1x1 matrix remaining
 		
 		return evals;
 	}
-
+	
 	/**
 	 * Computes the normalized eigenvectors
 	 * @param m the matrix whose eigenvectors are computed
@@ -224,38 +251,43 @@ public class SquareMatrixOps {
 	 * @param m the matrix whose eigenvectors are being computed 
 	 * @param evals the list of eigenvalues to compute the associated eigenvectors of
 	 * @return an array of normalized eigenvectors for the matrix
+	 * @throws NotSquareException the given matrix is not square
 	 */
 	public static Vector[] eigenvectors(Matrix m, ComplexNumber[] evals) {
+		
+		if (m.rows() != m.cols()) { // check if square
+			throw new NotSquareException();
+		}
 		
 		Vector[] evecs = new Vector[evals.length];
 		int vec_pos = 0;
 		
-		ComplexNumber[] test_vec = new ComplexNumber[evals.length];
-		for (int i = 0; i < evals.length; i++) {
-			test_vec[i] = new ComplexNumber(1, 0);
+		ComplexNumber[] test_vec = new ComplexNumber[m.cols()];
+		double val = 1.0/Math.sqrt(m.cols());
+		for (int i = 0; i < test_vec.length; i++) {
+			test_vec[i] = new ComplexNumber(val, 0);
 		}
 		
-		for (ComplexNumber ev : evals) {
-			
-			Matrix diag = new Matrix(m.getData());
-			for (int i = 0; i < evals.length; i++) {
-				diag.set(i, i, diag.getAt(i, i).subtract(ev));
+		for (ComplexNumber ev : evals) { // compute eigenvector for each given eval
+			Matrix diag = SquareMatrixOps.inverse((new Matrix(m.getData())).subtract(Pattern.diag(ev, m.rows())));
+			while (diag == null) {
+				// keep scaling the eigenvalue until diag is invertible
+				ev = ev.multiply(.999);
+				diag = SquareMatrixOps.inverse((new Matrix(m.getData())).subtract(Pattern.diag(ev, m.rows())));
 			}
-			diag = SquareMatrixOps.inverse(diag);
 			
 			Vector prev = new Vector(test_vec);
 			Vector next = diag.multiply(prev).normalize();
-			
+			//ComplexNumber.setEpsilon(1e-8);
 			do {
 				prev = next;
 				next = diag.multiply(prev).normalize();
-			//} while (!next.isAlmost(prev));
 			} while (!next.equals(prev));
 			evecs[vec_pos++] = next.normalize();
 		}
 		
 		return evecs;
-	}	
+	}
 	
 	/**
 	 * Computes the value of the matrix raised to a particular power

@@ -15,26 +15,30 @@ import static org.junit.Assert.*;
  */
 
 public class FactorizationTest {
-
+	
 	@Test public void QRDecompose() {
-		double[][] m1 = {{12,-51,4},{6,167,-68},{-4,24,-41}};
-		Factorization.QRDecompose(new Matrix(m1));
+		double[][] m1 = {{1.92,2.32},{.56,2.76}};
+		Matrix[] qr = Factorization.QRDecompose(new Matrix(m1));
+		assertTrue(Pattern.isUnitary(qr[0]) && Pattern.isUpperTriangular(qr[1]) && qr[0].multiply(qr[1]).equals(new Matrix(m1)));
 		
-		/*double[][] m1 = {{1.92,2.32},{.56,2.76}};
-		double[][] q1 = {{.96, -.28},{.28, .96}};
-		double[][] r1 = {{2,3},{0,2}};
+		double[][] m2 = {{12,-51,4},{6,167,-68},{-4,24,-41}};
+		qr = Factorization.QRDecompose(new Matrix(m2));
+		ComplexNumber.setEpsilon(1e-12);
+		assertTrue(Pattern.isUnitary(qr[0]) && Pattern.isUpperTriangular(qr[1]) && qr[0].multiply(qr[1]).equals(new Matrix(m2)));
+		ComplexNumber.setEpsilon(1e-14);
 		
-		Matrix[] qr1 = Factorization.QRDecompose(new Matrix(m1));
-		assertTrue(qr1[0].equals(new Matrix(q1)));
-		assertTrue(qr1[1].equals(new Matrix(r1)));*/
+		double[][] big = {{1,3,2,-1},{1,1,2,-3},{3,1,1,-1},{2,-2,1,2}};
+		qr = Factorization.QRDecompose(new Matrix(big));
+		assertTrue(Pattern.isUnitary(qr[0]) && qr[0].multiply(qr[1]).equals(new Matrix(big)));
 		
-		//double[][] q2 = {{1,2},{3,4}};
-		//System.out.println(Factorization.QRDecompose(new Matrix(q2))[1]);
+		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
+		ComplexNumber[][] z = {{new ComplexNumber(1,1), new ComplexNumber(2,0)},{new ComplexNumber(3,0),new ComplexNumber(4,0)}};
+		//qr = Factorization.QRDecompose(new Matrix(z));
+		//System.out.println(qr[0]);
+		//System.out.println(qr[1]);
+		//assertTrue(Pattern.isUnitary(qr[0]) && qr[0].multiply(qr[1]).equals(new Matrix(z)));
 		
-		//Matrix[] qr1 = m.QRDecompose();
-		//System.out.println(qr1[0]);
-		//System.out.println(qr1[1]);
-		
+		/*
 		//ComplexNumber[][] z = {{new ComplexNumber(1,0), new ComplexNumber(1,1)},{new ComplexNumber(2,-1),new ComplexNumber(3,0)}};
 		/*ComplexNumber[][] z = {{new ComplexNumber(0,1), new ComplexNumber(2, 0)},{new ComplexNumber(1,0),new ComplexNumber(1,1)}};
 		Matrix zm = new Matrix(z);
@@ -81,15 +85,23 @@ public class FactorizationTest {
 		assertTrue(Factorization.choleskyDecompose(new Matrix(c)).equals(new Matrix(c_exp)));
 	}
 	
-	@Test public void test_svd() {
-		/*double[][] f = {{4,0},{3,-5}};
-		Matrix m = new Matrix(f);
-		System.out.println(Factorization.singularValueDecomposition(m));*/
+	@Test public void singularValueDecomposition() {
+		
+		double[][] m1 = {{4,0},{3,-5}};
+		//System.out.println(Factorization.singularValueDecomposition(new Matrix(m1)));
+		
 	}
 	
-	@Test public void test_schur() {
-		double[][] f = {{4,0,1},{1,3,-1},{-1,0,2}};
-		//Matrix schur = Factorization.schurDecompose(new Matrix(f));
+	@Test public void schurDecomposition() {
+
+		// this works fine except the eigenvectors aren't computed right
 		
+		double[][] m1 = {{3,0,0,-1},{1,2,0,1},{2,0,4,2},{-1,0,0,3}};
+		Matrix[] schur = Factorization.schurDecompose(new Matrix(m1));
+		assertTrue(Pattern.isUnitary(schur[0]) && Pattern.isUpperTriangular(schur[1]) && schur[0].conjugateTranspose().multiply(new Matrix(m1)).multiply(schur[0]).equals(schur[1]));
+		
+		double[][] m2 = {{4,0,1},{1,3,-1},{-1,0,2}};
+		schur = Factorization.schurDecompose(new Matrix(m2));
+		assertTrue(Pattern.isUnitary(schur[0]) && Pattern.isUpperTriangular(schur[1]) && schur[0].conjugateTranspose().multiply(new Matrix(m2)).multiply(schur[0]).equals(schur[1]));
 	}
 }

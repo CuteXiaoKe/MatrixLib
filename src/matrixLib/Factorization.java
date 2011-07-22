@@ -18,28 +18,50 @@ public class Factorization {
 		Matrix[] qr = new Matrix[2]; // Q and R will be returned in this array
 		Matrix curr = new Matrix(m.getData()); // iterate on this matrix
 		Matrix tri = new Matrix(m.getData()), uni = new Matrix(m.rows());
+		boolean real = m.isReal(); // whether the matrix is real or complex
 		
-		for (int k = 0; k < m.cols()-1; k++) { // suspect
+		for (int k = 0; k < m.cols()-1; k++) {
 			
-			Vector column = curr.getVector(0), original = curr.getVector(0);
+			Vector column = curr.getVector(0), original;
+			int first = 0;
+			while (column.isZero()) {
+				column = curr.getVector(++first);
+			}
+			original = curr.getVector(first);
 			
-			// find the pivot element
-			int pivot = column.dim()-1;
-			while (column.getAt(pivot).isZero()) {
-				pivot--;
-				if (pivot == 0) {
-					break; // 0 vector
+			ComplexNumber factor = new ComplexNumber(1,0);
+			if (real) {
+				// find the pivot element
+				int pivot = column.dim()-1;
+				while (column.getAt(pivot).isZero()) {
+					pivot--;
+					if (pivot == 0) {
+						break; // 0 vector
+					}
+				}
+				ComplexNumber piv_el = column.getAt(pivot);
+				factor = new ComplexNumber(piv_el.Re() < 0 ? -1 : 1, 0);
+			}
+			else {
+				// have to compute exp(i*arg(x)) instead of just +/- 1
+				// uses the fact that exp(ix)=cos(x)+isin(x) and the cos(arctan(x)) formula
+				ComplexNumber coord = original.getAt(0);
+				System.out.println("coord: " + coord);
+				if (coord.Re() == 0) {
+					factor = new ComplexNumber(coord.Im() > 0 ? 1 : -1, 0);
+				}
+				else {
+					double ratio = coord.Im() / coord.Re();
+					factor = new ComplexNumber(1.0/Math.sqrt(ratio*ratio+1),ratio/Math.sqrt(ratio*ratio+1)).negative();
+					if (coord.Re() < 0) {
+						// arg adds/subs pi to the result of atan, negating cos/sin
+						factor = factor.negative();
+					}
+					System.out.println("factor: " + factor);
 				}
 			}
 			
-			if (column.getAt(pivot).Re() > 0) {
-				column.set(0, column.getAt(0).subtract(new ComplexNumber(Norm.pnorm(column,2),0)));
-			}
-			else {
-				column.set(0, column.getAt(0).add(new ComplexNumber(Norm.pnorm(column,2),0)));
-			}
-			//System.out.println("x: " + original);
-			//System.out.println("u: " + column);
+			column.set(0, column.getAt(0).add((new ComplexNumber(Norm.pnorm(column,2),0)).multiply(factor)));
 			
 			// compute the 2-norm squared (avoiding sqrt)
 			double normsqr = 0;
@@ -51,15 +73,20 @@ public class Factorization {
 			// build the householder matrix, Q = I - 2uu^T/||u||^2
 			ComplexNumber[][] hh_arr = new ComplexNumber[curr.rows()][curr.rows()]; // suspect
 			// cfactor is used in computing the householder matrix when using complex numbers
-			//ComplexNumber cfactor = original.dot(column).divide(column.dot(original)).add(new ComplexNumber(1,0));
-			
-			//System.out.println("cfactor: " + cfactor);
-			//System.out.println("norm sqr: " + normsqr);
+			// remember complex inner product does not commute
+			ComplexNumber cfactor;
+			if (real) {
+				cfactor = new ComplexNumber(2, 0);
+			}
+			else {
+				cfactor = original.dot(column).divide(column.dot(original)).add(new ComplexNumber(1,0));
+			}
+			//ComplexNumber cfactor = column.dot(original).divide(original.dot(column)).add(new ComplexNumber(1,0));
 			
 			for (int i = 0; i < curr.rows(); i++) {
 				for (int j = 0; j < curr.rows(); j++) {
-					//hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j)).multiply(cfactor).multiply(1.0/normsqr).negative();
-					hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j)).multiply(2.0/normsqr).negative();
+					hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j).conjugate()).multiply(cfactor).multiply(1.0/normsqr).negative();
+					//hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j)).multiply(2.0/normsqr).negative();
 					// account for subtracting the above from the identity matrix
 					if (i == j) {
 						hh_arr[i][j] = hh_arr[i][j].add(new ComplexNumber(1,0));
@@ -72,38 +99,22 @@ public class Factorization {
 				// append 1's in upper left diagonal so we can multiply them all together
 				householder = Pattern.blockDiagonal(householder, k);
 			}
-
-			//System.out.println("householder:");
-			//System.out.println(householder);
 			
 			uni = uni.multiply(householder.transpose()); // compute running Q
 			tri = householder.multiply(tri); // compute running R
 			
 			// now operate on the (1,1)-minor of the current matrix
-			ComplexNumber[][] minor = new ComplexNumber[tri.rows()-1][tri.cols()-1];
-			for (int i = 1; i < tri.rows(); i++) {
-				for (int j = 1; j < tri.rows(); j++) {
-					minor[i-1][j-1] = tri.getAt(i,j);
+			ComplexNumber[][] minor = new ComplexNumber[curr.rows()-1][curr.cols()-1];
+			for (int i = 0; i < minor.length; i++) {
+				for (int j = 0; j < minor[0].length; j++) {
+					minor[i][j] = tri.getAt(i+1,j+1);
 				}
 			}
 			curr = new Matrix(minor);
-			
-			//System.out.println(householder);
-			//System.out.println(tri);
-			//System.out.println(curr);
-			//if(1==1)return null;
 		}
 		
 		qr[0] = uni;
 		qr[1] = tri;
-		
-		//System.out.println("----------------------------");
-		//System.out.println(qr[0]);
-		//System.out.println(qr[1]);
-		
-		//qr[0] = m.orthonormalize();
-		//qr[0] = SquareMatrixOps.householder(m);
-		//qr[1] = qr[0].transpose().multiply(m);
 		
 		return qr;
 	}
@@ -119,16 +130,8 @@ public class Factorization {
 		Matrix[] svd = new Matrix[3];
 		ComplexNumber[] singvals = m.singularValues();
 		
+		Matrix diag = Pattern.diag(singvals);
 		
-		
-		ComplexNumber[][] build = new ComplexNumber[singvals.length][singvals.length];
-		int sv_pos = 0;
-		for (int i = 0; i < build.length; i++) {
-			for (int j = 0; j < build[0].length; j++) {
-				build[i][j] = (i == j) ? singvals[sv_pos++] : new ComplexNumber(0, 0);
-			}
-		}
-		Matrix diag = new Matrix(build);
 		System.out.println(diag);
 		System.out.println(SquareMatrixOps.inverse(diag));
 		
@@ -138,48 +141,40 @@ public class Factorization {
 	/**
 	 * Computes the Schur decomposition of the matrix
 	 * @param m the matrix whose Schur decomposition we are computing
-	 * @return the unitary matrix that can transform it to triangular form
+	 * @return an array containing the unitary matrix that can transform it to triangular form and the triangular form
 	 * @throws NotSquareException the given matrix is not square
 	 */
-	public static Matrix schurDecompose(Matrix m) throws NotSquareException {
+	public static Matrix[] schurDecompose(Matrix m) throws NotSquareException {
 	
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
 		}
 		
-		Matrix curr = new Matrix(m.getData()); // iterate, recomputing this matrix
+		Matrix curr = new Matrix(m.getData()), minor = new Matrix(m.getData()); // start with the given matrix
 		Matrix unitary_prod = new Matrix(m.rows());
 		
 		for (int k = 0; k < m.rows()-1; k++) {
-			// build the block matrix from the n-k size lower right hand corner
-			ComplexNumber[][] block_arr = new ComplexNumber[m.rows()-k][m.rows()-k];
-			for (int i = k; i < m.rows(); i++) {
-				for (int j = k; j < m.rows(); j++) {
-					block_arr[i-k][j-k] = curr.getAt(i,j);
+			
+			ComplexNumber[][] newmat = new ComplexNumber[m.rows()-k][m.rows()-k];
+			for (int i = 0; i < newmat.length; i++) {
+				for (int j = 0; j < newmat[0].length; j++) {
+					newmat[i][j] = curr.getAt(i+k,j+k);
 				}
 			}
-			Matrix block = new Matrix(block_arr);
-			System.out.println(block);
+			minor = new Matrix(newmat);
 			
-			// determine an eigenvalue/eigenvector for the block
-			ComplexNumber[] eigenval = {(SquareMatrixOps.eigenvalues(block))[0]};
-			System.out.println("eigenvalue: " + eigenval[0]);
-			Matrix unitary = SquareMatrixOps.eigenvectors(block, eigenval)[0].generateUnitaryMatrix();
-			//System.out.println(unitary);
+			ComplexNumber[] eval = {SquareMatrixOps.eigenvalues(minor)[0]};
+			Vector evec = SquareMatrixOps.eigenvectors(minor, eval)[0];
 			
-			Matrix unit_ref;
-			if (k == 0) {
-				unit_ref = unitary;
-			}
-			else {
-				unit_ref = Pattern.blockDiagonal(unitary, unitary.cols());
-			}
-			unitary_prod = unitary_prod.multiply(unit_ref);
-			System.out.println(unit_ref);
-			curr = unit_ref.conjugateTranspose().multiply(curr).multiply(unit_ref);
+			Matrix unitary = evec.generateUnitaryMatrix();
+			Matrix uni_ref = (k == 0) ? unitary : Pattern.blockDiagonal(unitary, k);
+			
+			unitary_prod = unitary_prod.multiply(uni_ref); // running unitary matrix
+			curr = uni_ref.conjugateTranspose().multiply(curr).multiply(uni_ref);
 		}
 		
-		return unitary_prod;
+		Matrix[] ut = {unitary_prod, curr};
+		return ut;
 	}
 	
 	/**

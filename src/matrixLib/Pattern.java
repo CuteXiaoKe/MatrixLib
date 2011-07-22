@@ -262,6 +262,24 @@ public class Pattern {
 	}
 	
 	/**
+	 * Generates the diagonal matrix with the same diagonal element, i.e. x*I
+	 * @param el the number that goes on the diagonal
+	 * @param size the size of the square matrix
+	 * @return the diagonal matrix with the given element along the diagonal
+	 */
+	public static Matrix diag(ComplexNumber el, int size) {
+		
+		// create a new matrix of all 0's
+		Matrix mat = new Matrix(size, size);
+		
+		for (int i = 0; i < size; i++) {
+			mat.set(i, i, el);
+		}
+		
+		return mat;
+	}
+	
+	/**
 	 * Generates the diagonal matrix with the given diagonal elements
 	 * @param diagonals the elements that lie along the diagonal
 	 * @return the diagonal matrix with the given diagonal elements

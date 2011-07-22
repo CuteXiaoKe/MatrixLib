@@ -208,6 +208,22 @@ public class Matrix {
 	public int cols() {
 		return cols;
 	}
+
+	/**
+	 * Tells whether the matrix is composed entirely of real numbers
+	 * @return boolean value indicating whether the matrix is real
+	 */
+	public boolean isReal() {
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (matrix[i][j].Im() != 0) {
+					return false; // complex entry found
+				}
+			}
+		}
+		return true; // didn't find any complex entries
+	}
 	
 	/**
 	 * Returns the result of multiplying this matrix by m

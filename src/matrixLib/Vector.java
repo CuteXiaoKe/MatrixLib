@@ -263,6 +263,20 @@ public class Vector extends Matrix {
 	}
 	
 	/**
+	 * Tells whether this is the 0 vector (all coordinates are 0)
+	 * @return a boolean value indicating whether this is the 0 vector
+	 */
+	public boolean isZero() {
+		
+		for (int i = 0; i < dim(); i++) {
+			if (!getAt(i).isZero()) {
+				return false; // found a nonzero one
+			}
+		}
+		return true; // all of the coordinates were 0
+	}
+	
+	/**
 	 * Returns a string representation of this vector <a, b, ...>
 	 * @return a string representation <a, b, ...>
 	 */

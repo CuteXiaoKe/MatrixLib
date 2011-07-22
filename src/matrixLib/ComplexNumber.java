@@ -217,6 +217,16 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	public ComplexNumber sqrt() {
 		
 		double a = this.Re(), b = this.Im();
+		
+		if (b == 0) { // see if we can just compute real sqrt
+			if (a >= 0) {
+				return new ComplexNumber(Math.sqrt(a),0);
+			}
+			else { // compute imaginary square root, sqrt(a)=isqrt(-a)
+				return new ComplexNumber(0, Math.sqrt(-a));
+			}
+		}
+		
 		double p = 1.0/Math.sqrt(2) * Math.sqrt(Math.sqrt(a*a+b*b)+a);
 		double q = 1.0/Math.sqrt(2) * Math.sqrt(Math.sqrt(a*a+b*b)-a);
 		
@@ -270,18 +280,18 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 
 	/**
-	 * Compares this to z by comparing the modulus of this with |z|
+	 * Compares this to z by comparing by absolute value, then by argument
+	 * @param z the complex number to compare with this
+	 * @return 1, -1, or 0 if the given number is greater, less, or equal
 	 */
 	public int compareTo(ComplexNumber z) {
 		
-		if (this.abs() > z.abs()) {
-			return -1;
-		}
-		else if (this.abs() < z.abs()) {
-			return 1;
-		}
+		if (this.abs() > z.abs()) return -1;
+		else if (this.abs() < z.abs()) return 1;
 		else {
-			return 0;
+			if (this.arg() > z.arg()) return -1;
+			else if (this.arg() > z.arg()) return 1;
+			else return 0;
 		}
 	}
 }

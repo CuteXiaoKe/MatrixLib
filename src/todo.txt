@@ -1,12 +1,8 @@
 todo:
 
 Strassen multiplication
-Fix eigenvalues/eigenvectors
-Numerically stable matrix inverse
-Orthonormalization via Householder/Givens
-Schur
 SVD
-QR decomposition - stable / complex
+QR decomposition for complex matrices
 positive definite for Cholesky
 Matrix functions - sin, exp, etc.
 Comment code better
