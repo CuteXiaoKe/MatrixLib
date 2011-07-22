@@ -193,7 +193,7 @@ public class SquareMatrixOps {
 		int pos = 0; // where we are in the evals array
 		int size = m.rows(); // the size of the current array
 		
-		while (size != 1) {
+		while (size > 2) {
 			Matrix shift = Pattern.diag(curr.getAt(size-1,size-1),size);
 			Matrix[] qr = Factorization.QRDecompose(curr.subtract(shift));
 			curr = qr[1].multiply(qr[0]).add(shift); // similarity transform, preserves spectrum
@@ -226,7 +226,18 @@ public class SquareMatrixOps {
 				curr = new Matrix(newmat);
 			}
 		}
-		evals[pos++] = curr.getAt(0,0); // there is a 1x1 matrix remaining
+		
+		if (size == 1) {
+			evals[pos++] = curr.getAt(0,0); // there is a 1x1 matrix remaining
+		}
+		else {
+			// size=2 in this branch
+			ComplexNumber left = curr.getAt(0,0).add(curr.getAt(1,1));
+			ComplexNumber leftprime = curr.getAt(0,0).subtract(curr.getAt(1,1));
+			ComplexNumber right = curr.getAt(0,1).multiply(curr.getAt(1,0)).multiply(4).add(leftprime.multiply(leftprime)).sqrt();
+			evals[pos++] = left.add(right).multiply(.5);
+			evals[pos++] = left.subtract(right).multiply(.5);
+		}
 		
 		return evals;
 	}
