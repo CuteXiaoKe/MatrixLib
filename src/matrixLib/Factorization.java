@@ -15,7 +15,6 @@ public class Factorization {
 	 */
 	public static Matrix[] QRDecompose(Matrix m) {
 		
-		Matrix[] qr = new Matrix[2]; // Q and R will be returned in this array
 		Matrix curr = new Matrix(m.getData()); // iterate on this matrix
 		Matrix tri = new Matrix(m.getData()), uni = new Matrix(m.rows());
 		boolean real = m.isReal(); // whether the matrix is real or complex
@@ -46,9 +45,8 @@ public class Factorization {
 				// have to compute exp(i*arg(x)) instead of just +/- 1
 				// uses the fact that exp(ix)=cos(x)+isin(x) and the cos(arctan(x)) formula
 				ComplexNumber coord = original.getAt(0);
-				System.out.println("coord: " + coord);
 				if (coord.Re() == 0) {
-					factor = new ComplexNumber(coord.Im() > 0 ? 1 : -1, 0);
+					factor = new ComplexNumber(coord.Im() > 0 ? -1 : 1, 0);
 				}
 				else {
 					double ratio = coord.Im() / coord.Re();
@@ -57,7 +55,6 @@ public class Factorization {
 						// arg adds/subs pi to the result of atan, negating cos/sin
 						factor = factor.negative();
 					}
-					System.out.println("factor: " + factor);
 				}
 			}
 			
@@ -79,14 +76,20 @@ public class Factorization {
 				cfactor = new ComplexNumber(2, 0);
 			}
 			else {
-				cfactor = original.dot(column).divide(column.dot(original)).add(new ComplexNumber(1,0));
+				cfactor = column.dot(original).divide(original.dot(column)).add(new ComplexNumber(1,0));
 			}
-			//ComplexNumber cfactor = column.dot(original).divide(original.dot(column)).add(new ComplexNumber(1,0));
+			
+			// for debugging:
+			ComplexNumber[][] vv = new ComplexNumber[column.dim()][column.dim()];
+			for (int i = 0; i < column.dim(); i++) {
+				for (int j = 0; j < column.dim(); j++) {
+					vv[i][j] = column.getAt(i).multiply(column.getAt(j).conjugate());
+				}
+			}
 			
 			for (int i = 0; i < curr.rows(); i++) {
 				for (int j = 0; j < curr.rows(); j++) {
 					hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j).conjugate()).multiply(cfactor).multiply(1.0/normsqr).negative();
-					//hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j)).multiply(2.0/normsqr).negative();
 					// account for subtracting the above from the identity matrix
 					if (i == j) {
 						hh_arr[i][j] = hh_arr[i][j].add(new ComplexNumber(1,0));
@@ -100,7 +103,7 @@ public class Factorization {
 				householder = Pattern.blockDiagonal(householder, k);
 			}
 			
-			uni = uni.multiply(householder.transpose()); // compute running Q
+			uni = uni.multiply(householder.conjugateTranspose()); // compute running Q
 			tri = householder.multiply(tri); // compute running R
 			
 			// now operate on the (1,1)-minor of the current matrix
@@ -113,9 +116,7 @@ public class Factorization {
 			curr = new Matrix(minor);
 		}
 		
-		qr[0] = uni;
-		qr[1] = tri;
-		
+		Matrix[] qr = {uni, tri};
 		return qr;
 	}
 	
