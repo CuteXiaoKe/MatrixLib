@@ -31,6 +31,8 @@ public class Factorization {
 			ComplexNumber factor = new ComplexNumber(1,0);
 			if (real) {
 				// find the pivot element
+				//double epsilon = ComplexNumber.getEpsilon();
+				//ComplexNumber.setEpsilon(1e-6); // avoid precision problems that zero column
 				int pivot = column.dim()-1;
 				while (column.getAt(pivot).isZero()) {
 					pivot--;
@@ -38,6 +40,7 @@ public class Factorization {
 						break; // 0 vector
 					}
 				}
+				//ComplexNumber.setEpsilon(epsilon);
 				ComplexNumber piv_el = column.getAt(pivot);
 				factor = new ComplexNumber(piv_el.Re() < 0 ? -1 : 1, 0);
 			}
@@ -50,8 +53,8 @@ public class Factorization {
 				}
 				else {
 					double ratio = coord.Im() / coord.Re();
-					factor = new ComplexNumber(1.0/Math.sqrt(ratio*ratio+1),ratio/Math.sqrt(ratio*ratio+1)).negative();
-					if (coord.Re() < 0) {
+					factor = new ComplexNumber(1.0/Math.sqrt(ratio*ratio+1),ratio/Math.sqrt(ratio*ratio+1));
+					if (coord.Re() > 0) {
 						// arg adds/subs pi to the result of atan, negating cos/sin
 						factor = factor.negative();
 					}
@@ -76,14 +79,12 @@ public class Factorization {
 				cfactor = new ComplexNumber(2, 0);
 			}
 			else {
-				cfactor = column.dot(original).divide(original.dot(column)).add(new ComplexNumber(1,0));
-			}
-			
-			// for debugging:
-			ComplexNumber[][] vv = new ComplexNumber[column.dim()][column.dim()];
-			for (int i = 0; i < column.dim(); i++) {
-				for (int j = 0; j < column.dim(); j++) {
-					vv[i][j] = column.getAt(i).multiply(column.getAt(j).conjugate());
+				ComplexNumber denom = original.dot(column);
+				if (denom.isZero()) {
+					cfactor = new ComplexNumber(1, 0);
+				}
+				else {
+					cfactor = column.dot(original).divide(original.dot(column)).add(new ComplexNumber(1,0));
 				}
 			}
 			
@@ -272,11 +273,23 @@ public class Factorization {
 	 */
 	public static Matrix choleskyDecompose(Matrix m) {
 		
+		// ensure the matrix is Hermetian and positive definite
 		if (!Pattern.isHermetian(m)) {
 			return null;
 		}
-		
-		// need to check if m is postive definite too
+		// matrix is positive definite iff leading principle minors are positive
+		// the minors are real because the matrix is Hermetian
+		for (int k = 1; k <= m.rows(); k++) { // Hermetian implies square
+			ComplexNumber[][] minor = new ComplexNumber[k][k];
+			for (int i = 0; i < k; i++) {
+				for (int j = 0; j < k; j++) {
+					minor[i][j] = m.getAt(i,j);
+				}
+			}
+			if (SquareMatrixOps.determinant(new Matrix(minor)).Re() <= 0) {
+				return null; // a L.P. minor is not positive
+			}
+		}
 		
 		ComplexNumber[][] L = new ComplexNumber[m.rows()][m.rows()];
 		

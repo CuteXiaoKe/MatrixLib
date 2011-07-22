@@ -66,15 +66,23 @@ public class FactorizationTest {
 
 		double[][] diag = {{1,0,0,0},{0,25,0,0},{0,0,64,0},{0,0,0,100}};
 		double[][] d_exp = {{1,0,0,0},{0,5,0,0},{0,0,8,0},{0,0,0,10}};;
-		double[][] m = {{2,-1,0},{-1,2,-1},{0,-1,2}};
-		double[][] m_exp = {{Math.sqrt(2),0,0},{-.5*Math.sqrt(2),.5*Math.sqrt(6),0},{0,-Math.sqrt(6)/3.0,2.0/Math.sqrt(3)}};
-		//double[][] big = {{16,-3,5,-8},{-3,16,-5,-8},{5,-5,24,0},{-8,-8,0,21}};
-		ComplexNumber[][] c = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
-		ComplexNumber[][] c_exp = {{new ComplexNumber(2,0),new ComplexNumber(0,0),new ComplexNumber(0,0)},{new ComplexNumber(0,-1),new ComplexNumber(3,0),new ComplexNumber(0,0)},{new ComplexNumber(0,.5),new ComplexNumber(.5,0),new ComplexNumber(Math.sqrt(8.5),0)}};
-		
 		assertTrue(Factorization.choleskyDecompose(new Matrix(diag)).equals(new Matrix(d_exp)));
-		assertTrue(Factorization.choleskyDecompose(new Matrix(m)).equals(new Matrix(m_exp)));
-		assertTrue(Factorization.choleskyDecompose(new Matrix(c)).equals(new Matrix(c_exp)));
+		
+		double[][] m = {{2,-1,0},{-1,2,-1},{0,-1,2}};
+		Matrix chol = Factorization.choleskyDecompose(new Matrix(m));
+		assertTrue(Pattern.isLowerTriangular(chol) && chol.multiply(chol.conjugateTranspose()).equals(new Matrix(m)));
+
+		ComplexNumber[][] c = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
+		chol = Factorization.choleskyDecompose(new Matrix(c));
+		assertTrue(Pattern.isLowerTriangular(chol) && chol.multiply(chol.conjugateTranspose()).equals(new Matrix(c)));
+
+		double[][] big = {{16,-3,5,-8},{-3,16,-5,-8},{5,-5,24,0},{-8,-8,0,21}};
+		chol = Factorization.choleskyDecompose(new Matrix(big));
+		assertTrue(Pattern.isLowerTriangular(chol) && chol.multiply(chol.conjugateTranspose()).equals(new Matrix(big)));
+		
+		double[][] fail = {{2,-17,7},{-17,-4,1},{7,1,-14}};
+		chol = Factorization.choleskyDecompose(new Matrix(fail));
+		assertTrue(chol == null); // this matrix was not positive definite
 	}
 	
 	@Test public void singularValueDecomposition() {

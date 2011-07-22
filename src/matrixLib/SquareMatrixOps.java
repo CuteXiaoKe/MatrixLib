@@ -195,6 +195,7 @@ public class SquareMatrixOps {
 		
 		while (size > 2) {
 			Matrix shift = Pattern.diag(curr.getAt(size-1,size-1),size);
+			System.out.println(curr.subtract(shift));
 			Matrix[] qr = Factorization.QRDecompose(curr.subtract(shift));
 			curr = qr[1].multiply(qr[0]).add(shift); // similarity transform, preserves spectrum
 			
