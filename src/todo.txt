@@ -1,9 +1,0 @@
-todo:
-
-Strassen multiplication
-SVD
-QR decomposition for complex matrices
-positive definite for Cholesky
-Matrix functions - sin, exp, etc.
-Comment code better
-More tests for pattern/squarematrixops

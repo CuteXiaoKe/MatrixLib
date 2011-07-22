@@ -1,6 +1,0 @@
-for nonsymmetric eigenvector computation in C:
-
-Numerical Methods that Work, Acton, F.S.
-Wilkinson/Reinsch, Linear Algebra, vol. 2 of Handbook for Automatic Computation
-Matrix Eigensystem Routines, Smith
-Stoer/Bulirsch, Introduction to Numerical Analysis
