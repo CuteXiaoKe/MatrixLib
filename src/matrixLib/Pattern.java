@@ -21,15 +21,15 @@ public class Pattern {
 			return false;
 		}
 		
-		for (int i = 1; i < m.rows(); i++) {
+		for (int i = 1; i < m.rows(); i++) { // start checking in the second row
 			for (int j = 0; j < i; j++) {
 				if (!m.getAt(i,j).isZero()) {
-					return false;
+					return false; // found a violation
 				}
 			}
 		}
 		
-		return true;
+		return true; // no violations for upper triangularity
 	}
 
 	/**
@@ -39,6 +39,7 @@ public class Pattern {
 	 */
 	public static boolean isLowerTriangular(Matrix m) {
 		
+		// remember transpose is reflection across diagonal
 		return isUpperTriangular(m.transpose());
 	}
 	
@@ -50,12 +51,11 @@ public class Pattern {
 	public static boolean isDiagonal(Matrix m) {
 		
 		// a matrix is diagonal if it is upper and lower triangular
-		
 		return isUpperTriangular(m) && isLowerTriangular(m);
 	}
 
 	/**
-	 * Computes the upper Hessenberg form of the matrix via similarity forms
+	 * Computes the upper Hessenberg form of the matrix via similarity transforms
 	 * based on Gauss-Jordan elimination
 	 * @param m the matrix on which the algorithm is run
 	 * @return the similar tridiagonal/Hessenberg matrix
@@ -196,15 +196,15 @@ public class Pattern {
 			return false; // must be square to be upper Hessenberg
 		}
 		
-		for (int i = 2; i < m.rows(); i++) {
+		for (int i = 2; i < m.rows(); i++) { // look below first subdiagonal
 			for (int j = 0; j < i-1; j++) {
 				if (!m.getAt(i,j).isZero()) {
-					return false;
+					return false; // found nonzero below first subdiagonal
 				}
 			}
 		}
 		
-		return true;
+		return true; // no violations found
 	}	
 
 	/**
@@ -220,14 +220,14 @@ public class Pattern {
 		
 		for (int i = 0; i < m.rows(); i++) {
 			for (int j = 0; j < m.cols(); j++) {
-				if ((i != j && !m.getAt(i, j).equals(new ComplexNumber(0, 0)))
+				if ((i != j && !m.getAt(i, j).isZero())
 					|| (i == j && !m.getAt(i, j).equals(new ComplexNumber(1, 0)))) {
-					return false;
+					return false; // found a violation
 				}
 			}
 		}
 		
-		return true;
+		return true; // no violations found
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class Pattern {
 		Matrix mat = new Matrix(size, size);
 		
 		for (int i = 0; i < size; i++) {
-			mat.set(i, i, el);
+			mat.set(i, i, el); // set whole diagonal to el
 		}
 		
 		return mat;
@@ -292,6 +292,7 @@ public class Pattern {
 		
 		for (int i = 0; i < diagonals.length; i++) {
 			for (int j = 0; j < diagonals.length; j++) {
+				// set diagonal elements, or 0 if off diagonal
 				mat[i][j] = (i==j) ? diagonals[i] : new ComplexNumber(0,0);
 			}
 		}
