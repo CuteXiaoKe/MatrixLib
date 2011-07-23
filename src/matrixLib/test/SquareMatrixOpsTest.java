@@ -16,29 +16,6 @@ import java.util.Arrays;
  */
 
 public class SquareMatrixOpsTest {
-
-	/**
-	 * Test to see whether two arrays (unsorted) contain the same elements
-	 * @param a1 one array to compare
-	 * @param a2 the other array to compare
-	 * @return true or false indicating whether two arrays are equal in the sense of sets
-	 */
-	private static boolean compareArrays(ComplexNumber[] a1, ComplexNumber[] a2) {
-		
-		if (a1.length != a2.length) {
-			return false; // can't be equal with different sizes
-		}
-		
-		Arrays.sort(a1);
-		Arrays.sort(a2);
-		
-		for (int i = 0; i < a1.length; i++) {
-			if (!a1[i].equals(a2[i])) {
-				return false;
-			}
-		}
-		return true; // none of the comparisons failed
-	}
 	
 	@Test public void det() {
 		// set up matrices for a testing a variety of determinants
@@ -77,35 +54,38 @@ public class SquareMatrixOpsTest {
 		assertTrue(SquareMatrixOps.inverse(new Matrix(tri)).equals(new Matrix(tri_exp)));
 		assertTrue(SquareMatrixOps.inverse(new Matrix(herm)).equals(new Matrix(herm_exp)));
 		
+		double epsilon = ComplexNumber.getEpsilon();
 		ComplexNumber.setEpsilon(1e-13);
 		assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
 		assertTrue(SquareMatrixOps.inverse(new Matrix(sing)) == null); // shouldn't exist
+		ComplexNumber.setEpsilon(epsilon);
 	}
 	
 	@Test public void eigenvalues() {
 		double[][] mat1 = {{3,0,0},{1,3,1},{2,-1,1}};
-		//double[][] mat1 = {{3,1},{1,5}};
-		//double[][] mat1 = {{1,3,2,-1},{1,1,2,-3},{3,1,1,-1},{2,-2,1,2}};
-		double[][] mat = {{0,-1},{1,0}};
-		ComplexNumber[] evs1 = SquareMatrixOps.eigenvalues(new Matrix(mat1));
-		ComplexNumber[] exp1 = {new ComplexNumber(3,0),new ComplexNumber(2,0),new ComplexNumber(2,0)};
-		
-		for (ComplexNumber ev : evs1) {
-			Matrix m = new Matrix(mat1);
+		Matrix m = new Matrix(mat1);
+		ComplexNumber[] evs = SquareMatrixOps.eigenvalues(m);
+		Vector[] vecs = SquareMatrixOps.eigenvectors(m, evs);
+		for (ComplexNumber ev : evs) {
 			assertTrue(SquareMatrixOps.determinant(m.subtract(Pattern.diag(ev, m.rows()))).isZero());
 		}
-		if(1==1)return;
+		for (Vector v : vecs) {
+			assertTrue(m.multiply(v).normalize().equals(v.normalize()));
+		}
 		
 		double[][] mat2 = {{0,-1},{1,0}};
-		ComplexNumber[] evs2 = SquareMatrixOps.eigenvalues(new Matrix(mat2));
+		m = new Matrix(mat2);
+		evs = SquareMatrixOps.eigenvalues(m);
+		for (ComplexNumber ev : evs) {
+			assertTrue(SquareMatrixOps.determinant(m.subtract(Pattern.diag(ev, m.rows()))).isZero());
+		}
 		
-		Vector[] vecs = SquareMatrixOps.eigenvectors(new Matrix(mat1), evs1);
-		
-		
-		double epsilon = ComplexNumber.getEpsilon();
-		ComplexNumber.setEpsilon(1e-6);
-		assertTrue(compareArrays(evs1, exp1));
-		ComplexNumber.setEpsilon(epsilon);
+		double[][] mat3 = {{1,3,2,-1},{1,1,2,-3},{3,1,1,-1},{2,-2,1,2}};
+		m = new Matrix(mat3);
+		evs = SquareMatrixOps.eigenvalues(m);
+		for (ComplexNumber ev : evs) {
+			assertTrue(SquareMatrixOps.determinant(m.subtract(Pattern.diag(ev, m.rows()))).isZero());
+		}
 	}
 	
 	@Test public void pow() {
