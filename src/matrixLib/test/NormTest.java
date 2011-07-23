@@ -15,8 +15,6 @@ import static org.junit.Assert.*;
 
 public class NormTest {
 
-	// pnorm, inf norm, frob norm, spec norm,
-	
 	@Test public void vecnorm() {
 		double[] vec = {1,2,3};
 		
@@ -34,6 +32,9 @@ public class NormTest {
 		assertTrue(Norm.pnorm(m, 1) == 11);
 		assertTrue(Norm.infinityNorm(m) == 12);
 		
-		// need to test spectral norm too
+		double[][] spectest = {{1,2,3},{4,5,6},{7,8,7}};
+		System.out.println(Norm.spectralNorm(new Matrix(spectest)));
+		ComplexNumber.setEpsilon(1e-3);
+		assertTrue(Norm.spectralNorm(new Matrix(spectest)).equals(new ComplexNumber(15.8101,0)));
 	}
 }

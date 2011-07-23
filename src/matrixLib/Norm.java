@@ -49,10 +49,10 @@ public class Norm {
 		for (int i = 0; i < m.cols(); i++) {
 			double sum = 0;
 			for (int j = 0; j < m.rows(); j++) {
-				sum += m.getAt(j, i).abs();
+				sum += m.getAt(j, i).abs(); // compute the column sum
 			}
 			if (sum > largest) {
-				largest = sum;
+				largest = sum; // found a new largest column sum
 			}
 		}
 		
@@ -71,10 +71,10 @@ public class Norm {
 		for (int i = 0; i < m.rows(); i++) {
 			double sum = 0;
 			for (int j = 0; j < m.cols(); j++) {
-				sum += m.getAt(i, j).abs();
+				sum += m.getAt(i, j).abs(); // compute the row sum
 			}
 			if (sum > largest) {
-				largest = sum;
+				largest = sum; // found a new row sum
 			}
 		}
 		
