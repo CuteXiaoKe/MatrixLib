@@ -1,8 +1,8 @@
 package matrixLib;
 
 /**
- * Represents a complex number, which has a real and imaginary part
- * Enables using matrices over the field C instead of just R
+ * Represents a complex number, which has a real and imaginary part.
+ * This enables using matrices over the field C instead of just R.
  * @author Bryan Cuccioli
  */
 public class ComplexNumber implements Comparable<ComplexNumber> {
@@ -12,7 +12,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	private static double epsilon = 1e-14; // default epsilon
 
 	/**
-	 * Creates the complex number z= (0, 0)
+	 * Creates the complex number z = (0, 0)
 	 */
 	public ComplexNumber() {
 		this.re = 0;
@@ -20,7 +20,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 	
 	/**
-	 * Creates a complex number z = (re, im)
+	 * Creates a complex number with given real and imaginary components
 	 * @param re The real part of z
 	 * @param im The imaginary part of z
 	 */
@@ -73,7 +73,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 	
 	/**
-	 * Returns the complex number created by subtracting z from this
+	 * Returns the complex number created by subtracting the given complex number from this one
 	 * @param z The complex number to subtract from this
 	 * @return The complex number created by subtracting z from this
 	 */
@@ -83,27 +83,25 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 	
 	/**
-	 * Returns the complex number created by multiplying this with z
-	 * Using the standard definition of multiplication over C
+	 * Returns the complex number created by multiplying this one with the given,
+	 * using the standard definition of multiplication for complex numbers
 	 * @param z The complex number to multiply with this
 	 * @return The complex number created by multiplying this with z
 	 */
 	public ComplexNumber multiply(ComplexNumber z) {
 		
-		return new ComplexNumber(
-				re*z.Re() - im*z.Im(),
-				re*z.Im() + im*z.Re());
+		return new ComplexNumber(re*z.Re() - im*z.Im(), re*z.Im() + im*z.Re());
 	}
 	
 	/**
 	 * Divides this complex number by z (through multiplying by the inverse)
-	 * @param z the complex number to divide this by
-	 * @return the quotient of this and the argument
+	 * @param z the complex number by which to divide this one
+	 * @return the quotient of this complex number and the argument
 	 * @throws ArithmeticException trying to divide by 0
 	 */
 	public ComplexNumber divide(ComplexNumber z) throws ArithmeticException {
 		
-		if (z.isZero()) {
+		if (z.isZero()) { // can't allow division by 0
 			 throw new ArithmeticException();
 		}
 		
@@ -114,13 +112,13 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 
 	/**
-	 * Returns the reciprocal 1/z of this complex number
+	 * Returns the reciprocal of this complex number
 	 * @return the reciprocal of this complex number
 	 * @throws ArithmeticException trying to take the reciprocal of zero
 	 */
 	public ComplexNumber reciprocal() throws ArithmeticException {
 		
-		if (this.isZero()) {
+		if (this.isZero()) { // can't compute the reciprocal of 0
 			 throw new ArithmeticException();
 		}
 		
@@ -163,21 +161,21 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 */
 	public double abs() {
 		
-		// if the number is real or imaginary, |z| is simple:
+		// try simple formulas to preserve precision
 		if (re == 0) {
 			return Math.abs(im);
 		}
 		else if (im == 0) {
 			return Math.abs(re);
 		}
-		// otherwise it's the more complicated modulus formula:
+		// otherwise resort to the more complicated modulus formula:
 		else {
 			return Math.sqrt(re*re + im*im);
 		}
 	}
 
 	/**
-	 * Returns the argument of this complex number
+	 * Returns the argument of this complex number, which is equivalent to computing atan2
 	 * @return the argument of this complex number
 	 * @throws ArtithmeticException trying to take the argument of 0
 	 */
@@ -188,37 +186,29 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 			 throw new ArithmeticException();
 		}
 		
-		if (re == 0.0) {
-			if (im > 0) {
-				return Math.PI/2;
-			}
-			else {
-				return -Math.PI/2;
-			}
+		if (re == 0.0) { // imaginary numbers are vertical in the plane
+			// sign determines whether the vector points up or down
+			return Math.PI/2 * Math.signum(im);
 		}
-		
-		else if (re > 0) {
+		else if (re > 0) { // can use regular atan on the right side of the plane
 			return Math.atan(im/re);
 		}
 		else {
-			if (im < 0) {
-				return Math.atan(im/re) - Math.PI;
-			}
-			else {
-				return Math.atan(im/re) + Math.PI;
-			}
+			// need to add or subtract pi if in quadrant 3 or 4
+			return Math.atan(im/re) + Math.PI * Math.signum(im);
 		}
 	}
 
 	/**
-	 * Returns the principle square root of this complex number
+	 * Computes the principle square root of this complex number
+	 * (the one which has positive real component)
 	 * @return the principle square root of this complex number
 	 */
 	public ComplexNumber sqrt() {
 		
 		double a = this.Re(), b = this.Im();
 		
-		if (b == 0) { // see if we can just compute real sqrt
+		if (b == 0) { // see if we can just compute simple sqrt
 			if (a >= 0) {
 				return new ComplexNumber(Math.sqrt(a),0);
 			}
@@ -227,12 +217,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 			}
 		}
 		
-		double p = 1.0/Math.sqrt(2) * Math.sqrt(Math.sqrt(a*a+b*b)+a);
-		double q = 1.0/Math.sqrt(2) * Math.sqrt(Math.sqrt(a*a+b*b)-a);
-		
-		if (b < 0) {
-			q = -q;
-		}
+		// use the square root formula for a complex number
+		double inner = Math.sqrt(a*a+b*b);
+		double p = 1.0/Math.sqrt(2) * Math.sqrt(inner+a);
+		double q = 1.0/Math.sqrt(2) * Math.sqrt(inner-a) * Math.signum(b);
 		
 		return new ComplexNumber(p, q);
 	}
@@ -261,8 +249,8 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	
 	/**
 	 * Tells whether two complex numbers are equal
-	 * @param z The complex number to compare with this
-	 * @return Whether the two complex numbers are equal
+	 * @param z The complex number to compare with this one
+	 * @return a boolean indicating whether the two complex numbers are equal
 	 */
 	public boolean equals(ComplexNumber z) {
 		
@@ -271,8 +259,8 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 	
 	/**
-	 * Tells whether this is the 0 vector in C
-	 * @return whether this is the complex number equal to 0
+	 * Tells whether this complex number is zero
+	 * @return a boolean indicating whether this is the complex number equal to 0
 	 */
 	public boolean isZero() {
 		
@@ -280,9 +268,10 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	}
 
 	/**
-	 * Compares this to z by comparing by absolute value, then by argument
+	 * Compares this to z by comparing by absolute value, then by argument.
+	 * This is used for sorting lists of complex numbers, when it depends only that the comparisons are consistent.
 	 * @param z the complex number to compare with this
-	 * @return 1, -1, or 0 if the given number is greater, less, or equal
+	 * @return 1, -1, or 0 if the given number is greater, less, or equal, according to the above description
 	 */
 	public int compareTo(ComplexNumber z) {
 		
