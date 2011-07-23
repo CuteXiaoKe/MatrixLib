@@ -1,26 +1,51 @@
 package matrixLib;
 
+/**
+ * Represents the exception that the given matrix is not square,
+ * which is required for the current operation
+ * @author Bryan Cuccioli
+ */
+
 public class NotSquareException extends RuntimeException {
 
-	private static final long serialVersionUID = -1623777304308609186L;
+	private static final long serialVersionUID = 218089983681707090L;
 
+	/**
+	 * Constructs a NotSquareException with the default message
+	 */
 	public NotSquareException() {
 		super("The matrix is not square.");
 	}
 
-	public NotSquareException(String arg0) {
-		super(arg0);
+	/**
+	 * Constructs a NotSquareException with a custom message
+	 * @param message the custom message
+	 */
+	public NotSquareException(String message) {
+		super(message);
 	}
 
-	public NotSquareException(Throwable arg0) {
-		super(arg0);
+	/**
+	 * Constructs a NotSquareException with a custom cause
+	 * @param cause the custom cause
+	 */
+	public NotSquareException(Throwable cause) {
+		super(cause);
 	}
 
-	public NotSquareException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	/**
+	 * Constructs a NotSquareException with a custom message and cause
+	 * @param message the custom message
+	 * @param cause the custom cause
+	 */
+	public NotSquareException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
+	/**
+	 * Computes a string representation of this exception
+	 */
 	public String toString() {
-		return "NotSquareExpception - matrix was not square.";
+		return "NotSquareExpception - " + this.getMessage();
 	}
 }
