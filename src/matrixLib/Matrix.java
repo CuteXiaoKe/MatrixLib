@@ -541,6 +541,14 @@ public class Matrix {
 					i = r;
 					lead++;
 					if (lead == cols()) {
+						if (type == 1) {
+							if (Pattern.isIdentity(rref)) {
+								rref.set(0, 0, det);
+							}
+							else {
+								rref.set(0, 0, new ComplexNumber(0, 0));
+							}
+						}
 						return rref;
 					}
 				}
@@ -581,6 +589,8 @@ public class Matrix {
 			return rref;
 		}
 		else {
+			System.out.println("mat:\n"+this);
+			System.out.println("rref:\n"+rref);
 			if (Pattern.isIdentity(rref)) {
 				rref.set(0, 0, det);
 			}
