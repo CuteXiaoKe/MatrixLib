@@ -101,7 +101,6 @@ public class FactorizationTest {
 	@Test public void schurDecomposition() {
 
 		// this works fine except the eigenvectors aren't computed right
-		if(1==1)return;
 		double[][] m1 = {{3,0,0,-1},{1,2,0,1},{2,0,4,2},{-1,0,0,3}};
 		Matrix[] schur = Factorization.schurDecompose(new Matrix(m1));
 		assertTrue(Pattern.isUnitary(schur[0]) && Pattern.isUpperTriangular(schur[1]) && schur[0].conjugateTranspose().multiply(new Matrix(m1)).multiply(schur[0]).equals(schur[1]));
