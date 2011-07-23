@@ -3,8 +3,9 @@ package matrixLib.test;
 import matrixLib.ComplexNumber;
 import matrixLib.Factorization;
 import matrixLib.Matrix;
-import matrixLib.SquareMatrixOps;
 import matrixLib.Pattern;
+import matrixLib.NoLUDecompositionException;
+import matrixLib.NotPositiveDefiniteException;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -42,24 +43,30 @@ public class FactorizationTest {
 	
 	@Test public void luDecompose() {
 		double[][] mat1 = {{1,2},{3,4}};
-		double[][] mat2 = {{1,2,-2,3},{-1,1,0,2},{3,-3,4,1},{2,1,1,-2}};
-		ComplexNumber[][] mat3 = {{new ComplexNumber(0,1),new ComplexNumber(2,1)},{new ComplexNumber(3,-1),new ComplexNumber(5,3)}};
-		double[][] mat4 = {{1,2,-2,3},{-1,-2,0,2},{3,-3,0,1},{2,1,1,-2}};
-		
 		Matrix[] lu = Factorization.luDecompose(new Matrix(mat1));
 		assertTrue(Pattern.isLowerTriangular(lu[0]) && Pattern.isUpperTriangular(lu[1])
 				&& lu[0].multiply(lu[1]).equals(new Matrix(mat1)));
 		
+		double[][] mat2 = {{1,2,-2,3},{-1,1,0,2},{3,-3,4,1},{2,1,1,-2}};
 		lu = Factorization.luDecompose(new Matrix(mat2));
 		assertTrue(Pattern.isLowerTriangular(lu[0]) && Pattern.isUpperTriangular(lu[1])
 				&& lu[0].multiply(lu[1]).equals(new Matrix(mat2)));
 		
+		ComplexNumber[][] mat3 = {{new ComplexNumber(0,1),new ComplexNumber(2,1)},{new ComplexNumber(3,-1),new ComplexNumber(5,3)}};
 		lu = Factorization.luDecompose(new Matrix(mat3));
 		assertTrue(Pattern.isLowerTriangular(lu[0]) && Pattern.isUpperTriangular(lu[1])
 				&& lu[0].multiply(lu[1]).equals(new Matrix(mat3)));
 		
-		lu = Factorization.luDecompose(new Matrix(mat4));
-		assertTrue(lu == null); // this one does not admit an LU factorization
+		// test the one that isn't supposed to work
+		boolean failed = false;
+		double[][] mat4 = {{1,2,-2,3},{-1,-2,0,2},{3,-3,0,1},{2,1,1,-2}};
+		try {
+			lu = Factorization.luDecompose(new Matrix(mat4));
+		}
+		catch (NoLUDecompositionException e) {
+			failed = true;
+		}
+		assertTrue(failed);
 	}
 	
 	@Test public void choleskyDecompose() {
@@ -80,16 +87,16 @@ public class FactorizationTest {
 		chol = Factorization.choleskyDecompose(new Matrix(big));
 		assertTrue(Pattern.isLowerTriangular(chol) && chol.multiply(chol.conjugateTranspose()).equals(new Matrix(big)));
 		
+		// test the one that shouldn't work (isn't positive definite)
+		boolean failed = false;
 		double[][] fail = {{2,-17,7},{-17,-4,1},{7,1,-14}};
-		chol = Factorization.choleskyDecompose(new Matrix(fail));
-		assertTrue(chol == null); // this matrix was not positive definite
-	}
-	
-	@Test public void singularValueDecomposition() {
-		
-		double[][] m1 = {{4,0},{3,-5}};
-		//System.out.println(Factorization.singularValueDecomposition(new Matrix(m1)));
-		
+		try {
+			chol = Factorization.choleskyDecompose(new Matrix(fail));
+		}
+		catch (NotPositiveDefiniteException e) {
+			failed = true;
+		}
+		assertTrue(failed);
 	}
 	
 	@Test public void schurDecomposition() {

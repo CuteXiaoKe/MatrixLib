@@ -8,12 +8,16 @@ package matrixLib;
 public class Factorization {
 
 	/**
-	 * Performs a QR decomposition on the given matrix, writing a matrix as a product of
+	 * Performs a QR decomposition on the given square matrix, writing a matrix as a product of
 	 * a unitary matrix Q and upper triangular matrix R
 	 * @param m the matrix whose QR factorization we wish to compute
-	 * @return an ordered pair {Q, R} 
+	 * @return the array representation {Q, R} 
 	 */
-	public static Matrix[] QRDecompose(Matrix m) {
+	public static Matrix[] QRDecompose(Matrix m) throws NotSquareException {
+		
+		if (m.rows() != m.cols()) { // only implemented for square matrices so far
+			throw new NotSquareException("only implemented for square matrices");
+		}
 		
 		Matrix curr = new Matrix(m.getData()); // iterate on this matrix
 		Matrix tri = new Matrix(m.getData()), uni = new Matrix(m.rows());
@@ -21,37 +25,36 @@ public class Factorization {
 		
 		for (int k = 0; k < m.cols()-1; k++) {
 			
+			// pick the first nonzero column
 			Vector column = curr.getVector(0), original;
 			int first = 0;
 			while (column.isZero()) {
 				column = curr.getVector(++first);
 			}
-			original = curr.getVector(first);
+			original = curr.getVector(first); // store for later
 			
 			ComplexNumber factor = new ComplexNumber(1,0);
 			if (real) {
 				// find the pivot element
-				//double epsilon = ComplexNumber.getEpsilon();
-				//ComplexNumber.setEpsilon(1e-6); // avoid precision problems that zero column
 				int pivot = column.dim()-1;
 				while (column.getAt(pivot).isZero()) {
 					pivot--;
 					if (pivot == 0) {
-						break; // 0 vector
+						break; // has to be this one if any; avoid overflow
 					}
 				}
-				//ComplexNumber.setEpsilon(epsilon);
-				ComplexNumber piv_el = column.getAt(pivot);
-				factor = new ComplexNumber(piv_el.Re() < 0 ? -1 : 1, 0);
+				// use the opposite sign of the pivot to avoid catastrophic subtraction
+				factor = new ComplexNumber(column.getAt(pivot).Re() < 0 ? 1 : -1, 0);
 			}
 			else {
 				// have to compute exp(i*arg(x)) instead of just +/- 1
-				// uses the fact that exp(ix)=cos(x)+isin(x) and the cos(arctan(x)) formula
 				ComplexNumber coord = original.getAt(0);
 				if (coord.Re() == 0) {
+					// use the opposite sign to avoid catastrophic subtraction
 					factor = new ComplexNumber(coord.Im() > 0 ? -1 : 1, 0);
 				}
 				else {
+					// uses the fact that exp(ix)=cos(x)+isin(x) and the cos(arctan(x)) formula
 					double ratio = coord.Im() / coord.Re();
 					factor = new ComplexNumber(1.0/Math.sqrt(ratio*ratio+1),ratio/Math.sqrt(ratio*ratio+1));
 					if (coord.Re() > 0) {
@@ -61,33 +64,35 @@ public class Factorization {
 				}
 			}
 			
+			// augment one copy of the column so it is not lin. dep. with the original
 			column.set(0, column.getAt(0).add((new ComplexNumber(Norm.pnorm(column,2),0)).multiply(factor)));
 			
-			// compute the 2-norm squared (avoiding sqrt)
+			// compute the 2-norm squared (avoiding sqrt for accuracy)
 			double normsqr = 0;
 			for (int j = 0; j < column.dim(); j++) {
 				ComplexNumber coord = column.getAt(j);
 				normsqr += coord.Re()*coord.Re()+coord.Im()*coord.Im();
 			}
 			
-			// build the householder matrix, Q = I - 2uu^T/||u||^2
+			// build the householder matrix, Q = I - (1+w)uu^T/||u||^2
 			ComplexNumber[][] hh_arr = new ComplexNumber[curr.rows()][curr.rows()]; // suspect
-			// cfactor is used in computing the householder matrix when using complex numbers
+			// cfactor (1+w) is used in computing the householder matrix when using complex numbers
 			// remember complex inner product does not commute
 			ComplexNumber cfactor;
-			if (real) {
+			if (real) { // w reduces to 1 in the real case
 				cfactor = new ComplexNumber(2, 0);
 			}
 			else {
 				ComplexNumber denom = original.dot(column);
-				if (denom.isZero()) {
+				if (denom.isZero()) { // w = 0 if column/original are parallel
 					cfactor = new ComplexNumber(1, 0);
 				}
-				else {
+				else { // compute cfactor := w+1
 					cfactor = column.dot(original).divide(original.dot(column)).add(new ComplexNumber(1,0));
 				}
 			}
 			
+			// build the householder matrix
 			for (int i = 0; i < curr.rows(); i++) {
 				for (int j = 0; j < curr.rows(); j++) {
 					hh_arr[i][j] = column.getAt(i).multiply(column.getAt(j).conjugate()).multiply(cfactor).multiply(1.0/normsqr).negative();
@@ -122,41 +127,23 @@ public class Factorization {
 	}
 	
 	/**
-	 * Computes the singular value decomposition (SVD) of this matrix,
-	 * writing it as a product of a unitary matrix, a diagonal matrix, and another unitary matrix.
-	 * @param m the matrix whose SVD we wish to compute
-	 * @return the matrices composing the factorization M={unitary, diagonal, unitary*}
-	 */
-	public static Matrix[] singularValueDecomposition(Matrix m) {
-		
-		Matrix[] svd = new Matrix[3];
-		ComplexNumber[] singvals = m.singularValues();
-		
-		Matrix diag = Pattern.diag(singvals);
-		
-		System.out.println(diag);
-		System.out.println(SquareMatrixOps.inverse(diag));
-		
-		return null; // fix this
-	}
-	
-	/**
-	 * Computes the Schur decomposition of the matrix
+	 * Computes the Schur decomposition of the matrix, which uses a unitary transform to find a similar triangular matrix
 	 * @param m the matrix whose Schur decomposition we are computing
 	 * @return an array containing the unitary matrix that can transform it to triangular form and the triangular form
 	 * @throws NotSquareException the given matrix is not square
 	 */
 	public static Matrix[] schurDecompose(Matrix m) throws NotSquareException {
 	
-		if (m.rows() != m.cols()) {
+		if (m.rows() != m.cols()) { // only defined for square matrices
 			throw new NotSquareException();
 		}
 		
 		Matrix curr = new Matrix(m.getData()), minor = new Matrix(m.getData()); // start with the given matrix
-		Matrix unitary_prod = new Matrix(m.rows());
+		Matrix unitary_prod = new Matrix(m.rows()); // keep running product of unitary transforms here
 		
 		for (int k = 0; k < m.rows()-1; k++) {
 			
+			// compute the minor that is to be operated on in this iteration
 			ComplexNumber[][] newmat = new ComplexNumber[m.rows()-k][m.rows()-k];
 			for (int i = 0; i < newmat.length; i++) {
 				for (int j = 0; j < newmat[0].length; j++) {
@@ -165,14 +152,16 @@ public class Factorization {
 			}
 			minor = new Matrix(newmat);
 			
+			// find an eigenvalue and corresponding eigenvector for the current minor
 			ComplexNumber[] eval = {SquareMatrixOps.eigenvalues(minor)[0]};
 			Vector evec = SquareMatrixOps.eigenvectors(minor, eval)[0];
 			
+			// generate a same-sized unitary reflector matrix based on this eigenvector
 			Matrix unitary = evec.generateUnitaryMatrix();
 			Matrix uni_ref = (k == 0) ? unitary : Pattern.blockDiagonal(unitary, k);
 			
 			unitary_prod = unitary_prod.multiply(uni_ref); // running unitary matrix
-			curr = uni_ref.conjugateTranspose().multiply(curr).multiply(uni_ref);
+			curr = uni_ref.conjugateTranspose().multiply(curr).multiply(uni_ref); // similarity transform
 		}
 		
 		Matrix[] ut = {unitary_prod, curr};
@@ -182,14 +171,13 @@ public class Factorization {
 	/**
 	 * Computes and returns the LU decomposition of the matrix
 	 * @param m the matrix whose LU decomposition we are computing
-	 * @return the result of the LU decomposition {L,U}, or null if no LU decomposition is admitted
-	 * @throws NotSquareException the supplied matrix is not square 
+	 * @return the result of the LU decomposition {L,U}
+	 * @throws NotSquareException the supplied matrix is not square
+	 * @throws NoLUDecompositionException the supplied square matrix does not admit an LU decomposition 
 	 */
-	public static Matrix[] luDecompose(Matrix m) throws NotSquareException {
+	public static Matrix[] luDecompose(Matrix m) throws NotSquareException, NoLUDecompositionException {
 		
-		// returns {null, null} if the matrix does not admit an LU-decomposition
-		
-		if (m.rows() != m.cols()) {
+		if (m.rows() != m.cols()) { // matrix must be square
 			throw new NotSquareException();
 		}
 		
@@ -198,17 +186,15 @@ public class Factorization {
 		
 		// initialize the L and U matrices
 		if (m.getAt(0,0).isZero()) {
-			return null; // no factorization if (0,0) is 0
+			return null; // no factorization if 0 is at (0,0)
 		}
 		
-		// initialize the first row of U
+		// initialize the first row of U/column of L
 		for (int j = 0; j < m.cols(); j++) {
 			U[0][j] = m.getAt(0,j).divide(m.getAt(0,0));
-		}
-		// initialize the first column of L
-		for (int j = 0; j < m.rows(); j++) {
 			L[j][0] = m.getAt(j,0);
 		}
+
 		// initialize the remainder of L and U to zero
 		for (int i = 0; i < m.rows(); i++) {
 			for (int j = 1; j < m.cols(); j++) {
@@ -218,12 +204,11 @@ public class Factorization {
 		}
 		
 		for (int n = 1; n < m.rows(); n++) {
-			
 			// next computations are based on the previously determined rows
-			// there are rows-n vectors of n coordinates to consider
 			ComplexNumber[][] l_prev = new ComplexNumber[m.rows()-n][n];
 			ComplexNumber[][] u_prev = new ComplexNumber[m.rows()-n][n];
 			
+			// compute previously determined row/col
 			for (int i = n; i < m.rows(); i++) {
 				for (int j = 0; j < n; j++) {
 					l_prev[i-n][j] = L[i][j];
@@ -241,7 +226,7 @@ public class Factorization {
 			}
 			if (L[n][n].isZero() && n != m.rows()-1) {
 				// the factorization is not possible
-				return null;
+				throw new NoLUDecompositionException();
 			}
 			
 			U[n][n] = new ComplexNumber(1,0);
@@ -258,24 +243,23 @@ public class Factorization {
 		}
 		
 		// return the matrices {L, U}
-		Matrix[] lu = new Matrix[2];
-		lu[0] = new Matrix(L);
-		lu[1] = new Matrix(U);
+		Matrix[] lu = {new Matrix(L), new Matrix(U)};
 		return lu;
 	}
 	
 	/**
-	 * Performs a Cholesky decomposition, which writes a 
-	 * positive definite Hermetian matrix in terms of a 
-	 * lower triangular matrix and its conjugate transpose
+	 * Performs a Cholesky decomposition, which writes a  positive definite Hermetian
+	 * matrix in terms of a lower triangular matrix and its conjugate transpose
 	 * @param m the matrix whose Cholesky decomposition we wish to compute
-	 * @return the lower triangular matrix L in A=LL* or null if no Cholesky decomposition is admitted
+	 * @return the lower triangular matrix L in A=LL*
+	 * @throws NotHermetianException the given matrix is not Hermetian
+	 * @throws NotPositiveDefiniteException the given matrix is not positive definite
 	 */
-	public static Matrix choleskyDecompose(Matrix m) {
+	public static Matrix choleskyDecompose(Matrix m) throws NotHermetianException, NotPositiveDefiniteException {
 		
 		// ensure the matrix is Hermetian and positive definite
 		if (!Pattern.isHermetian(m)) {
-			return null;
+			throw new NotHermetianException();
 		}
 		// matrix is positive definite iff leading principle minors are positive
 		// the minors are real because the matrix is Hermetian
@@ -287,7 +271,7 @@ public class Factorization {
 				}
 			}
 			if (SquareMatrixOps.determinant(new Matrix(minor)).Re() <= 0) {
-				return null; // a L.P. minor is not positive
+				throw new NotPositiveDefiniteException(); // a L.P. minor is not positive
 			}
 		}
 		
@@ -317,6 +301,7 @@ public class Factorization {
 				}
 			}
 			
+			// now compute the remainder
 			Vector temp_ip = new Vector(prevcols[0]);
 			L[j][j] = m.getAt(j,j).subtract(temp_ip.dot(temp_ip)).sqrt();
 			

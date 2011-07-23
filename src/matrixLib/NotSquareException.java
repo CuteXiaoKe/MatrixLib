@@ -7,7 +7,7 @@ package matrixLib;
  */
 
 public class NotSquareException extends RuntimeException {
-
+	
 	private static final long serialVersionUID = 218089983681707090L;
 
 	/**
@@ -46,6 +46,6 @@ public class NotSquareException extends RuntimeException {
 	 * Computes a string representation of this exception
 	 */
 	public String toString() {
-		return "NotSquareExpception - " + this.getMessage();
+		return "NotSquareException - " + this.getMessage();
 	}
 }
