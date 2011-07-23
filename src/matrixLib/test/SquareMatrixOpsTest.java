@@ -91,13 +91,7 @@ public class SquareMatrixOpsTest {
 		ComplexNumber[] exp1 = {new ComplexNumber(3,0),new ComplexNumber(2,0),new ComplexNumber(2,0)};
 		
 		for (ComplexNumber ev : evs1) {
-			System.out.println("-----------------");
-			double[][] fuck = {{0,0,0},{1,0,1},{2,-1,-2}};
-			
-			System.out.println("fuck: " + SquareMatrixOps.determinant(new Matrix(fuck)));
 			Matrix m = new Matrix(mat1);
-			System.out.println(m.subtract(Pattern.diag(ev, m.rows())));
-			System.out.println(SquareMatrixOps.determinant(m.subtract(Pattern.diag(ev, m.rows()))));
 			assertTrue(SquareMatrixOps.determinant(m.subtract(Pattern.diag(ev, m.rows()))).isZero());
 		}
 		if(1==1)return;

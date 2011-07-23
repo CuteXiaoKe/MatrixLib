@@ -589,8 +589,6 @@ public class Matrix {
 			return rref;
 		}
 		else {
-			System.out.println("mat:\n"+this);
-			System.out.println("rref:\n"+rref);
 			if (Pattern.isIdentity(rref)) {
 				rref.set(0, 0, det);
 			}
