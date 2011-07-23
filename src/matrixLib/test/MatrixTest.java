@@ -1,19 +1,17 @@
 package matrixLib.test;
 
-/**
- * Library of JUnit 4 tests for the Matrix class
- * @author Bryan Cuccioli
- */
-
 import static org.junit.Assert.*;
-
-import java.util.LinkedList;
-
 import org.junit.Test;
 
 import matrixLib.ComplexNumber;
 import matrixLib.Matrix;
 import matrixLib.Vector;
+import java.util.LinkedList;
+
+/**
+ * Library of JUnit 4 tests for the Matrix class
+ * @author Bryan Cuccioli
+ */
 
 public class MatrixTest {
 
@@ -64,11 +62,15 @@ public class MatrixTest {
 		assertTrue((new Matrix(z2)).multiply(new Vector(vec)).equals(new Vector(vres)));
 	}
 	
-	@Test public void add() {
+	@Test public void add_sub_scale() {
 		double[][] f = {{1,2},{3,4}};
 		double[][] g = {{5,6},{7,8}};
-		double[][] h = {{6,8},{10,12}};
-		assertTrue((new Matrix(f)).add(new Matrix(g)).equals(new Matrix(h)));
+		double[][] sum = {{6,8},{10,12}};
+		double[][] doubled = {{2,4},{6,8}};
+		
+		assertTrue((new Matrix(f)).add(new Matrix(g)).equals(new Matrix(sum)));
+		assertTrue((new Matrix(sum)).subtract(new Matrix(f)).equals(new Matrix(g)));
+		assertTrue((new Matrix(f)).multiply(2).equals(new Matrix(doubled)));
 	}
 	
 	@Test public void orthonormalize() {
@@ -108,8 +110,14 @@ public class MatrixTest {
 		expected.add(v1); expected.add(v2); expected.add(v3);
 		
 		for (Vector v : basis) {
-			System.out.println(v);
-			//assertTrue(expected.contains(v));
+			// make sure each computed vector is in the expecteds list
+			boolean contains = false;
+			for (Vector exp : expected) {
+				if (v.equals(exp)) {
+					contains = true;
+				}
+			}
+			assertTrue(contains);
 		}
 	}
 }

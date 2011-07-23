@@ -295,6 +295,7 @@ public class Matrix {
 		// matrix multiplication logic for a single column
 		ComplexNumber[] prod = new ComplexNumber[this.rows()];
 		for (int i = 0; i < rows(); i++) {
+			prod[i] = new ComplexNumber(0,0); // initialize for addition
 			for (int j = 0; j < cols(); j++) {
 				prod[i] = prod[i].add(matrix[i][j].multiply(v.getAt(j)));
 			}
