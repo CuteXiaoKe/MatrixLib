@@ -15,20 +15,23 @@ import matrixLib.Vector;
 
 public class VectorTest {
 	
-	@Test public void add() {
+	@Test public void constructors() {
+		ComplexNumber[] entries = {new ComplexNumber(1,3),new ComplexNumber(4,2),new ComplexNumber(-5.5,-6)};
+		Vector v = new Vector(entries);
+		for (int i = 0; i < v.dim(); i++) {
+			assertTrue(v.getAt(i).equals(entries[i]));
+		}
+	}
+	
+	@Test public void add_sub_scale() {
 		ComplexNumber[] a = {new ComplexNumber(1,3),new ComplexNumber(4,2),new ComplexNumber(-5.5,-6)};
 		ComplexNumber[] b = {new ComplexNumber(2,-3),new ComplexNumber(-2,-2),new ComplexNumber(6,-3)};
 		ComplexNumber[] sum = {new ComplexNumber(3,0),new ComplexNumber(2,0),new ComplexNumber(.5,-9)};
+		ComplexNumber[] scaled = {new ComplexNumber(2,6),new ComplexNumber(8,4),new ComplexNumber(-11,-12)};
 		
 		assertTrue((new Vector(a)).add(new Vector(b)).equals(new Vector(sum)));
-	}
-	
-	@Test public void subtract() {
-		ComplexNumber[] a = {new ComplexNumber(1,3),new ComplexNumber(4,2),new ComplexNumber(-5.5,-6)};
-		ComplexNumber[] b = {new ComplexNumber(2,-3),new ComplexNumber(-2,-2),new ComplexNumber(6,-3)};
-		ComplexNumber[] sum = {new ComplexNumber(-1,6),new ComplexNumber(6,4),new ComplexNumber(-11.5,-3)};
-		
-		assertTrue((new Vector(a)).subtract(new Vector(b)).equals(new Vector(sum)));
+		assertTrue((new Vector(sum)).subtract(new Vector(a)).equals(new Vector(b)));
+		assertTrue((new Vector(a)).multiply(2).equals(new Vector(scaled)));
 	}
 	
 	@Test public void dot() {
@@ -73,7 +76,7 @@ public class VectorTest {
 		
 		// make sure the normal vector has magnitude 1
 		double magnitude = matrixLib.Norm.pnorm(normal, 2);
-		assertTrue(Math.abs(magnitude-1) < 1e-15);
+		assertTrue(Math.abs(magnitude-1) < ComplexNumber.getEpsilon());
 	}
 	
 	@Test public void reflector() {
