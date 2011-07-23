@@ -5,6 +5,8 @@ package matrixLib;
  * @author Bryan Cuccioli
  */
 
+import matrixLib.exception.*;
+
 public class Vector extends Matrix {
 	
 	/**

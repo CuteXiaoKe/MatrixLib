@@ -4,8 +4,7 @@ import matrixLib.ComplexNumber;
 import matrixLib.Factorization;
 import matrixLib.Matrix;
 import matrixLib.Pattern;
-import matrixLib.NoLUDecompositionException;
-import matrixLib.NotPositiveDefiniteException;
+import matrixLib.exception.*;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

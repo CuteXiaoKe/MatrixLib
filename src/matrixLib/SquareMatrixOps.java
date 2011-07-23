@@ -5,6 +5,8 @@ package matrixLib;
  * @author Bryan Cuccioli
  */
 
+import matrixLib.exception.*;
+
 public class SquareMatrixOps {
 
 	// inverts a lower triangular matrix; called by inverse()
