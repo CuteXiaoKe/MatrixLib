@@ -12,8 +12,9 @@ public class Vector extends Matrix {
 	/**
 	 * Constructs an empty vector of size n
 	 * @param n the size of the vector
+	 * @throws DimensionMismatchException the given dimension is invalid
 	 */
-	public Vector(int n) {
+	public Vector(int n) throws DimensionMismatchException {
 		
 		super(n, 1);
 	}
@@ -24,7 +25,7 @@ public class Vector extends Matrix {
 	 */
 	public Vector(ComplexNumber[] entries) {
 		
-		super(parse(entries));
+		super(parse(entries)); // make it look like a two dimensional array
 	}
 	
 	/**
@@ -33,27 +34,35 @@ public class Vector extends Matrix {
 	 */
 	public Vector(double[] entries) {
 	
-		super(parse(entries));
+		super(parse(entries)); // make it look like a two dimensional array
 	}
 	
-	// wraps a 1d array into a 2d column array
-	// used as a helper to the Vector(ComplexNumber[]) constructor
+	/**
+	 * Wraps a 1d array to a 2d column array, for use in several constructors
+	 * @param array the array to wrap
+	 * @return the 2d column array with the given entries
+	 */
 	private static ComplexNumber[][] parse(ComplexNumber[] array) {
 		
 		ComplexNumber[][] ret = new ComplexNumber[array.length][1];
 		for (int i = 0; i < array.length; i++) {
+			// each element gets its own row
 			ret[i][0] = array[i];
 		}
 		
 		return ret;
 	}
 	
-	// wraps a 1d array into a 2d column array
-	// used as a helper to the Vector(double[]) constructor
+	/**
+	 * Wraps a 1d array to a 2d column array, for use in several constructors
+	 * @param array the array to wrap
+	 * @return the 2d column array with the given entries
+	 */
 	private static double[][] parse(double[] array) {
 		
 		double[][] ret = new double[array.length][1];
 		for (int i = 0; i < array.length; i++) {
+			// each element gets its own row
 			ret[i][0] = array[i];
 		}
 		
@@ -96,6 +105,7 @@ public class Vector extends Matrix {
 	 */
 	public int dim() {
 		
+		// the dimension is the number of rows if considered as a matrix
 		return super.rows();
 	}
 	
@@ -107,7 +117,16 @@ public class Vector extends Matrix {
 	 */
 	public Vector add(Vector v) throws DimensionMismatchException {
 		
-		return super.add((Matrix)v).toVector();
+		if (this.dim() != v.dim()) { // need same dimensions to add
+			throw new DimensionMismatchException("incompatible dimensions");
+		}
+		
+		// add vectors elementwise
+		ComplexNumber[] sum = new ComplexNumber[dim()];
+		for (int i = 0; i < dim(); i++) {
+			sum[i] = getAt(i).add(v.getAt(i));
+		}
+		return new Vector(sum);
 	}
 
 	/**
@@ -118,23 +137,60 @@ public class Vector extends Matrix {
 	 */
 	public Vector subtract(Vector v) throws DimensionMismatchException {
 		
-		return super.add((Matrix)v.multiply(-1)).toVector();
+		if (this.dim() != v.dim()) { // need same dimensions to subtract
+			throw new DimensionMismatchException("incompatible dimensions");
+		}
+		
+		// subtract vectors elementwise
+		ComplexNumber[] diff = new ComplexNumber[dim()];
+		for (int i = 0; i < dim(); i++) {
+			diff[i] = getAt(i).subtract(v.getAt(i));
+		}
+		return new Vector(diff);
+	}
+	
+	/**
+	 * Multiplies a vector by a scalar by multiplying each element by that scalar
+	 * @param s the scalar by which to multiply the vector
+	 * @return the newly scaled vector
+	 */
+	public Vector multiply(ComplexNumber s) {
+		
+		ComplexNumber[] scaled = new ComplexNumber[dim()];
+		for (int i = 0; i < dim(); i++) { // multiply elementwise
+			scaled[i] = getAt(i).multiply(s);
+		}
+		return new Vector(scaled);
+	}
+	
+	/**
+	 * Multiplies a vector by a scalar by multiplying each element by that scalar
+	 * @param s the scalar by which to multiply the vector
+	 * @return the newly scaled vector
+	 */
+	public Vector multiply(double s) {
+		
+		ComplexNumber[] scaled = new ComplexNumber[dim()];
+		for (int i = 0; i < dim(); i++) { // multiply elementwise
+			scaled[i] = getAt(i).multiply(s);
+		}
+		return new Vector(scaled);
 	}
 	
 	/**
 	 * Compute the Hermetian inner product (dot product) of two vectors
 	 * @param v the vector to dot against this
-	 * @return the inner product <this, v> of this vector with v
+	 * @return the inner product of the two vectors
 	 * @throws DimensionMismatchException the vectors do not have matching dimension 
 	 */
 	public ComplexNumber dot(Vector v) throws DimensionMismatchException {
 		
-		if (this.dim() != v.dim()) {
+		if (this.dim() != v.dim()) { // need matching dimensions for inner product
 			 new DimensionMismatchException();
 		}
 		
 		ComplexNumber dotprod = new ComplexNumber(0, 0);
-		for (int i = 0; i < dim(); i++) {
+		for (int i = 0; i < dim(); i++) { // compute Hermetian inner product
 			dotprod = dotprod.add(this.getAt(i).multiply(v.getAt(i).conjugate()));
 		}
 		return dotprod;
@@ -144,7 +200,7 @@ public class Vector extends Matrix {
 	 * Compute the cross product between two vectors
 	 * @param v The vector to cross this with
 	 * @return The cross product between this and v, this x v
-	 * @throws DimensionMismatchException the vectors do not have three coordinates
+	 * @throws DimensionMismatchException the vectors are not in R^3 or C^3
 	 */
 	public Vector cross(Vector v) throws DimensionMismatchException {
 		
@@ -153,8 +209,8 @@ public class Vector extends Matrix {
 			 new DimensionMismatchException();
 		}
 		
-		ComplexNumber[] coords = new ComplexNumber[3];
-		
+		// apply the cross product formula
+		ComplexNumber[] coords = new ComplexNumber[3];		
 		coords[0] = getAt(1).multiply(v.getAt(2)).subtract(getAt(2).multiply(v.getAt(1)));
 		coords[1] = getAt(2).multiply(v.getAt(0)).subtract(getAt(0).multiply(v.getAt(2)));
 		coords[2] = getAt(0).multiply(v.getAt(1)).subtract(getAt(1).multiply(v.getAt(0)));
@@ -174,10 +230,10 @@ public class Vector extends Matrix {
 			 new DimensionMismatchException();
 		}
 		
-		ComplexNumber factor = onto.dot(this).divide(onto.dot(onto));
+		ComplexNumber factor = onto.dot(this).divide(onto.dot(onto)); // scaling factor
 		ComplexNumber[] entries = new ComplexNumber[dim()];
 		
-		for (int i = 0; i < dim(); i++) {
+		for (int i = 0; i < dim(); i++) { // multiply each entry by scaling factor
 			entries[i] = onto.getAt(i).multiply(factor);
 		}
 		
@@ -190,12 +246,13 @@ public class Vector extends Matrix {
 	 */
 	public Vector normalize() {
 		
+		// compute the complex norm of this vector
 		ComplexNumber norm = new ComplexNumber(0, 0);
 		for (int i = 0; i < dim(); i++) {
 			norm = norm.add(getAt(i).multiply(getAt(i).conjugate()));
 		}
 		norm = norm.sqrt();
-		
+		// and divide each element by this norm
 		ComplexNumber[] entries = new ComplexNumber[dim()];
 		for (int i = 0; i < dim(); i++) {
 			entries[i] = getAt(i).divide(norm);
@@ -213,12 +270,13 @@ public class Vector extends Matrix {
 		Vector[] overspan = new Vector[this.dim()+1];
 		overspan[0] = this.normalize();
 		ComplexNumber[] oscontent = new ComplexNumber[this.dim()];
-		oscontent[0] = new ComplexNumber(1,0); // debug - should be (1,1)
+		oscontent[0] = new ComplexNumber(1,0);
 		
-		for (int i = 1; i < this.dim(); i++) {
+		for (int i = 1; i < this.dim(); i++) { // initialize oscontent to <1,0,...,0>
 			oscontent[i] = new ComplexNumber(0,0);
 		}
 		
+		// generate vectors that do better than span the whole vector space
 		for (int i = 1; i <= this.dim(); i++) {
 			overspan[i] = new Vector(oscontent);
 			if (i != this.dim()) {
@@ -232,9 +290,10 @@ public class Vector extends Matrix {
 		Matrix rref = allvectors.rref();
 		Vector[] basis = new Vector[this.dim()];
 		int vec_pos = 0;
+		// the first n pivot columns specify the maximal independent subset
 		for (int i = 0; i < this.dim(); i++) {
 			for (int j = 0; j <= this.dim(); j++) {
-				if (!rref.getAt(i,j).isZero()) {
+				if (!rref.getAt(i,j).isZero()) { // found a new pivot
 					basis[vec_pos++] = allvectors.getVector(j);
 					break;
 				}
@@ -251,9 +310,10 @@ public class Vector extends Matrix {
 	 */
 	public Matrix reflector() {
 		
-		double factor = 2.0/Math.pow(Norm.pnorm(this, 2), 2);
+		double factor = 2.0/Math.pow(Norm.pnorm(this, 2), 2); // scaling factor
 		ComplexNumber[][] ref = new ComplexNumber[this.dim()][this.dim()];
 		
+		// compute the identity matrix minus the product of the vectors scaled
 		for (int i = 0; i < this.dim(); i++) {
 			for (int j = 0; j < this.dim(); j++) {
 				ref[i][j] = (i==j) ? new ComplexNumber(1,0) : new ComplexNumber(0,0);
@@ -287,10 +347,7 @@ public class Vector extends Matrix {
 		String str = "<";
 		for (int i = 0; i < this.dim(); i++) {
 			str += this.getAt(i);
-			if (i != this.dim() - 1) {
-				str += ", ";
-			}
-			
+			if (i != this.dim() - 1) str += ", ";
 		}
 		str += ">";
 		
