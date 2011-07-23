@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import matrixLib.exception.*;
 
 /**
- * Represents a matrix over either R or C
+ * Represents a matrix over the complex numbers
  * @author Bryan Cuccioli
  */
 public class Matrix {
@@ -14,14 +14,18 @@ public class Matrix {
 	private int rows, cols;
 	
 	/**
-	 * Constructs the nxn identity matrix
+	 * Constructs the identity matrix of a given size
 	 * @param n the number of rows and columns in this identity matrix
+	 * @throws DimensionMismatchException the given matrix size is less than one
 	 */
-	public Matrix(int n) {
+	public Matrix(int n) throws DimensionMismatchException {
+		
+		if (n < 1) { // tried to give invalid size
+			throw new DimensionMismatchException("matrix must be at least 1 by 1");
+		}
 		
 		matrix = new ComplexNumber[n][n];
-		rows = n;
-		cols = n;
+		rows = cols = n;
 		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
@@ -31,14 +35,23 @@ public class Matrix {
 	}
 
 	/**
-	 * Constructs the matrix that wraps the array mat[][]
+	 * Constructs the matrix that wraps the given array
 	 * @param mat the data to go in the matrix
+	 * @throws DimensionMismatchException the given array is not rectangular
 	 */
-	public Matrix(double[][] mat) {
+	public Matrix(double[][] mat) throws DimensionMismatchException {
+		
+		// make sure the given array has at least some data
+		if (mat.length == 0 || mat[0].length == 0) {
+			throw new DimensionMismatchException("no data in array");
+		}
 		
 		matrix = new ComplexNumber[mat.length][mat[0].length];
 		
 		for (int i = 0; i < mat.length; i++) {
+			if (mat[0].length != mat[i].length) { // jagged array found
+				throw new DimensionMismatchException("jagged array");
+			}
 			for (int j = 0; j < mat[0].length; j++) {
 				matrix[i][j] = new ComplexNumber(mat[i][j], 0);
 			}
@@ -55,13 +68,17 @@ public class Matrix {
 	 */
 	public Matrix(ComplexNumber[][] mat) throws DimensionMismatchException {
 		
+		// make sure the given array has at least some data 
 		if (mat.length == 0 || mat[0].length == 0) {
-			throw new DimensionMismatchException();
+			throw new DimensionMismatchException("no data in array");
 		}
 		
 		matrix = new ComplexNumber[mat.length][mat[0].length];
 		
 		for (int i = 0; i < mat.length; i++) {
+			if (mat[0].length != mat[i].length) { // jagged array
+				throw new DimensionMismatchException("jagged array");
+			}
 			for (int j = 0; j < mat[0].length; j++) {
 				matrix[i][j] = mat[i][j];
 			}
@@ -72,11 +89,16 @@ public class Matrix {
 	}
 	
 	/**
-	 * Create a new unpopulated r by c matrix
+	 * Create a new matrix of the given dimensions populated by zeros
 	 * @param r the number of rows in the matrix
 	 * @param c the number of columns in the matrix
+	 * @throws DimensionMismatchException invalid number of rows or columns
 	 */
 	public Matrix(int r, int c) {
+		
+		if (r < 1 || c < 1) { // make sure there are some rows and columns
+			throw new DimensionMismatchException("invalid row/column configuration");
+		}
 		
 		matrix = new ComplexNumber[r][c];
 		this.rows = r;
@@ -104,7 +126,7 @@ public class Matrix {
 		for (int j = 0; j < cols; j++) {
 			if (j != 0 && vectors[j].dim() != vectors[j-1].dim()) {
 				// the vectors did not all have the same number of coordinates
-				 throw new DimensionMismatchException();
+				 throw new DimensionMismatchException("jagged set of vectors");
 			}
 			for (int i = 0; i < rows; i++) {
 				matrix[i][j] = vectors[j].getAt(i);
@@ -116,11 +138,17 @@ public class Matrix {
 	 * Retrieves the nth vector from the matrix
 	 * @param n the column/vector to get from the matrix
 	 * @return the nth vector from the matrix
+	 * @throws ArrayIndexOutOfBoundsException invalid column number given
 	 */
 	public Vector getVector(int n) {
 		
-		ComplexNumber[] entries = new ComplexNumber[rows()];
+		// check validity of column number
+		if (n < 0 || n >= cols) {
+			throw new ArrayIndexOutOfBoundsException("invalid column number");
+		}
 		
+		ComplexNumber[] entries = new ComplexNumber[rows()];
+		// populate the vector with that matrix column
 		for (int i = 0; i < rows(); i++) {
 			entries[i] = matrix[i][n];
 		}
@@ -132,13 +160,13 @@ public class Matrix {
 	 * Gets the element at location (r,c) in the matrix
 	 * @param r the row to retrieve the element from
 	 * @param c the column to retrieve the element from
-	 * @throws ArrayIndexOutOfBoundsException trying to access an element out of the bounds of the matrix
 	 * @return the element in the matrix at (r,c)
+	 * @throws ArrayIndexOutOfBoundsException trying to access an element out of the bounds of the matrix
 	 */
 	public ComplexNumber getAt(int r, int c) throws ArrayIndexOutOfBoundsException {
 		
-		if (r >= rows() || c >= cols()) {
-			throw new ArrayIndexOutOfBoundsException();
+		if (r >= rows() || c >= cols() || r < 0 || c < 0) {
+			throw new ArrayIndexOutOfBoundsException("tried to access outside of the matrix");
 		}
 		
 		return matrix[r][c];
@@ -153,15 +181,15 @@ public class Matrix {
 	 */
 	public void set(int r, int c, ComplexNumber val) throws ArrayIndexOutOfBoundsException {
 		
-		if (r >= rows() || c >= cols()) {
-			throw new ArrayIndexOutOfBoundsException();
+		if (r >= rows() || c >= cols() || c < 0 || r < 0) {
+			throw new ArrayIndexOutOfBoundsException("tried to access outside of the matrix");
 		}
 		
 		matrix[r][c] = val;
 	}
 	
 	/**
-	 * Returns the matrix transpose of this matrix
+	 * Returns the matrix transpose of this matrix (reflected about the diagonal)
 	 * @return the transpsoe of this matrix
 	 */
 	public Matrix transpose() {
@@ -178,7 +206,7 @@ public class Matrix {
 	}
 	
 	/**
-	 * Returns the conjugate transpose of this matrix
+	 * Returns the conjugate transpose of this matrix (transposed and conjugated)
 	 * @return the matrix that is the conjugate transpose of this matrix
 	 */
 	public Matrix conjugateTranspose() {
@@ -236,11 +264,11 @@ public class Matrix {
 		
 		// can only multiply matrices of dimension nxm by mxp
 		if (cols != m.rows()) {
-			 throw new DimensionMismatchException();
+			 throw new DimensionMismatchException("incompatible dimensions for multiplying");
 		}
 		
+		// otherwise compute the matrix product in the standard way
 		ComplexNumber[][] prod = new ComplexNumber[rows()][m.cols()];
-		
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < m.cols(); j++) {
 				prod[i][j] = new ComplexNumber(0,0);
@@ -265,15 +293,15 @@ public class Matrix {
 			throw new DimensionMismatchException();
 		}
 		
-		Vector prod = new Vector(this.rows());
-		
+		// matrix multiplication logic for a single column
+		ComplexNumber[] prod = new ComplexNumber[this.rows()];
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < cols(); j++) {
-				prod.set(i, prod.getAt(i).add(matrix[i][j].multiply(v.getAt(j))));
+				prod[i] = prod[i].add(matrix[i][j].multiply(v.getAt(j)));
 			}
 		}
 		
-		return prod;
+		return new Vector(prod);
 	}
 	
 	/**
@@ -288,15 +316,15 @@ public class Matrix {
 			 throw new DimensionMismatchException();
 		}
 		
-		Matrix sum = new Matrix(rows, cols);
-		
+		// add matrices elementwise
+		ComplexNumber[][] sum = new ComplexNumber[rows][cols];
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				sum.set(i, j, matrix[i][j].add(m.getAt(i, j)));
+				sum[i][j] = matrix[i][j].add(m.getAt(i,j));
 			}
 		}
 		
-		return sum;
+		return new Matrix(sum);
 	}
 
 	/**
@@ -311,38 +339,39 @@ public class Matrix {
 			 throw new DimensionMismatchException();
 		}
 		
-		Matrix diff = new Matrix(rows, cols);
-		
+		// subtract matrices elementwise
+		ComplexNumber[][] diff = new ComplexNumber[rows][cols];
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				diff.set(i, j, matrix[i][j].subtract(m.getAt(i, j)));
+				diff[i][j] = matrix[i][j].subtract(m.getAt(i,j));
 			}
 		}
 		
-		return diff;
+		return new Matrix(diff);
 	}
 	
 	/**
 	 * Multiplies each element of the matrix by a complex number
 	 * @param factor the scalar to multiply the matrix by
-	 * @return the matrix factor*this
+	 * @return the matrix with each element multiplied by the scalar
 	 */
 	public Matrix multiply(ComplexNumber factor) {
 		
-		Matrix scaled = new Matrix(rows, cols);
+		// multiply each element by factor
+		ComplexNumber[][] scaled = new ComplexNumber[rows][cols];
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				scaled.set(i, j, matrix[i][j].multiply(factor));
+				scaled[i][j] = matrix[i][j].multiply(factor);
 			}
 		}
 		
-		return scaled;
+		return new Matrix(scaled);
 	}
 
 	/**
 	 * Multiplies each element of the matrix by a real scalar
 	 * @param factor the scalar to multiply the matrix by
-	 * @return the matrix factor*this
+	 * @return the matrix with each element multiplied by the scalar
 	 */
 	public Matrix multiply(double factor) {
 		
@@ -356,6 +385,7 @@ public class Matrix {
 	 */
 	public Matrix orthonormalize() {
 		
+		// store the columns of the matrices as an array of vectors
 		Vector[] result = new Vector[cols()];
 		for (int j = 0; j < cols(); j++) {
 			result[j] = this.getVector(j);
@@ -363,13 +393,13 @@ public class Matrix {
 		
 		for (int j = 0; j < cols(); j++) {
 			result[j] = result[j].normalize();
-			
+			// make each subsequent vector span the remaining subspace
 			for (int i = j+1; i < cols(); i++) {
-				result[i] = result[i].subtract(result[j].multiply(result[j].dot(result[i])).toVector());
+				result[i] = result[i].subtract(result[j].multiply(result[j].dot(result[i])));
 			}
 		}
 		
-		return new Matrix(result);
+		return new Matrix(result); // columns are now orthonormalized
 	}
 	
 	/**
@@ -393,8 +423,8 @@ public class Matrix {
 		for (int i = 0; i < rows(); i++) {
 			for (int j = 0; j < cols(); j++) {
 				if (!rref.getAt(i,j).isZero()) {
-					basis.add(getVector(j));
-					break;
+					basis.add(getVector(j)); // the basis is formed by the pivot columns
+					break; // move on to the next row and find the next pivot
 				}
 			}
 		}
@@ -403,145 +433,44 @@ public class Matrix {
 	}
 	
 	/**
-	 * Gets the singular values of the matrix
-	 * @return an array of singular values of the matrix, sorted in descending order by absolute value
+	 * Gets the singular values of the matrix, which are the square roots of the
+	 * eigenvalues of the matrix A^H A
+	 * @return an array of singular values of the matrix
 	 */
 	public ComplexNumber[] singularValues() {
 		
-		ComplexNumber[] sv = new ComplexNumber[cols()];
-		Matrix sm = new Matrix(this.conjugateTranspose().multiply(this).getData());
-		ComplexNumber[] evals = SquareMatrixOps.eigenvalues(sm);
+		ComplexNumber[] sv = SquareMatrixOps.eigenvalues(this.conjugateTranspose().multiply(this));
 		
-		for (int i = 0; i < evals.length; i++) {
-			sv[i] = evals[i].sqrt();
+		for (int i = 0; i < sv.length; i++) {
+			sv[i] = sv[i].sqrt();
 		}
 		
-		Arrays.sort(sv); // uses a tuned quicksort
 		return sv;
 	}
 	
 	/**
-	 * Converts this matrix to a vector through the canonical isomorphism
-	 * (reading the elements top to bottom, left to right)
-	 * @return a vector with the elements from this matrix
+	 * Helper method for rref(), used for computing either the rref or the determinant
+	 * @param type 0 to tell it to compute rref, 1 to compute determinant
+	 * @return the rref form of the matrix, or a matrix holding the determinant at the (0,0) element
 	 */
-	public Vector toVector() {
-		
-		Vector v = new Vector(rows * cols);
-		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				v.set(i*cols + j, getAt(i, j));
-			}
-		}
-		
-		return v;
-	}
-	
-	// helper method for rref() and determinant()
-	// type=0: rref; type=1: determinant
-	protected Matrix rref_stable(int type) {
-		
-		Matrix rref = new Matrix(matrix);
-		ComplexNumber det = new ComplexNumber(1,0);
-		
-		int i = 0, j = 0;
-		while (i < rows() && j < cols()) {
-			// find pivot in column j, starting in row i
-			int maxi = i;
-			for (int k = i+1; k < rows(); k++) {
-				if (rref.getAt(k,j).abs() > rref.getAt(maxi,j).abs()) {
-					maxi = k;
-				}
-			}
-			if (!rref.getAt(maxi,j).isZero()) {
-				// swap rows i and maxi
-				if (i != maxi) {
-					for (int a = 0; a < cols(); a++) {
-						ComplexNumber temp = rref.getAt(i, a);
-						rref.set(i, a, rref.getAt(maxi, a));
-						rref.set(maxi, a, temp);
-					}
-					// swapping rows negates the determinant
-					det = det.negative();
-				}
-				
-				// divide row i by [i,j]
-				ComplexNumber div = rref.getAt(i, j);
-				for (int a = 0; a < cols(); a++) {
-					rref.set(i, a, rref.getAt(i, a).divide(div));
-				}
-				// scaling the matrix scales the determinant
-				det = det.multiply(div);
-				
-				for (int u = i+1; u < rows(); u++) {
-					// subtract row i times [u,j] from row u - det unchanged
-					ComplexNumber c = rref.getAt(u, j); 
-					for (int a = 0; a < cols(); a++) {
-						rref.set(u, a, rref.getAt(u, a).subtract(rref.getAt(i, a).multiply(c)));
-					}
-				}
-				i++;
-			}
-			j++;
-		}
-		
-		// use back substitution to convert to rref
-		for (int r = rows()-1; r > 0; r--) {
-			// find the pivot column
-			int pivot = -1;
-			for (int k = 0; k < cols(); k++) {
-				if (!rref.getAt(r,k).isZero()) {
-					pivot = k;
-					break;
-				}
-			}
-			if (pivot != -1) { // if the row is empty it won't help
-				for (int u = 0; u < r; u++) {
-					ComplexNumber c_first = rref.getAt(u, pivot); // since [r,pivot]=1
-					rref.set(u, pivot, new ComplexNumber(0, 0));
-					for (int a = pivot+1; a < cols(); a++) {
-						rref.set(u, a, rref.getAt(u,a).subtract(c_first.multiply(rref.getAt(r, a))));
-					}
-				}
-			}
-		}
-
-		if (type == 0) {
-			return rref;
-		}
-		else {
-			if (Pattern.isIdentity(rref)) {
-				rref.set(0, 0, det);
-			}
-			else {
-				rref.set(0, 0, new ComplexNumber(0, 0));
-			}
-		}
-		
-		return rref;
-	}
-	
-	// helper method for public rref()
-	// used for computing either rref or the determinant
-	// type=0: rref, type=1: det
 	protected Matrix rref(int type) {
 		
 		Matrix rref = new Matrix(matrix);
 		ComplexNumber det = new ComplexNumber(1,0);
 		
 		int lead = 0;
-		for (int r = 0; r < rows(); r++) {
+		for (int r = 0; r < rows(); r++) { // compute for each row
 			if (lead >= cols()) {
 				break;
 			}
 			int i = r;
-			while (rref.getAt(i, lead).isZero()) {
+			while (rref.getAt(i, lead).isZero()) { // find the pivot element
 				i++;
 				if (i == rows()) {
 					i = r;
 					lead++;
-					if (lead == cols()) {
+					if (lead == cols()) { // we found the last pivot
+						// returning; setup determinant computation if necessary
 						if (type == 1) {
 							if (Pattern.isIdentity(rref)) {
 								rref.set(0, 0, det);
@@ -574,26 +503,28 @@ public class Matrix {
 			// scaling the matrix scales the determinant
 			det = det.multiply(div);
 			
-			for (int j = 0; j < rows(); j++) {
+			for (int j = 0; j < rows(); j++) { // back-substitute upwards
 				if (j != r) {
 					// subtract row r * -rref[j][lead] from row j
+					// this has no effect on the determinant
 					ComplexNumber c = rref.getAt(j, lead); 
 					for (int a = 0; a < cols(); a++) {
 						rref.set(j, a, rref.getAt(j, a).subtract(rref.getAt(r, a).multiply(c)));
 					}
 				}
 			}
-			lead++;
+			lead++; // now looking for a pivot further right
 		}
 		
-		if (type == 0) {
+		if (type == 0) { // just wanted the simple rref
 			return rref;
 		}
 		else {
+			// if we didn't row reduce to identity, the matrix is singular
 			if (Pattern.isIdentity(rref)) {
-				rref.set(0, 0, det);
+				rref.set(0, 0, det); // which means the determinant is 0
 			}
-			else {
+			else { // otherwise encode the determinant in the matrix
 				rref.set(0, 0, new ComplexNumber(0, 0));
 			}
 		}
@@ -608,32 +539,32 @@ public class Matrix {
 	 */
 	public Matrix rref() {
 		
-		return rref(0);
-		//return rref_stable(0);
+		return rref(0); // just compute the regular rref
 	}
 	
 	/**
-	 * Returns the rank of this matrix (the dimension of its image)
+	 * Returns the rank of this matrix (the dimension of its image), which is the
+	 * number of pivot columns of the row-reduced echelon form
 	 * @return the rank of this matrix 
 	 */
 	public int rank() {
 		
-		int rk = 0;
+		int rk = 0; // count of pivot columns
 		
 		for (ComplexNumber[] row : this.rref().getData()) {
 			boolean all_zero = true;
 			for (ComplexNumber z : row) {
-				if (!z.isZero()) {
+				if (!z.isZero()) { // we found a pivot
 					all_zero = false;
 					break;
 				}
 			}
-			if (!all_zero) {
+			if (!all_zero) { // if we found a pivot, increment the count
 				rk++;
 			}
 		}
 		
-		return rk;
+		return rk; // count of pivots is rank
 	}
 	
 	/**
@@ -642,7 +573,7 @@ public class Matrix {
 	 */
 	public int nullity() {
 		
-		return cols() - rank();
+		return cols() - rank(); // nullity + rank = no. columns
 	}
 
 	/**
@@ -659,11 +590,11 @@ public class Matrix {
 
 			for (int j = 0; j < cols; j++) {
 				mstr += getAt(i, j).toString();
-				if (j != cols - 1) mstr += ", ";
+				if (j != cols - 1) mstr += ", "; // add commas until last element
 				else {
 					mstr += "]";
-					if (i == rows - 1) mstr += "]";
-					else mstr += "\n";
+					if (i == rows - 1) mstr += "]"; // cap with final ]
+					else mstr += "\n"; // otherwise start again at next line
 				}
 			}
 		}
