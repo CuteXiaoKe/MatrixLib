@@ -188,7 +188,7 @@ public class Factorization {
 		
 		// initialize the L and U matrices
 		if (m.getAt(0,0).isZero()) {
-			return null; // no factorization if 0 is at (0,0)
+			throw new NoLUDecompositionException(); // no factorization if 0 is at (0,0)
 		}
 		
 		// initialize the first row of U/column of L

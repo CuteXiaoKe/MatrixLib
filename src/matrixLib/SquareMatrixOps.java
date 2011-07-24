@@ -27,10 +27,7 @@ public class SquareMatrixOps {
 		tri_inv[0][0] = tri.getAt(0,0).reciprocal();
 		for (int i = 1; i < tri.rows(); i++) {
 			// just compute the reciprocal of the diagonal elements
-			if (tri.getAt(i,i).isZero()) {
-				return null; // if 0 is on the diagonal, matrix is singular
-			}
-			tri_inv[i][i] = tri.getAt(i,i).reciprocal();
+			tri_inv[i][i] = tri.getAt(i,i).reciprocal(); // nonsingular => nonzero
 			
 			for (int j = 0; j < i; j++) {
 				// found by solving L L^-1 = I
@@ -52,7 +49,7 @@ public class SquareMatrixOps {
 	/**
 	 * Computes the inverse of the matrix via Gauss-Jordan elimination
 	 * @param m the matrix of which the inverse is computed
-	 * @return the corresponding inverse matrix, or null if the matrix is not invertible
+	 * @return the corresponding inverse matrix
 	 * @throws NotSquareException the matrix is not square
 	 * @throws SingularMatrixException the given matrix is singular/not invertible
 	 */
@@ -125,7 +122,7 @@ public class SquareMatrixOps {
 			}
 			if (all_zero) {
 				// there was an all 0 row; not identity
-				return null;
+				throw new SingularMatrixException();
 			}
 		}
 		
@@ -274,7 +271,7 @@ public class SquareMatrixOps {
 			evals[pos++] = curr.getAt(0,0); // there is a 1x1 matrix remaining
 		}
 		else {
-			// size=2 in this branch
+			// size=2 in this branch; apply explicit 2x2 formula
 			ComplexNumber left = curr.getAt(0,0).add(curr.getAt(1,1));
 			ComplexNumber leftprime = curr.getAt(0,0).subtract(curr.getAt(1,1));
 			ComplexNumber right = curr.getAt(0,1).multiply(curr.getAt(1,0)).multiply(4).add(leftprime.multiply(leftprime)).sqrt();
