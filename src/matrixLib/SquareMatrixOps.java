@@ -78,8 +78,8 @@ public class SquareMatrixOps {
 			}
 			return inverse_lt(m);
 		}
-		// can factor a Hermetian matrix to make inversion easy
-		else if (Pattern.isHermetian(m)) {
+		// can factor a Hermitian matrix to make inversion easy
+		else if (Pattern.isHermitian(m)) {
 			boolean cholesky_failed = false;
 			Matrix tri = null;
 			try {

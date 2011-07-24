@@ -143,14 +143,14 @@ public class Pattern {
 	}
 	
 	/**
-	 * Tells whether the matrix is Hermetian/self-adjoint (equal to its own conjugate transpose)
+	 * Tells whether the matrix is Hermitian/self-adjoint (equal to its own conjugate transpose)
 	 * @param m the matrix to check
-	 * @return whether the matrix is Hermetian
+	 * @return whether the matrix is Hermitian
 	 */
-	public static boolean isHermetian(Matrix m) {
+	public static boolean isHermitian(Matrix m) {
 		
 		if (m.rows() != m.cols()) {
-			return false; // must be square to be Hermetian
+			return false; // must be square to be Hermitian
 		}
 		
 		return m.conjugateTranspose().equals(m);

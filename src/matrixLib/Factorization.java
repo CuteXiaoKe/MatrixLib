@@ -250,22 +250,22 @@ public class Factorization {
 	}
 	
 	/**
-	 * Performs a Cholesky decomposition, which writes a  positive definite Hermetian
+	 * Performs a Cholesky decomposition, which writes a  positive definite Hermitian
 	 * matrix in terms of a lower triangular matrix and its conjugate transpose
 	 * @param m the matrix whose Cholesky decomposition we wish to compute
 	 * @return the lower triangular matrix L in A=LL*
-	 * @throws NotHermetianException the given matrix is not Hermetian
+	 * @throws NotHermitianException the given matrix is not Hermitian
 	 * @throws NotPositiveDefiniteException the given matrix is not positive definite
 	 */
-	public static Matrix choleskyDecompose(Matrix m) throws NotHermetianException, NotPositiveDefiniteException {
+	public static Matrix choleskyDecompose(Matrix m) throws NotHermitianException, NotPositiveDefiniteException {
 		
-		// ensure the matrix is Hermetian and positive definite
-		if (!Pattern.isHermetian(m)) {
-			throw new NotHermetianException();
+		// ensure the matrix is Hermitian and positive definite
+		if (!Pattern.isHermitian(m)) {
+			throw new NotHermitianException();
 		}
 		// matrix is positive definite iff leading principle minors are positive
-		// the minors are real because the matrix is Hermetian
-		for (int k = 1; k <= m.rows(); k++) { // Hermetian implies square
+		// the minors are real because the matrix is Hermitian
+		for (int k = 1; k <= m.rows(); k++) { // Hermitian implies square
 			ComplexNumber[][] minor = new ComplexNumber[k][k];
 			for (int i = 0; i < k; i++) {
 				for (int j = 0; j < k; j++) {

@@ -58,7 +58,7 @@ public class PatternTest {
 		
 		assertTrue(Pattern.isSymmetric(new Matrix(sym)));
 		assertTrue(Pattern.isAntiSymmetric(new Matrix(asym)));
-		assertTrue(Pattern.isHermetian(new Matrix(herm)));
+		assertTrue(Pattern.isHermitian(new Matrix(herm)));
 	}
 	
 	@Test public void other() {

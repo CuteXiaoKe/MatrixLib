@@ -178,7 +178,7 @@ public class Vector extends Matrix {
 	}
 	
 	/**
-	 * Compute the Hermetian inner product (dot product) of two vectors
+	 * Compute the Hermitian inner product (dot product) of two vectors
 	 * @param v the vector to dot against this
 	 * @return the inner product of the two vectors
 	 * @throws DimensionMismatchException the vectors do not have matching dimension 
@@ -190,7 +190,7 @@ public class Vector extends Matrix {
 		}
 		
 		ComplexNumber dotprod = new ComplexNumber(0, 0);
-		for (int i = 0; i < dim(); i++) { // compute Hermetian inner product
+		for (int i = 0; i < dim(); i++) { // compute Hermitian inner product
 			dotprod = dotprod.add(this.getAt(i).multiply(v.getAt(i).conjugate()));
 		}
 		return dotprod;
