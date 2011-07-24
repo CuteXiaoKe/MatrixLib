@@ -9,7 +9,13 @@ import matrixLib.exception.*;
 
 public class SquareMatrixOps {
 
-	// inverts a lower triangular matrix; called by inverse()
+	/**
+	 * This is a numericall stable algorithm for computing the inverse of a lower triangular matrix.
+	 * It is called by inverse(), and has that the given matrix is square, triangular and invertible
+	 * as a precondition. It is numerically stable.
+	 * @param tri the square, nonsingular, lower triangular matrix to invert
+	 * @return the inverse of the given matrix, which is also lower triangular
+	 */
 	private static Matrix inverse_lt(Matrix tri) {
 		ComplexNumber[][] tri_inv = new ComplexNumber[tri.rows()][tri.rows()];
 
@@ -48,8 +54,9 @@ public class SquareMatrixOps {
 	 * @param m the matrix of which the inverse is computed
 	 * @return the corresponding inverse matrix, or null if the matrix is not invertible
 	 * @throws NotSquareException the matrix is not square
+	 * @throws SingularMatrixException the given matrix is singular/not invertible
 	 */
-	public static Matrix inverse(Matrix m) throws NotSquareException {
+	public static Matrix inverse(Matrix m) throws NotSquareException, SingularMatrixException {
 		
 		if (m.rows() != m.cols()) {
 			throw new NotSquareException();
@@ -57,20 +64,43 @@ public class SquareMatrixOps {
 
 		// test for common easy cases
 		if (Pattern.isUpperTriangular(m)) {
+			for (int i = 0; i < m.rows(); i++) {
+				// det. of tri. matrix is product of diagonals
+				if (m.getAt(i,i).isZero()) { // if there's a 0, det=0
+					throw new SingularMatrixException();
+				}
+			}
 			return inverse_lt(m.transpose());
 		}
 		else if (Pattern.isLowerTriangular(m)) {
+			for (int i = 0; i < m.rows(); i++) {
+				// det. of tri. matrix is product of diagonals
+				if (m.getAt(i,i).isZero()) { // if there's a 0, det=0
+					throw new SingularMatrixException();
+				}
+			}
 			return inverse_lt(m);
 		}
+		// can factor a Hermetian matrix to make inversion easy
 		else if (Pattern.isHermetian(m)) {
-			Matrix tri = Factorization.choleskyDecompose(m);
+			boolean cholesky_failed = false;
+			Matrix tri = null;
+			try {
+				tri = Factorization.choleskyDecompose(m);
+			}
+			catch (NotPositiveDefiniteException e) {
+				cholesky_failed = true;
+			}
 			Matrix l_inv = inverse_lt(tri);
-			return l_inv.conjugateTranspose().multiply(l_inv);
+			// if the Cholesky factorization didn't work, have to do normal inversion
+			if (!cholesky_failed) {
+				return l_inv.conjugateTranspose().multiply(l_inv);
+			}
 		}
 		
 		// otherwise we have to use the generic algorithm
 		ComplexNumber[][] augmented = new ComplexNumber[m.rows()][m.cols()*2];
-		
+		// row reduce the augmented matrix and recover the inverse on the right
 		for (int i = 0; i < m.rows(); i++) {
 			for (int j = 0; j < m.cols()*2; j++) {
 				if (j < m.cols()) {
@@ -99,8 +129,8 @@ public class SquareMatrixOps {
 			}
 		}
 		
+		// recover the inverse matrix from the right side
 		ComplexNumber[][] inv = new ComplexNumber[m.rows()][m.cols()];
-		
 		for (int i = 0; i < m.rows(); i++) {
 			for (int j = 0; j < m.cols(); j++) {
 				inv[i][j] = aug_rref.getAt(i, j+m.cols());
@@ -129,7 +159,7 @@ public class SquareMatrixOps {
 		else if (m.rows() == 2) {
 			return m.getAt(0,0).multiply(m.getAt(1,1)).subtract(m.getAt(1,0).multiply(m.getAt(0,1)));
 		}
-		else {
+		else { // rref(1) encodes the determinant in the upper left corner of the matrix
 			return m.rref(1).getAt(0, 0);
 		}
 	}
@@ -142,12 +172,12 @@ public class SquareMatrixOps {
 	 */
 	public static ComplexNumber trace(Matrix m) throws NotSquareException {
 		
-		if (m.rows() != m.cols()) {
+		if (m.rows() != m.cols()) { // matrix must be square to find trace
 			throw new NotSquareException();
 		}
 		
+		// simply sum the diagonals
 		ComplexNumber tr = new ComplexNumber(0, 0);
-		
 		for (int i = 0; i < m.rows(); i++) {
 			tr = tr.add(m.getAt(i, i));
 		}
@@ -155,22 +185,28 @@ public class SquareMatrixOps {
 		return tr;
 	}
 	
-	// helper method used for the QR algorithm
-	// returns min(the no. of rows of 0s in the bottom left block,2)
+	/**
+	 * This is a helper method for the QR algorithm. It finds the 'form' of the matrix, which
+	 * is either a row of zeros on the bottom except the rightmost element, two rows of zeros
+	 * on the bottom except for the rightmost 2x2 block, or neither
+	 * @param m the matrix whose 'form' we compute
+	 * @return 1, 2 or 0, with respect to the definition given in the description
+	 */
 	private static int getForm(Matrix m) {
 		
 		ComplexNumber[][] entries = m.getData();
 		int n = m.rows() - 2;
 		
+		// see if it is of form 2
 		boolean form2 = true;
 		for (int i = 0; i < n; i++) {
 			if (!entries[n][i].isZero() || !entries[n+1][i].isZero()) {
-				form2 = false;
+				form2 = false; // this violates it being form 2
 			}
 		}
 		if (form2) return 2;
 		
-		n++;
+		n++; // we subsequently check only the bottom row
 		for (int i = 0; i < n; i++) {
 			if (!entries[n][i].isZero()) {
 				// isn't 1, and we already know it isn't 2
@@ -183,30 +219,35 @@ public class SquareMatrixOps {
 	}
 
 	/**
-	 * Returns a list of the eigenvalues of the matrix
+	 * Returns a list of the eigenvalues of the matrix by computing QR similarity transforms until
+	 * the matrix converges to a triangular matrix (i.e. implements the shifted QR algorithm)
 	 * @param m the matrix whose eigenvalues we compute
 	 * @return an array containing the eigenvalues of the matrix
 	 * @throws NotSquareException the given matrix is not square 
 	 */
 	public static ComplexNumber[] eigenvalues(Matrix m) {
 		
-		Matrix curr = Pattern.hessenberg(m);
+		if (m.rows() != m.cols()) { // only square matrices have eigenvalues
+			throw new NotSquareException();
+		}
+		
+		Matrix curr = Pattern.hessenberg(m); // makes it converge sooner
 		ComplexNumber[] evals = new ComplexNumber[m.rows()];
 		int pos = 0; // where we are in the evals array
 		int size = m.rows(); // the size of the current array
 		
-		while (size > 2) {
+		while (size > 2) { // once the matrix is 2x2, can just use the explicit form
 			Matrix shift = Pattern.diag(curr.getAt(size-1,size-1),size);
 			Matrix[] qr = Factorization.QRDecompose(curr.subtract(shift));
 			curr = qr[1].multiply(qr[0]).add(shift); // similarity transform, preserves spectrum
 			
 			int form = getForm(curr);
-			if (form == 1) {
-				size--;
+			if (form == 1) { // the lower right element is an eigenvalue
+				size--; // we will operate on the upper left block of size one less
 				evals[pos++] = curr.getAt(size, size);
 			}
 			else if (form == 2) {
-				size -= 2;
+				size -= 2; // operate on the upper left block of size two less
 				// apply formula for eigenvalues of a 2x2 matrix
 				ComplexNumber left = curr.getAt(size,size).add(curr.getAt(size+1,size+1));
 				ComplexNumber leftprime = curr.getAt(size,size).subtract(curr.getAt(size+1,size+1));
@@ -214,10 +255,10 @@ public class SquareMatrixOps {
 				evals[pos++] = left.add(right).multiply(.5);
 				evals[pos++] = left.subtract(right).multiply(.5);
 			}
-			if (size == 0) {
+			if (size == 0) { // we have fully reduced the matrix
 				return evals;
 			}
-			if (form != 0) {
+			if (form != 0) { // we found {1|2} eigenvalues, so reduce
 				// build the new matrix to operate on if an eval was found
 				ComplexNumber[][] newmat = new ComplexNumber[size][size];
 				for (int i = 0; i < size; i++) {
@@ -252,7 +293,7 @@ public class SquareMatrixOps {
 	 */
 	public static Vector[] eigenvectors(Matrix m) throws NotSquareException {
 
-		if (m.rows() != m.cols()) {
+		if (m.rows() != m.cols()) { // needs to be square to have eigenvectors
 			throw new NotSquareException();
 		}
 		
@@ -275,27 +316,37 @@ public class SquareMatrixOps {
 		Vector[] evecs = new Vector[evals.length];
 		int vec_pos = 0;
 		
+		// start with an initial guess vector of magnitude 1
 		ComplexNumber[] test_vec = new ComplexNumber[m.cols()];
-		double val = 1.0/Math.sqrt(m.cols());
+		double val = 1.0/Math.sqrt(m.cols()); // want magnitude=1
 		for (int i = 0; i < test_vec.length; i++) {
 			test_vec[i] = new ComplexNumber(val, 0);
 		}
 		
 		for (ComplexNumber ev : evals) { // compute eigenvector for each given eval
-			Matrix diag = SquareMatrixOps.inverse((new Matrix(m.getData())).subtract(Pattern.diag(ev, m.rows())));
-			while (diag == null) {
-				// keep scaling the eigenvalue until diag is invertible
-				ev = ev.multiply(.999);
-				diag = SquareMatrixOps.inverse((new Matrix(m.getData())).subtract(Pattern.diag(ev, m.rows())));
+			Matrix diag = null;
+			boolean inverted = false; // have we successfully inverted the matrix yet?
+			while (!inverted) {
+				inverted = true; // assume the matrix will invert successfully
+				try {
+					diag = SquareMatrixOps.inverse((new Matrix(m.getData())).subtract(Pattern.diag(ev, m.rows())));
+				}
+				catch (SingularMatrixException e) {
+					inverted = false; // the matrix was singular, so try again
+				}
+				if (!inverted) {
+					ev = ev.multiply(.999); // try again with a fudged eigenvalue
+				}
 			}
 			
 			Vector prev = new Vector(test_vec);
 			Vector next = diag.multiply(prev).normalize();
+			// continue applying to vectors until they stop changing
 			do {
-				prev = next;
+				prev = next; // for comparison
 				next = diag.multiply(prev).normalize();
 			} while (!next.equals(prev));
-			evecs[vec_pos++] = next.normalize();
+			evecs[vec_pos++] = next; // found a normalized eigenvector
 		}
 		
 		return evecs;

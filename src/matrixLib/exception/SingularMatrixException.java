@@ -6,7 +6,7 @@ package matrixLib.exception;
  * @author Bryan Cuccioli
  */
 
-public class SingularMatrixException extends Exception {
+public class SingularMatrixException extends RuntimeException {
 	
 	private static final long serialVersionUID = -3930658714138010367L;
 
