@@ -62,8 +62,9 @@ public class ComplexNumberTest {
 	}
 	
 	@Test public void epsilon() {
+		double epsilon = ComplexNumber.getEpsilon(); // change epsilon responsibly
 		ComplexNumber.setEpsilon(1337);
 		assertTrue(ComplexNumber.getEpsilon() == 1337);
-		ComplexNumber.setEpsilon(1e-15);
+		ComplexNumber.setEpsilon(epsilon);
 	}
 }

@@ -209,7 +209,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		double a = this.Re(), b = this.Im();
 		
 		if (b == 0) { // see if we can just compute simple sqrt
-			if (Math.abs(a) < epsilon) return new ComplexNumber(0,0);
+			//if (Math.abs(a) < epsilon) return new ComplexNumber(0,0);
 			if (a >= 0) {
 				return new ComplexNumber(Math.sqrt(a),0);
 			}

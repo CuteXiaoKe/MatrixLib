@@ -33,7 +33,9 @@ public class NormTest {
 		assertTrue(Norm.infinityNorm(m) == 12);
 		
 		double[][] spectest = {{1,2,3},{4,5,6},{7,8,7}};
+		double epsilon = ComplexNumber.getEpsilon(); // change epsilon responsibly
 		ComplexNumber.setEpsilon(1e-3);
 		assertTrue(Norm.spectralNorm(new Matrix(spectest)).equals(new ComplexNumber(15.8101,0)));
+		ComplexNumber.setEpsilon(epsilon);
 	}
 }
