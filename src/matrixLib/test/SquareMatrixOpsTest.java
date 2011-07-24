@@ -48,11 +48,7 @@ public class SquareMatrixOpsTest {
 		
 		assertTrue(SquareMatrixOps.inverse(new Matrix(tri)).equals(new Matrix(tri_exp)));
 		assertTrue(SquareMatrixOps.inverse(new Matrix(herm)).equals(new Matrix(herm_exp)));
-		
-		double epsilon = ComplexNumber.getEpsilon();
-		ComplexNumber.setEpsilon(1e-13);
 		assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
-		ComplexNumber.setEpsilon(epsilon);
 		
 		boolean failed = false;
 		try {
@@ -68,10 +64,10 @@ public class SquareMatrixOpsTest {
 		double[][] mat1 = {{3,0,0},{1,3,1},{2,-1,1}};
 		Matrix m = new Matrix(mat1);
 		ComplexNumber[] evs = SquareMatrixOps.eigenvalues(m);
-		Vector[] vecs = SquareMatrixOps.eigenvectors(m, evs);
 		for (ComplexNumber ev : evs) {
 			assertTrue(SquareMatrixOps.determinant(m.subtract(Pattern.diag(ev, m.rows()))).isZero());
 		}
+		Vector[] vecs = SquareMatrixOps.eigenvectors(m, evs);
 		for (Vector v : vecs) {
 			assertTrue(m.multiply(v).normalize().equals(v.normalize()));
 		}

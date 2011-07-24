@@ -9,7 +9,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 
 	private double re;
 	private double im;
-	private static double epsilon = 1e-12; // default epsilon
+	private static double epsilon = 1e-13; // default epsilon
 
 	/**
 	 * Creates the complex number z = (0, 0)
@@ -209,7 +209,7 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		double a = this.Re(), b = this.Im();
 		
 		if (b == 0) { // see if we can just compute simple sqrt
-			//if (Math.abs(a) < epsilon) return new ComplexNumber(0,0);
+			if (Math.abs(a) < epsilon) return new ComplexNumber(0,0);
 			if (a >= 0) {
 				return new ComplexNumber(Math.sqrt(a),0);
 			}

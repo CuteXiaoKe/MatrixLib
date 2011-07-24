@@ -31,9 +31,10 @@ public class FactorizationTest {
 		
 		double[][] m2 = {{12,-51,4},{6,167,-68},{-4,24,-41}};
 		qr = Factorization.QRDecompose(new Matrix(m2));
+		double epsilon = ComplexNumber.getEpsilon(); // responsible epsilon changing
 		ComplexNumber.setEpsilon(1e-12);
 		assertTrue(Pattern.isUnitary(qr[0]) && Pattern.isUpperTriangular(qr[1]) && qr[0].multiply(qr[1]).equals(new Matrix(m2)));
-		ComplexNumber.setEpsilon(1e-14);
+		ComplexNumber.setEpsilon(epsilon);
 		
 		double[][] big = {{1,3,2,-1},{1,1,2,-3},{3,1,1,-1},{2,-2,1,2}};
 		qr = Factorization.QRDecompose(new Matrix(big));
