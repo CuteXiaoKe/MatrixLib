@@ -36,19 +36,26 @@ public class SquareMatrixOpsTest {
 	}
 	
 	@Test public void inverse() {
-		double[][] mat = {{5,19},{1,4}};
+		double[][] mat = {{5,19},{1,4}}; // in GL, so its inverse is an integer matrix
 		double[][] sing = {{1,2,3},{4,5,6},{7,8,9}}; // not invertible
-		double[][] inv = {{4,-19},{-1,5}};
+		double[][] tri = {{1,0,0},{3,2,0},{4,6,5}};
+		double[][] herm = {{6,2,-2},{2,6,-2},{-2,-2,10}};
+		ComplexNumber[][] img = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},
+				{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},
+				{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
 		
-		double[][] tri = {{1,0,0},{3,2,0},{4,6,5}}, tri_exp = {{1,0,0},{-1.5,.5,0},{1,-.6,.2}};
-		double[][] herm = {{6,2,-2},{2,6,-2},{-2,-2,10}}, herm_exp = {{7.0/36,-1.0/18,1.0/36},{-1.0/18,7.0/36,1.0/36},{1.0/36,1.0/36,1.0/9}};
+		Matrix inverse = SquareMatrixOps.inverse(new Matrix(mat));
+		assertTrue(!Pattern.isIdentity(inverse) && Pattern.isIdentity((new Matrix(mat)).multiply(inverse)));
 		
-		ComplexNumber[][] c = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
-		ComplexNumber[][] c_exp = {{new ComplexNumber(4,0),new ComplexNumber(0,2),new ComplexNumber(0,-1)},{new ComplexNumber(0,-2),new ComplexNumber(10,0),new ComplexNumber(1,0)},{new ComplexNumber(0,1),new ComplexNumber(1,0),new ComplexNumber(9,0)}};
+		inverse = SquareMatrixOps.inverse(new Matrix(tri));
+		assertTrue(!Pattern.isIdentity(inverse) && Pattern.isLowerTriangular(inverse)
+				&& Pattern.isIdentity((new Matrix(tri)).multiply(inverse)));
 		
-		assertTrue(SquareMatrixOps.inverse(new Matrix(tri)).equals(new Matrix(tri_exp)));
-		assertTrue(SquareMatrixOps.inverse(new Matrix(herm)).equals(new Matrix(herm_exp)));
-		assertTrue(SquareMatrixOps.inverse(new Matrix(mat)).equals(new Matrix(inv)));
+		inverse = SquareMatrixOps.inverse(new Matrix(herm));
+		assertTrue(!Pattern.isIdentity(inverse) && Pattern.isIdentity((new Matrix(herm)).multiply(inverse)));
+		
+		inverse = SquareMatrixOps.inverse(new Matrix(img));
+		assertTrue(!Pattern.isIdentity(inverse) && Pattern.isIdentity((new Matrix(img)).multiply(inverse)));
 		
 		boolean failed = false;
 		try {
@@ -90,9 +97,16 @@ public class SquareMatrixOpsTest {
 	@Test public void pow() {
 		double[][] mat_arr = {{1,2},{3,4}}, matcube = {{37,54},{81,118}};
 		Matrix mat = new Matrix(mat_arr);
+		double[][] invtest = {{5,19},{1,4}}; // in GL, so its inverse is an integer matrix
+		double[][] invtest_exp = {{311,-1520},{-80,391}};
 		
 		assertTrue(SquareMatrixOps.pow(mat,1).equals(mat));
 		assertTrue(SquareMatrixOps.pow(mat,3).equals(new Matrix(matcube)));
 		assertTrue(Pattern.isIdentity(SquareMatrixOps.pow(mat,0)));
+		
+		double epsilon = ComplexNumber.getEpsilon(); // change epsilon responsibly
+		ComplexNumber.setEpsilon(1e-11);
+		assertTrue(SquareMatrixOps.pow(new Matrix(invtest),-3).equals(new Matrix(invtest_exp)));
+		ComplexNumber.setEpsilon(epsilon);
 	}
 }
