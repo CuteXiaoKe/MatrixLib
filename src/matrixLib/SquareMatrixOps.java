@@ -67,7 +67,7 @@ public class SquareMatrixOps {
 					throw new SingularMatrixException();
 				}
 			}
-			return inverse_lt(m.transpose());
+			return inverse_lt(m.transpose()).transpose();
 		}
 		else if (Pattern.isLowerTriangular(m)) {
 			for (int i = 0; i < m.rows(); i++) {
