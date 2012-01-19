@@ -246,11 +246,20 @@ public class SquareMatrixOps {
 			else if (form == 2) {
 				size -= 2; // operate on the upper left block of size two less
 				// apply formula for eigenvalues of a 2x2 matrix
-				ComplexNumber left = curr.getAt(size,size).add(curr.getAt(size+1,size+1));
-				ComplexNumber leftprime = curr.getAt(size,size).subtract(curr.getAt(size+1,size+1));
-				ComplexNumber right = curr.getAt(size,size+1).multiply(curr.getAt(size+1,size)).multiply(4).add(leftprime.multiply(leftprime)).sqrt();
-				evals[pos++] = left.add(right).multiply(.5);
-				evals[pos++] = left.subtract(right).multiply(.5);
+				ComplexNumber b = curr.getAt(size,size).add(curr.getAt(size+1,size+1));
+				ComplexNumber c = curr.getAt(size,size).multiply(curr.getAt(size+1,size+1))
+					.subtract(curr.getAt(size,size+1).multiply(curr.getAt(size+1,size)));
+
+				// minimize possibility of underflow or precision loss
+				// this is just a more stable version of the quadratic formula
+				ComplexNumber disc = b.multiply(b).subtract(c.multiply(4)).sqrt();
+				if (b.conjugate().multiply(disc).Re() < 0) {
+					disc = disc.negative();
+				}
+				ComplexNumber temp = b.add(disc).divide(-2);
+				
+				evals[pos++] = temp;
+				evals[pos++] = c.divide(temp);
 			}
 			if (size == 0) { // we have fully reduced the matrix
 				return evals;
