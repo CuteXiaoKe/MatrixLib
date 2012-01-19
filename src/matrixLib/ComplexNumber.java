@@ -105,10 +105,18 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 			 throw new ArithmeticException();
 		}
 		
-		// this is more numerically stable than the concise formulation
-		ComplexNumber quot = this.multiply(z.conjugate());
-		double recmod = (z.Re()*z.Re() + z.Im()*z.Im());
-		return new ComplexNumber(quot.Re()/recmod, quot.Im()/recmod);
+		// prevent overflow, underflow, and loss of precision
+		double c = z.Re(), d = z.Im();
+		if (Math.abs(c) >= Math.abs(d)) {
+			double quot = d / c;
+			double denom = c + d * quot;
+			return new ComplexNumber((re+im*quot)/denom, (im-re*quot)/denom);
+		}
+		else {
+			double quot = c / d;
+			double denom = c * quot + d;
+			return new ComplexNumber((re*quot+im)/denom, (im*quot-re)/denom);
+		}
 	}
 
 	/**
@@ -170,7 +178,16 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 		}
 		// otherwise resort to the more complicated modulus formula:
 		else {
-			return Math.sqrt(re*re + im*im);
+			// prevent intermediate result from overflowing
+			double a = Math.abs(re), b = Math.abs(im);
+			if (a < b) {
+				// need a to hold the larger of |re| and |im|
+				double z = a;
+				a = b;
+				b = z;
+			}
+			
+			return a * Math.sqrt(1 + Math.pow(b/a, 2));
 		}
 	}
 
@@ -205,25 +222,38 @@ public class ComplexNumber implements Comparable<ComplexNumber> {
 	 * @return the principle square root of this complex number
 	 */
 	public ComplexNumber sqrt() {
+	
+		double c = this.Re(), d = this.Im(), omega;
 		
-		double a = this.Re(), b = this.Im();
-		
-		if (b == 0) { // see if we can just compute simple sqrt
-			if (Math.abs(a) < epsilon) return new ComplexNumber(0,0);
-			if (a >= 0) {
-				return new ComplexNumber(Math.sqrt(a),0);
-			}
-			else { // compute imaginary square root, sqrt(a)=isqrt(-a)
-				return new ComplexNumber(0, Math.sqrt(-a));
-			}
+		// check if we can just compute a simple sqrt
+		if (d == 0) {
+			if (Math.abs(c) < epsilon) return new ComplexNumber(0,0);
+			else if (c >= 0) return new ComplexNumber(Math.sqrt(c),0);
+			else // compute imaginary square root, sqrt(c)=isqrt(-c)
+				return new ComplexNumber(0, Math.sqrt(-c));
 		}
 		
-		// use the square root formula for a complex number
-		double inner = Math.sqrt(a*a+b*b);
-		double p = 1.0/Math.sqrt(2) * Math.sqrt(inner+a);
-		double q = 1.0/Math.sqrt(2) * Math.sqrt(inner-a) * Math.signum(b);
+		// guard intermediate results to ensure maximum precision
+		if (Math.abs(c) >= Math.abs(d)) {
+			double quot = d / c;
+			omega = Math.sqrt(Math.abs(c)) * Math.sqrt((1 + Math.sqrt(1 + quot*quot) / 2.0));
+		}
+		else {
+			double quot = Math.abs(c / d);
+			omega = Math.sqrt(Math.abs(d)) * Math.sqrt((quot + Math.sqrt(1 + quot*quot) / 2.0));
+		}
 		
-		return new ComplexNumber(p, q);
+		if (c >= 0) {
+			return new ComplexNumber(omega, d / (2.0 * omega));
+		}
+		else {
+			if (d >= 0) {
+				return new ComplexNumber(Math.abs(d)/(2.0*omega), omega);
+			}
+			else {
+				return new ComplexNumber(Math.abs(d)/(2.0*omega), -omega);
+			}
+		}
 	}
 	
 	/**
