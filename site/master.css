@@ -5,9 +5,15 @@ body {
 }
 
 div#github {
-  position: absolute;
+  position: fixed;
   top: 0px;
   right: 0px;
+}
+
+div#social {
+  position: absolute;
+  top: 15px;
+  left: 15px;
 }
 
 div#header {
