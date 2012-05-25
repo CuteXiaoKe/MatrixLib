@@ -1,0 +1,58 @@
+body {
+  margin: 30px 20% auto 20%;
+  background-image: url('grid.png');
+  background-attachment: fixed;
+}
+
+div#github {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+div#header {
+  font-weight: 700;
+  font-family: 'Karla';
+  font-size: 64px;
+  text-align: center;
+}
+
+div#subheader {
+  font-style: italic;
+  font-family: 'Karla';
+  font-size: 32px;
+  text-align: center;
+}
+
+div#links {
+  font-family: 'Open Sans';
+  font-size: 18px;
+  margin-top: 15px;
+  text-indent: 25px;
+  text-align: center;
+}
+
+p, li {
+  font-family: 'Open Sans';
+  text-align: justify;
+}
+
+p.section {
+  font-weight: bold;
+  font-family: 'Karla';
+  font-size: 22px;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: blue;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+

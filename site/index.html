@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="description" content="MatrixLib project description and documentation." />
+  <meta name="author" content="Bryan Cuccioli" />
+  <title>MatrixLib</title>
+  <link rel="stylesheet" type="text/css" href="master.css" />
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Karla:400,700|Open+Sans" />
+</head>
+<body>
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript">
+    MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+    inlineMath: [ ['$$','$$'], ["\\(","\\)"] ],
+    displayMath: [ ["\\[","\\]"] ],
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+  </script>
+  <div id="github">
+    <a href="https://github.com/bcuccioli/matrixlib"><img src="github.png" alt="Fork me on Github" /></a>
+  </div>
+  <div id="header">MatrixLib</div>
+  <div id="subheader">A Java-based numerical<br />linear algebra library.</div>
+  <div id="links">
+    <a href="#description">Description</a> &bull;
+    <a href="#features">Features</a> &bull;
+    <a href="#issues">Known Issues</a> &bull;
+    <a href="https://github.com/downloads/bcuccioli/MatrixLib/matrixlib.jar">Download</a> &bull;
+    <a href="doc/">Docs</a> &bull;
+    <a href="http://bcuccioli.com/blog">Blog</a> &bull;
+    <a href="https://github.com/bcuccioli/matrixlib/">Source</a>
+  </div>
+  <a name="description"><p class="section">Description</p></a>
+  <p>MatrixLib is an efficient, numerically precise library of Java classes and routines that can be incorporated into larger projects. It is adept at handling very large matrices, and the algorithms it employs are designed to be as efficient as possible. For example, the determinant algorithm works via a modification of Gauss-Jordan reduction, achieving an asymptotic time complexity of $$\mathcal{O}(n^3)$$ instead of $$\mathcal{O}(n!)$$, as per the standard formula.</p>
+  <p>You can download the .jar file that can be imported into your projects <a href="https://github.com/downloads/bcuccioli/MatrixLib/matrixlib.jar">here</a>, and you can view the source tree on GitHub <a href="https://github.com/bcuccioli/matrixlib/">here</a>. Additionally, you can view the development blog, wherein issues related to design and implementation are discussed, as a subsection of my blog <a href="http://bcuccioli.com/blog">here</a>.</p>
+  <a name="features"><p class="section">Features</p></a>
+  <ul>
+    <li>Support for complex numbers and common operations over the complex numbers, including arithmetic and square root</li><br />
+    <li>Support for matrices over complex numbers</li><br />
+    <li>Matrix class that handles common matrix operations, including pivoted Gauss-Jordan reduction</li><br />
+    <li>Vector class that supports common operations, including cross product, Hermitian inner product (a generalization of the dot product) and projection</li><br />
+    <li>Computation of determinant and matrix inverse in $$\mathcal{O}(n^3)$$ asymptotic time complexity</li><br />
+    <li>Routines to compute numerically stable pivoted Cholesky factorization, LU decomposition, QR decomposition, and Schur decomposition for real and complex arbitrarily large matrices</li><br />
+    <li>Computation of eigenvalues and singular values via explicit shifted QR algorithm and eigenvectors via inverse iteration</li><br />
+    <li>Computation of standard norms, including the general p-norm, Frobenius norm, infinity norm and spectral norm</li><br />
+    <li>Orthonormalization of matrices via modified Gram-Schmidt procedure and conversion of matrices to Hessenberg form via Householder transformations</li>
+  </ul>
+  <a name="issues"><p class="section">Known Issues</p></a>
+  <ul>
+    <li>Computation of eigenvectors produces incorrect results for some matrices. This causes their Schur decomposition to be computed incorrectly.</li>
+  </ul>
+</body>
+</html>
+
