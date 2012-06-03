@@ -18,7 +18,7 @@ div#social {
 
 div#header {
   font-weight: 700;
-  font-family: 'Karla';
+  font-family: 'Bitter';
   font-size: 64px;
   text-align: center;
 }
@@ -44,8 +44,8 @@ p, li {
 }
 
 p.section {
-  font-weight: bold;
-  font-family: 'Karla';
+  font-weight: 700;
+  font-family: 'Bitter';
   font-size: 22px;
 }
 
