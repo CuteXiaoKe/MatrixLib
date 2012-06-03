@@ -24,8 +24,8 @@ div#header {
 }
 
 div#subheader {
-  font-style: italic;
-  font-family: 'Karla';
+  font-weight: 700;
+  font-family: 'Bitter';
   font-size: 32px;
   text-align: center;
 }
