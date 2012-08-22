@@ -577,6 +577,30 @@ public class Matrix {
 	}
 
 	/**
+	 * Computes the LaTeX string representing the matrix
+	 * @return LaTeX code to generate the matrix
+	 */
+	public String toLatexString() {
+
+		String lstr = "\\begin{pmatrix}";
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				lstr += getAt(i, j).toString();
+				if (j != cols - 1) {
+					lstr += "&";
+				}
+			}
+			if (i != rows - 1) {
+				lstr += "\\\\";
+			}
+		}
+
+		lstr += "\\end{pmatrix}";
+		return lstr;
+	}
+
+	/**
 	 * Computes a string representation of this matrix
 	 * @return a string representation of this matrix
 	 */
