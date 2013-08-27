@@ -1,0 +1,16 @@
+<p>Recently I have made improvements to MatrixLib's ComplexNumber class. These changes have brought about greater accuracy and precision while better guarding against over- and underflow. As ComplexNumber's methods are central to the functionality of the rest of the system, these modifications represent essential steps towards increasing the efficacy and numerical stability of the system as a whole.</p>
+<p>The following improvements were largely based on advice from the seminal <i>Numerical Recipes</i> by Press et al. The first modification, though somewhat trivial, was to change the modulus from being calculated in the usual way to being calculated by</p>
+<p>\[|a+bi|=\begin{cases}|a|\sqrt{1+(b/a)^2} & |a|\geq |b|\\|b|\sqrt{1+(a/b)^2}&|a|<|b|\end{cases}.\]</p>
+<p>This helps to guard against overflow in the square root argument. Taking things a step further, I re-implemented complex division according to the following equivalent formula to avoid overflow, underflow, and loss of precision:</p>
+<p>\[\frac{a+bi}{c+di}=\begin{cases}\frac{a+b(d/c)+i(b-a(d/c))}{c+d(d/c)} & |c|\geq |d|\\ \frac{a(c/d)+b + i(b(c/d)-a)}{c(c/d)+d}&|c|<|d|\end{cases}.\]</p>
+<p>Finally, I re-implemented complex square root in a similar fashion in order to guard all possible intermediate results against under/overflow and precision loss. In order to calculate the square root of $$c+di$$, the first step is to calculate the factor</p>
+<p>\[w=\begin{cases}0&c=d=0\\\sqrt{|c|}\sqrt{\frac{1+\sqrt{1+(d/c)^2}}{2}}&|c|\geq |d|\\ \sqrt{|d|}\sqrt{\frac{|c/d|+\sqrt{1+(c/d)^2}}{2}}&|c|<|d|\end{cases},\]</p>
+<p>so that we have</p>
+<p>\[\sqrt{c+di}=\begin{cases}0&w=0\\w+i\left(\frac{d}{2w}\right)&w\neq 0,c\geq 0\\ \frac{|d|}{2w}+iw&w\neq 0,c<0,d\geq 0\\ \frac{|d|}{2w}-iw&w\neq 0,c<0,d<0\end{cases}.\]</p>
+<p>With these changes, there is a small but noticeable increase in precision and decrease in numerical rounding errors when computing eigenvalues and determinants. </p>
+<p>On the topic of eigenvalues, I implemented one additional change to the eigenvalue solver. The eigenvalue solver uses the explicitly-shifted QR algorithm to reduce the matrix to $$2\times 2$$ so that it can solve the eigenvalues using the quadratic formula. I re-implemented the quadratic formula to guard against precision loss and over/underflow. In solving $$x^2+bx+c=0$$, the system first computes</p>
+<p>\[q=-\frac{1}{2}\left(b+\mathrm{sgn}(b)\sqrt{b^2-4c}\right),\]</p>
+<p>where the sign of the square root is chosen to make</p>
+<p>\[\Re(b\star\sqrt{b^2-4c})\geq 0.\]</p>
+<p>We then compute the roots $$x_1=q$$ and $$x_2=c/q$$ (it is easy to check that this reduces to the usual quadratic formula).</p>
+<p>For a side-by-side comparison of code commits before and after these changes, see the <a href="https://github.com/bcuccioli/MatrixLib/commits/master">the commit list on github</a>.</p>

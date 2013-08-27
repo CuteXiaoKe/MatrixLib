@@ -32,7 +32,7 @@ div#subheader {
 }
 
 div#links {
-  font-family: 'Open Sans';
+  font-family: 'Bitter';
   font-size: 20px;
   margin-top: 15px;
   text-indent: 25px;
@@ -41,7 +41,7 @@ div#links {
 
 div#topbar {
   position: fixed;
-  display: table;
+  display: none;
   top: 0px;
   left: 0px;
   width: 100%;
@@ -63,6 +63,11 @@ div#topbar {
   background-repeat: repeat-x;
   border-color: #252525;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff222222', endColorstr='#ff111111', GradientType=0);
+}
+
+div#blog-content p {
+  font-family: 'Port Lligat Slab';
+  font-weight: 400;
 }
 
 span.bannername {
@@ -91,7 +96,7 @@ p, li {
   text-align: justify;
 }
 
-p.section {
+.section {
   font-weight: 700;
   font-family: 'Bitter';
   font-size: 22px;
@@ -116,4 +121,12 @@ footer {
   position: relative;
   left: 10px;
   bottom: 10px;
+}
+
+#posts a {
+  font-size: 16px;
+}
+
+a.section {
+  cursor: pointer;
 }
